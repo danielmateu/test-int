@@ -4,6 +4,7 @@ import { ProductAdapter } from '@/lib/mock-data-interface';
 import { legacyResponse } from '@/lib/mockData';
 import { useMemo, useState } from 'react';
 import { Input } from './ui/input';
+import { Card, CardContent } from './ui/card';
 
 interface legacyResponseProps {
     legacyResponse: typeof legacyResponse;
@@ -22,7 +23,7 @@ export default function ProductList({ legacyResponse }: legacyResponseProps) {
     // console.log({ filteredProducts });
 
     return (
-        <div>
+        <div className="space-y-12">
             {/* <h1>Hello Page</h1> */}
             <Input
                 type="text"
@@ -36,7 +37,11 @@ export default function ProductList({ legacyResponse }: legacyResponseProps) {
                 {
                     filteredProducts.map(product => (
                         <li key={product.id}>
-                            {product.name} - {product.price} - {product.date ? product.date.toString() : "Sin fecha"}
+                            <Card>
+                                <CardContent>
+                                    {product.name} - {product.price}€ - {product.date ? product.date.toString() : "Sin fecha"}
+                                </CardContent>
+                            </Card>
                         </li>
                     ))
                 }
