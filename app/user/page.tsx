@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function UserPage() {
     return (
-        <div>
+        <div className='p-12'>
             <h1>User Toggle Page</h1>
             <UserToggle
                 initialStatus={true}
