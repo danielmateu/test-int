@@ -17,7 +17,6 @@ export default function ProductList({ legacyResponse }: legacyResponseProps) {
 
     const filteredProducts = useMemo(() => {
         return products.filter(product => product.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()))
-
     }, [products, searchTerm]);
 
     // console.log({ filteredProducts });

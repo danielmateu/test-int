@@ -5,8 +5,6 @@ import Link from "next/link";
 
 export default function HomePage() {
 
-    // console.log(legacyResponse);
-
     return (
         <div className="p-10">
             <h1>Pagina Home, aquí mostraremos los datos recibidos</h1>
