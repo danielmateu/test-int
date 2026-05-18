@@ -1,0 +1,122 @@
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CVData, CVTheme } from "./types";
+import { Paintbrush, Type } from "lucide-react";
+
+interface CVStyleEditorProps {
+  data: CVData;
+  setData: React.Dispatch<React.SetStateAction<CVData>>;
+}
+
+const COLORS = [
+  { name: "Slate", value: "#0f172a", className: "bg-slate-900" },
+  { name: "Azul", value: "#2563eb", className: "bg-blue-600" },
+  { name: "Esmeralda", value: "#059669", className: "bg-emerald-600" },
+  { name: "Rosa", value: "#e11d48", className: "bg-rose-600" },
+  { name: "Púrpura", value: "#7c3aed", className: "bg-violet-600" },
+  { name: "Naranja", value: "#ea580c", className: "bg-orange-600" },
+];
+
+const FONTS = [
+  { name: "Sans (Moderno)", value: "font-sans", className: "font-sans" },
+  { name: "Serif (Clásico)", value: "font-serif", className: "font-serif" },
+  { name: "Mono (Técnico)", value: "font-mono", className: "font-mono" },
+];
+
+export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
+  const handleThemeChange = (field: keyof CVTheme, value: string) => {
+    setData((prev) => ({
+      ...prev,
+      theme: { ...prev.theme, [field]: value },
+    }));
+  };
+
+  return (
+    <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto pb-20">
+      <div className="space-y-1">
+        <h2 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <Paintbrush className="w-8 h-8" />
+          Estilos del CV
+        </h2>
+        <p className="text-muted-foreground">Personaliza el aspecto visual de tu currículum.</p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <Paintbrush className="w-4 h-4" />
+            </div>
+            Color Principal
+          </CardTitle>
+          <CardDescription>
+            Elige un color para los acentos, iconos y títulos principales.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            value={data.theme.color}
+            onValueChange={(val) => handleThemeChange("color", val)}
+            className="grid grid-cols-3 sm:grid-cols-6 gap-4"
+          >
+            {COLORS.map((color) => (
+              <div key={color.value} className="flex flex-col items-center gap-2">
+                <RadioGroupItem
+                  value={color.value}
+                  id={`color-${color.value}`}
+                  className="sr-only"
+                />
+                <Label
+                  htmlFor={`color-${color.value}`}
+                  className={`w-12 h-12 rounded-full cursor-pointer ring-offset-2 ring-offset-background transition-all hover:scale-110 ${color.className} ${
+                    data.theme.color === color.value ? "ring-2 ring-primary" : "ring-1 ring-slate-200"
+                  }`}
+                >
+                  <span className="sr-only">{color.name}</span>
+                </Label>
+                <span className="text-xs font-medium text-muted-foreground">{color.name}</span>
+              </div>
+            ))}
+          </RadioGroup>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <Type className="w-4 h-4" />
+            </div>
+            Tipografía
+          </CardTitle>
+          <CardDescription>
+            Selecciona la fuente que mejor encaje con tu perfil profesional.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            value={data.theme.font}
+            onValueChange={(val) => handleThemeChange("font", val)}
+            className="flex flex-col gap-4"
+          >
+            {FONTS.map((font) => (
+              <div key={font.value} className="flex items-center space-x-2">
+                <RadioGroupItem value={font.value} id={`font-${font.value}`} />
+                <Label
+                  htmlFor={`font-${font.value}`}
+                  className={`text-lg cursor-pointer ${font.className}`}
+                >
+                  {font.name}
+                  <p className="text-sm text-muted-foreground font-sans mt-1">
+                    El veloz murciélago hindú comía feliz cardillo y kiwi.
+                  </p>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

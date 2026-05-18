@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { CVForm } from "@/components/cv-builder/CVForm";
+import { CVStyleEditor } from "@/components/cv-builder/CVStyleEditor";
 import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Printer, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -18,10 +20,19 @@ const initialData: CVData = {
     location: "",
     summary: "",
     imageUrl: "",
+    githubUrl: "",
+    portfolioUrl: "",
+    linkedinUrl: "",
+    xUrl: "",
   },
   experience: [],
   education: [],
   skills: [],
+  coverLetter: "",
+  theme: {
+    color: "#0f172a", // Default slate-900
+    font: "font-sans",
+  },
 };
 
 export default function BuilderPage() {
@@ -60,9 +71,20 @@ export default function BuilderPage() {
       {/* Main content */}
       <main className="container flex flex-col xl:flex-row gap-8 p-4 md:p-8 max-w-full print:p-0 print:gap-0 print:m-0 print:block">
 
-        {/* Left column: Form */}
+        {/* Left column: Form & Styles */}
         <div className="flex-1 xl:max-w-[800px] xl:h-[calc(100vh-8rem)] xl:overflow-y-auto print:hidden no-scrollbar pr-2">
-          <CVForm data={cvData} setData={setCvData} />
+          <Tabs defaultValue="content" className="w-full">
+            <TabsList className="w-full grid grid-cols-2 mb-8">
+              <TabsTrigger value="content">Contenido</TabsTrigger>
+              <TabsTrigger value="styles">Diseño</TabsTrigger>
+            </TabsList>
+            <TabsContent value="content" className="mt-0 outline-none">
+              <CVForm data={cvData} setData={setCvData} />
+            </TabsContent>
+            <TabsContent value="styles" className="mt-0 outline-none">
+              <CVStyleEditor data={cvData} setData={setCvData} />
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Right column: Preview */}

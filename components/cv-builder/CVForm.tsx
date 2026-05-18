@@ -93,9 +93,27 @@ export function CVForm({ data, setData }: CVFormProps) {
           <CardTitle>Datos Personales</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="imageUpload">Foto de Perfil</Label>
+          <div className="space-y-2 md:col-span-2">
+            <Label htmlFor="imageUpload">Foto de Perfil</Label>
+            {data.personalInfo.imageUrl ? (
+              <div className="flex items-center gap-4 mt-2">
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-200">
+                  <img
+                    src={data.personalInfo.imageUrl}
+                    alt="Perfil"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePersonalInfoChange("imageUrl", "")}
+                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+                >
+                  Eliminar foto
+                </Button>
+              </div>
+            ) : (
               <Input
                 id="imageUpload"
                 type="file"
@@ -103,7 +121,9 @@ export function CVForm({ data, setData }: CVFormProps) {
                 onChange={handleImageChange}
                 className="cursor-pointer"
               />
-            </div>
+            )}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="fullName">Nombre Completo</Label>
               <Input
@@ -148,6 +168,46 @@ export function CVForm({ data, setData }: CVFormProps) {
                 value={data.personalInfo.location}
                 onChange={(e) => handlePersonalInfoChange("location", e.target.value)}
                 placeholder="Madrid, España"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="githubUrl">GitHub URL</Label>
+              <Input
+                id="githubUrl"
+                type="url"
+                value={data.personalInfo.githubUrl || ""}
+                onChange={(e) => handlePersonalInfoChange("githubUrl", e.target.value)}
+                placeholder="https://github.com/tuusuario"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
+              <Input
+                id="linkedinUrl"
+                type="url"
+                value={data.personalInfo.linkedinUrl || ""}
+                onChange={(e) => handlePersonalInfoChange("linkedinUrl", e.target.value)}
+                placeholder="https://linkedin.com/in/tuusuario"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="portfolioUrl">Portfolio URL</Label>
+              <Input
+                id="portfolioUrl"
+                type="url"
+                value={data.personalInfo.portfolioUrl || ""}
+                onChange={(e) => handlePersonalInfoChange("portfolioUrl", e.target.value)}
+                placeholder="https://tuweb.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="xUrl">X (Twitter) URL</Label>
+              <Input
+                id="xUrl"
+                type="url"
+                value={data.personalInfo.xUrl || ""}
+                onChange={(e) => handlePersonalInfoChange("xUrl", e.target.value)}
+                placeholder="https://x.com/tuusuario"
               />
             </div>
             <div className="space-y-2 md:col-span-2">
@@ -215,8 +275,8 @@ export function CVForm({ data, setData }: CVFormProps) {
                         placeholder="Fecha fin"
                       />
                     </div>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => handleExperienceChange(exp.id, "endDate", "Actualidad")}
                       className="px-3"
                       title="Marcar como Actualidad"
@@ -294,8 +354,8 @@ export function CVForm({ data, setData }: CVFormProps) {
                         placeholder="Fecha fin"
                       />
                     </div>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => handleEducationChange(edu.id, "endDate", "Actualidad")}
                       className="px-3"
                       title="Marcar como Actualidad"
@@ -325,6 +385,23 @@ export function CVForm({ data, setData }: CVFormProps) {
               value={data.skills.join(", ")}
               onChange={(e) => handleSkillsChange(e.target.value)}
               placeholder="React, TypeScript, Node.js, Diseño UI..."
+            />
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Carta de Presentación</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="coverLetter">Contenido de la carta (opcional)</Label>
+            <Textarea
+              id="coverLetter"
+              value={data.coverLetter}
+              onChange={(e) => setData(prev => ({ ...prev, coverLetter: e.target.value }))}
+              placeholder="Escribe aquí tu carta de presentación..."
+              className="min-h-[200px]"
             />
           </div>
         </CardContent>
