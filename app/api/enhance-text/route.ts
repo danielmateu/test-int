@@ -40,25 +40,55 @@ export async function POST(req: NextRequest) {
         systemPrompt += "Mejora profesionalmente el siguiente texto para un currículum vitae. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones.";
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: [
-        { role: 'user', parts: [{ text }] }
-      ],
-      config: {
-        systemInstruction: systemPrompt,
-        temperature: 0.7,
+    const models = [
+      // 'gemini-3.1-flash-lite',  // rápido, más cuota disponible
+      // 'gemini-3.0-flash',
+      // 'gemini-3.1-pro',
+      // 'gemini-2.5-pro',
+      // 'gemini-2.5-flash',
+      'gemini-2.5-flash-lite',
+      // 'gemini-2.0-flash',
+      // 'gemini-2.0-flash-lite',
+    ];
+    const requestPayload = {
+      contents: [{ role: 'user', parts: [{ text }] }],
+      config: { systemInstruction: systemPrompt, temperature: 0.7 },
+    };
+
+    let lastError: any;
+    for (const model of models) {
+      try {
+        const response = await ai.models.generateContent({ model, ...requestPayload });
+        const enhancedText = response.text?.trim() || text;
+        return NextResponse.json({ text: enhancedText });
+      } catch (err: any) {
+        lastError = err;
+        const isRetriable =
+          err?.message?.includes('503') ||
+          err?.message?.includes('UNAVAILABLE') ||
+          err?.message?.includes('429') ||
+          err?.message?.includes('RESOURCE_EXHAUSTED') ||
+          err?.status === 503 ||
+          err?.status === 429;
+        if (!isRetriable) break; // Only retry on overload/quota errors
+        console.warn(`Model ${model} unavailable, trying next...`);
       }
-    });
+    }
 
-    const enhancedText = response.text?.trim() || text;
-
-    return NextResponse.json({ text: enhancedText });
+    throw lastError;
   } catch (error: any) {
     console.error("AI Enhance Error:", error);
+    const isOverloaded =
+      error?.message?.includes('503') ||
+      error?.message?.includes('UNAVAILABLE') ||
+      error?.message?.includes('429') ||
+      error?.message?.includes('RESOURCE_EXHAUSTED');
+    const userMessage = isOverloaded
+      ? "Se ha agotado la cuota de IA disponible. Por favor, inténtalo de nuevo más tarde."
+      : "No se pudo mejorar el texto. Inténtalo de nuevo.";
     return NextResponse.json(
-      { error: error.message || "Failed to enhance text" },
-      { status: 500 }
+      { error: userMessage },
+      { status: isOverloaded ? 503 : 500 }
     );
   }
 }

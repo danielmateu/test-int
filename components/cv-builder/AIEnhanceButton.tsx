@@ -30,7 +30,10 @@ export function AIEnhanceButton({ text, context, onEnhance, className }: AIEnhan
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Error al conectar con la IA");
+        const errorMsg = typeof data.error === "string"
+          ? data.error
+          : "Error al conectar con la IA";
+        throw new Error(errorMsg);
       }
 
       if (data.text) {
