@@ -395,10 +395,10 @@ export function CVForm({ data, setData }: CVFormProps) {
             <div className="space-y-2 md:col-span-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="summary">Perfil Profesional</Label>
-                <AIEnhanceButton 
-                  text={data.personalInfo.summary} 
-                  context="summary" 
-                  onEnhance={(text) => handlePersonalInfoChange("summary", text)} 
+                <AIEnhanceButton
+                  text={data.personalInfo.summary}
+                  context="summary"
+                  onEnhance={(text) => handlePersonalInfoChange("summary", text)}
                 />
               </div>
               <Textarea
@@ -406,7 +406,7 @@ export function CVForm({ data, setData }: CVFormProps) {
                 value={data.personalInfo.summary}
                 onChange={(e) => handlePersonalInfoChange("summary", e.target.value)}
                 placeholder="Breve descripción de tu perfil y objetivos..."
-                className="h-24"
+                className=""
               />
             </div>
           </div>
@@ -425,11 +425,11 @@ export function CVForm({ data, setData }: CVFormProps) {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndExperience}>
             <SortableContext items={data.experience.map(e => e.id)} strategy={verticalListSortingStrategy}>
               {data.experience.map((exp) => (
-                <SortableExperienceItem 
-                  key={exp.id} 
-                  exp={exp} 
-                  handleExperienceChange={handleExperienceChange} 
-                  removeExperience={removeExperience} 
+                <SortableExperienceItem
+                  key={exp.id}
+                  exp={exp}
+                  handleExperienceChange={handleExperienceChange}
+                  removeExperience={removeExperience}
                 />
               ))}
             </SortableContext>
@@ -452,11 +452,11 @@ export function CVForm({ data, setData }: CVFormProps) {
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndEducation}>
             <SortableContext items={data.education.map(e => e.id)} strategy={verticalListSortingStrategy}>
               {data.education.map((edu) => (
-                <SortableEducationItem 
-                  key={edu.id} 
-                  edu={edu} 
-                  handleEducationChange={handleEducationChange} 
-                  removeEducation={removeEducation} 
+                <SortableEducationItem
+                  key={edu.id}
+                  edu={edu}
+                  handleEducationChange={handleEducationChange}
+                  removeEducation={removeEducation}
                 />
               ))}
             </SortableContext>
@@ -491,10 +491,10 @@ export function CVForm({ data, setData }: CVFormProps) {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="coverLetter">Contenido de la carta (opcional)</Label>
-              <AIEnhanceButton 
-                text={data.coverLetter} 
-                context="coverLetter" 
-                onEnhance={(text) => setData(prev => ({ ...prev, coverLetter: text }))} 
+              <AIEnhanceButton
+                text={data.coverLetter}
+                context="coverLetter"
+                onEnhance={(text) => setData(prev => ({ ...prev, coverLetter: text }))}
               />
             </div>
             <Textarea
