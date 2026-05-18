@@ -41,14 +41,14 @@ export async function POST(req: NextRequest) {
     }
 
     const models = [
-      // 'gemini-3.1-flash-lite',  // rápido, más cuota disponible
-      // 'gemini-3.0-flash',
-      // 'gemini-3.1-pro',
-      // 'gemini-2.5-pro',
-      // 'gemini-2.5-flash',
+      'gemini-3.1-flash-lite',  // rápido, más cuota disponible
+      'gemini-3.0-flash',
+      'gemini-3.1-pro',
+      'gemini-2.5-pro',
+      'gemini-2.5-flash',
       'gemini-2.5-flash-lite',
-      // 'gemini-2.0-flash',
-      // 'gemini-2.0-flash-lite',
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
     ];
     const requestPayload = {
       contents: [{ role: 'user', parts: [{ text }] }],
