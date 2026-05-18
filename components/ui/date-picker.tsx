@@ -60,8 +60,11 @@ export function DatePicker({ value, onChange, placeholder = "Seleccionar fecha" 
           mode="single"
           selected={dateValue}
           onSelect={handleSelect}
-          initialFocus
+          autoFocus
           locale={es}
+          captionLayout="dropdown"
+          fromYear={1950}
+          toYear={new Date().getFullYear() + 10}
         />
       </PopoverContent>
     </Popover>

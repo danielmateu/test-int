@@ -1,65 +1,99 @@
-"use client";
-
-import { useState } from "react";
-import { CVForm } from "@/components/cv-builder/CVForm";
-import { CVPreview } from "@/components/cv-builder/CVPreview";
-import { CVData } from "@/components/cv-builder/types";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { ArrowRight, FileText, Sparkles, Zap } from "lucide-react";
+import { ModeToggle } from "@/components/mode-toggle";
 
-const initialData: CVData = {
-  personalInfo: {
-    fullName: "",
-    jobTitle: "",
-    email: "",
-    phone: "",
-    location: "",
-    summary: "",
-    imageUrl: "",
-  },
-  experience: [],
-  education: [],
-  skills: [],
-};
-
-export default function Home() {
-  const [cvData, setCvData] = useState<CVData>(initialData);
-
-  const handlePrint = () => {
-    window.print();
-  };
-
+export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans print:bg-white print:p-0">
-      {/* Header bar - hidden when printing */}
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:hidden">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-full">
-          <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
-            CV AI <span className="text-muted-foreground font-normal">Builder</span>
+    <div className="min-h-screen bg-background font-sans selection:bg-primary/20">
+      {/* Navigation */}
+      <nav className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="font-bold text-xl tracking-tight flex items-center gap-2">
+            <div className="w-8 h-8 bg-primary text-primary-foreground rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5" />
+            </div>
+            CV AI Builder
           </div>
-          <Button onClick={handlePrint} className="gap-2">
-            <Printer className="w-4 h-4" />
-            Exportar a PDF
-          </Button>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="container flex flex-col xl:flex-row gap-8 p-4 md:p-8 max-w-full print:p-0 print:gap-0 print:m-0 print:block">
-        
-        {/* Left column: Form */}
-        <div className="flex-1 xl:max-w-[800px] xl:h-[calc(100vh-8rem)] xl:overflow-y-auto print:hidden no-scrollbar pr-2">
-          <CVForm data={cvData} setData={setCvData} />
-        </div>
-
-        {/* Right column: Preview */}
-        <div className="flex-1 flex justify-center items-start xl:h-[calc(100vh-8rem)] xl:overflow-y-auto print:h-auto print:overflow-visible print:block bg-zinc-100/50 dark:bg-zinc-900/50 rounded-xl p-4 md:p-8 print:p-0 print:bg-transparent">
-          <div className="w-full max-w-[210mm] transition-all duration-300 ease-in-out print:max-w-none">
-            <CVPreview data={cvData} />
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" asChild>
+              <Link href="/login">Iniciar Sesión</Link>
+            </Button>
+            <Button asChild>
+              <Link href="/register">Empezar Gratis</Link>
+            </Button>
+            <ModeToggle />
           </div>
         </div>
+      </nav>
 
-      </main>
+      {/* Hero Section */}
+      <section className="py-20 md:py-32 px-4 overflow-hidden relative">
+        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background"></div>
+        <div className="container mx-auto text-center max-w-4xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
+            <Sparkles className="w-4 h-4" />
+            <span>El maquetador de CV más inteligente</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-tight">
+            Crea tu currículum perfecto en <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-600">minutos</span>
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto leading-relaxed">
+            Nuestra herramienta maquetará tu CV en tiempo real con un diseño profesional y moderno, listo para imprimir o exportar a PDF.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button size="lg" className="h-14 px-8 text-lg w-full sm:w-auto" asChild>
+              <Link href="/register">
+                Crear mi CV ahora <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="h-14 px-8 text-lg w-full sm:w-auto" asChild>
+              <Link href="/builder">
+                Probar Demo Sin Registro
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 bg-zinc-50 dark:bg-zinc-900/50 px-4">
+        <div className="container mx-auto max-w-5xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Todo lo que necesitas para destacar</h2>
+            <p className="text-lg text-muted-foreground">Diseñado para ayudarte a conseguir tu próximo trabajo.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-background p-8 rounded-2xl shadow-sm border">
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">En Tiempo Real</h3>
+              <p className="text-muted-foreground">Observa cómo tu CV toma forma a medida que escribes. Sin esperas ni recargas molestas.</p>
+            </div>
+            <div className="bg-background p-8 rounded-2xl shadow-sm border">
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+                <FileText className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Exportación Perfecta</h3>
+              <p className="text-muted-foreground">Genera un PDF limpio, en formato A4 estándar, listo para ser enviado a los reclutadores.</p>
+            </div>
+            <div className="bg-background p-8 rounded-2xl shadow-sm border">
+              <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-6">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold mb-3">Diseño Profesional</h3>
+              <p className="text-muted-foreground">Plantillas y estilos minimalistas creados para maximizar la legibilidad y el impacto visual.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="py-12 border-t text-center text-muted-foreground px-4">
+        <p>&copy; {new Date().getFullYear()} CV AI Builder. Todos los derechos reservados.</p>
+      </footer>
     </div>
   );
 }
