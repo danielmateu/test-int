@@ -30,6 +30,9 @@ export async function POST(req: NextRequest) {
       case "experience":
         systemPrompt += "Mejora la siguiente descripción de experiencia laboral. Usa verbos de acción fuertes, enfócate en logros y responsabilidades clave. Haz que suene muy profesional. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones ni comillas.";
         break;
+      case "education":
+        systemPrompt += "Mejora la siguiente descripción de formación académica. Enfócate en las habilidades adquiridas, proyectos relevantes o logros destacados durante los estudios. Haz que suene muy profesional. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones ni comillas.";
+        break;
       case "coverLetter":
         systemPrompt += "Mejora la siguiente carta de presentación. Hazla persuasiva, educada y directa. Mejora el vocabulario y la fluidez. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones ni comillas.";
         break;

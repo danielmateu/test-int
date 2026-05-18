@@ -126,14 +126,19 @@ export function CVPreview({ data }: CVPreviewProps) {
             </h2>
             <div className="space-y-4">
               {education.map((edu) => (
-                <div key={edu.id} className="flex justify-between items-baseline">
-                  <div>
+                <div key={edu.id}>
+                  <div className="flex justify-between items-baseline mb-1">
                     <h3 className="text-base font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
-                    <div className="text-sm font-medium text-slate-700">{edu.institution || "Institución"}</div>
+                    <span className="text-sm font-medium text-slate-500 whitespace-nowrap ml-4">
+                      {edu.startDate} {edu.startDate && edu.endDate && "–"} {edu.endDate}
+                    </span>
                   </div>
-                  <div className="text-sm font-medium text-slate-500 whitespace-nowrap ml-4 text-right">
-                    {edu.startDate} {edu.startDate && edu.endDate && "–"} {edu.endDate}
-                  </div>
+                  <div className="text-sm font-semibold text-slate-700 mb-2">{edu.institution || "Institución"}</div>
+                  {edu.description && (
+                    <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                      {edu.description}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

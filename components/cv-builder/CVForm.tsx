@@ -3,10 +3,145 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, GripVertical } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { AIEnhanceButton } from "./AIEnhanceButton";
 import { CVData, Experience, Education } from "./types";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+interface SortableExperienceItemProps {
+  exp: Experience;
+  handleExperienceChange: (id: string, field: keyof Experience, value: string) => void;
+  removeExperience: (id: string) => void;
+}
+
+function SortableExperienceItem({ exp, handleExperienceChange, removeExperience }: SortableExperienceItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: exp.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 1,
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={`space-y-4 relative border-b pb-6 last:border-0 last:pb-0 bg-card ${isDragging ? "shadow-lg rounded-lg border-b-0 p-4" : ""}`}>
+      <div className="absolute right-0 top-0 flex items-center gap-1">
+        <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing hover:bg-slate-100 text-slate-400">
+          <GripVertical className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={() => removeExperience(exp.id)} className="text-red-500 hover:text-red-700">
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-20 pt-2">
+        <div className="space-y-2">
+          <Label>Empresa</Label>
+          <Input value={exp.company} onChange={(e) => handleExperienceChange(exp.id, "company", e.target.value)} placeholder="Nombre de la empresa" />
+        </div>
+        <div className="space-y-2">
+          <Label>Puesto</Label>
+          <Input value={exp.role} onChange={(e) => handleExperienceChange(exp.id, "role", e.target.value)} placeholder="Ej. Software Engineer" />
+        </div>
+        <div className="space-y-2">
+          <Label>Fecha Inicio</Label>
+          <DatePicker value={exp.startDate} onChange={(val) => handleExperienceChange(exp.id, "startDate", val)} placeholder="Fecha inicio" />
+        </div>
+        <div className="space-y-2">
+          <Label>Fecha Fin</Label>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <DatePicker value={exp.endDate} onChange={(val) => handleExperienceChange(exp.id, "endDate", val)} placeholder="Fecha fin" />
+            </div>
+            <Button variant="outline" onClick={() => handleExperienceChange(exp.id, "endDate", "Actualidad")} className="px-3" title="Marcar como Actualidad">Actual</Button>
+          </div>
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <div className="flex items-center justify-between">
+            <Label>Descripción</Label>
+            <AIEnhanceButton text={exp.description} context="experience" onEnhance={(text) => handleExperienceChange(exp.id, "description", text)} />
+          </div>
+          <Textarea value={exp.description} onChange={(e) => handleExperienceChange(exp.id, "description", e.target.value)} placeholder="Describe tus responsabilidades y logros..." className="h-20" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface SortableEducationItemProps {
+  edu: Education;
+  handleEducationChange: (id: string, field: keyof Education, value: string) => void;
+  removeEducation: (id: string) => void;
+}
+
+function SortableEducationItem({ edu, handleEducationChange, removeEducation }: SortableEducationItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: edu.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 1,
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={`space-y-4 relative border-b pb-6 last:border-0 last:pb-0 bg-card ${isDragging ? "shadow-lg rounded-lg border-b-0 p-4" : ""}`}>
+      <div className="absolute right-0 top-0 flex items-center gap-1">
+        <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing hover:bg-slate-100 text-slate-400">
+          <GripVertical className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={() => removeEducation(edu.id)} className="text-red-500 hover:text-red-700">
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-20 pt-2">
+        <div className="space-y-2 md:col-span-2">
+          <Label>Institución</Label>
+          <Input value={edu.institution} onChange={(e) => handleEducationChange(edu.id, "institution", e.target.value)} placeholder="Universidad o Centro" />
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label>Titulación</Label>
+          <Input value={edu.degree} onChange={(e) => handleEducationChange(edu.id, "degree", e.target.value)} placeholder="Ej. Grado en Ingeniería Informática" />
+        </div>
+        <div className="space-y-2">
+          <Label>Fecha Inicio</Label>
+          <DatePicker value={edu.startDate} onChange={(val) => handleEducationChange(edu.id, "startDate", val)} placeholder="Fecha inicio" />
+        </div>
+        <div className="space-y-2">
+          <Label>Fecha Fin</Label>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <DatePicker value={edu.endDate} onChange={(val) => handleEducationChange(edu.id, "endDate", val)} placeholder="Fecha fin" />
+            </div>
+            <Button variant="outline" onClick={() => handleEducationChange(edu.id, "endDate", "Actualidad")} className="px-3" title="Marcar como Actualidad">Actual</Button>
+          </div>
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <div className="flex items-center justify-between">
+            <Label>Descripción (opcional)</Label>
+            <AIEnhanceButton text={edu.description || ""} context="education" onEnhance={(text) => handleEducationChange(edu.id, "description", text)} />
+          </div>
+          <Textarea value={edu.description || ""} onChange={(e) => handleEducationChange(edu.id, "description", e.target.value)} placeholder="Describe los logros, proyectos o habilidades adquiridas..." className="h-20" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface CVFormProps {
   data: CVData;
@@ -65,7 +200,7 @@ export function CVForm({ data, setData }: CVFormProps) {
       ...prev,
       education: [
         ...prev.education,
-        { id: Date.now().toString(), institution: "", degree: "", startDate: "", endDate: "" },
+        { id: Date.now().toString(), institution: "", degree: "", startDate: "", endDate: "", description: "" },
       ],
     }));
   };
@@ -82,6 +217,41 @@ export function CVForm({ data, setData }: CVFormProps) {
     setData((prev) => ({ ...prev, skills: skillsArray }));
   };
 
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEndExperience = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setData((prev) => {
+        const oldIndex = prev.experience.findIndex((item) => item.id === active.id);
+        const newIndex = prev.experience.findIndex((item) => item.id === over.id);
+        return {
+          ...prev,
+          experience: arrayMove(prev.experience, oldIndex, newIndex),
+        };
+      });
+    }
+  };
+
+  const handleDragEndEducation = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setData((prev) => {
+        const oldIndex = prev.education.findIndex((item) => item.id === active.id);
+        const newIndex = prev.education.findIndex((item) => item.id === over.id);
+        return {
+          ...prev,
+          education: arrayMove(prev.education, oldIndex, newIndex),
+        };
+      });
+    }
+  };
+
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto pb-20">
       <div className="space-y-1">
@@ -94,7 +264,6 @@ export function CVForm({ data, setData }: CVFormProps) {
           <CardTitle>Datos Personales</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {/* Top Row: Avatar + Basic Info */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             <div className="shrink-0 space-y-2 flex flex-col items-center sm:items-start">
               <Label htmlFor="imageUpload">Foto de Perfil</Label>
@@ -154,7 +323,6 @@ export function CVForm({ data, setData }: CVFormProps) {
             </div>
           </div>
 
-          {/* Bottom Grid: Contact & Links */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -254,77 +422,18 @@ export function CVForm({ data, setData }: CVFormProps) {
           </Button>
         </CardHeader>
         <CardContent className="space-y-6">
-          {data.experience.map((exp, index) => (
-            <div key={exp.id} className="space-y-4 relative border-b pb-6 last:border-0 last:pb-0">
-              <div className="absolute right-0 top-0">
-                <Button variant="ghost" size="icon" onClick={() => removeExperience(exp.id)} className="text-red-500 hover:text-red-700">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-10">
-                <div className="space-y-2">
-                  <Label>Empresa</Label>
-                  <Input
-                    value={exp.company}
-                    onChange={(e) => handleExperienceChange(exp.id, "company", e.target.value)}
-                    placeholder="Nombre de la empresa"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Puesto</Label>
-                  <Input
-                    value={exp.role}
-                    onChange={(e) => handleExperienceChange(exp.id, "role", e.target.value)}
-                    placeholder="Ej. Software Engineer"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Fecha Inicio</Label>
-                  <DatePicker
-                    value={exp.startDate}
-                    onChange={(val) => handleExperienceChange(exp.id, "startDate", val)}
-                    placeholder="Fecha inicio"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Fecha Fin</Label>
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <DatePicker
-                        value={exp.endDate}
-                        onChange={(val) => handleExperienceChange(exp.id, "endDate", val)}
-                        placeholder="Fecha fin"
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleExperienceChange(exp.id, "endDate", "Actualidad")}
-                      className="px-3"
-                      title="Marcar como Actualidad"
-                    >
-                      Actual
-                    </Button>
-                  </div>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <div className="flex items-center justify-between">
-                    <Label>Descripción</Label>
-                    <AIEnhanceButton 
-                      text={exp.description} 
-                      context="experience" 
-                      onEnhance={(text) => handleExperienceChange(exp.id, "description", text)} 
-                    />
-                  </div>
-                  <Textarea
-                    value={exp.description}
-                    onChange={(e) => handleExperienceChange(exp.id, "description", e.target.value)}
-                    placeholder="Describe tus responsabilidades y logros..."
-                    className="h-20"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndExperience}>
+            <SortableContext items={data.experience.map(e => e.id)} strategy={verticalListSortingStrategy}>
+              {data.experience.map((exp) => (
+                <SortableExperienceItem 
+                  key={exp.id} 
+                  exp={exp} 
+                  handleExperienceChange={handleExperienceChange} 
+                  removeExperience={removeExperience} 
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
           {data.experience.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">No has añadido experiencia todavía.</p>
           )}
@@ -340,61 +449,18 @@ export function CVForm({ data, setData }: CVFormProps) {
           </Button>
         </CardHeader>
         <CardContent className="space-y-6">
-          {data.education.map((edu, index) => (
-            <div key={edu.id} className="space-y-4 relative border-b pb-6 last:border-0 last:pb-0">
-              <div className="absolute right-0 top-0">
-                <Button variant="ghost" size="icon" onClick={() => removeEducation(edu.id)} className="text-red-500 hover:text-red-700">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-10">
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Institución</Label>
-                  <Input
-                    value={edu.institution}
-                    onChange={(e) => handleEducationChange(edu.id, "institution", e.target.value)}
-                    placeholder="Universidad o Centro"
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label>Titulación</Label>
-                  <Input
-                    value={edu.degree}
-                    onChange={(e) => handleEducationChange(edu.id, "degree", e.target.value)}
-                    placeholder="Ej. Grado en Ingeniería Informática"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Fecha Inicio</Label>
-                  <DatePicker
-                    value={edu.startDate}
-                    onChange={(val) => handleEducationChange(edu.id, "startDate", val)}
-                    placeholder="Fecha inicio"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Fecha Fin</Label>
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <DatePicker
-                        value={edu.endDate}
-                        onChange={(val) => handleEducationChange(edu.id, "endDate", val)}
-                        placeholder="Fecha fin"
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleEducationChange(edu.id, "endDate", "Actualidad")}
-                      className="px-3"
-                      title="Marcar como Actualidad"
-                    >
-                      Actual
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndEducation}>
+            <SortableContext items={data.education.map(e => e.id)} strategy={verticalListSortingStrategy}>
+              {data.education.map((edu) => (
+                <SortableEducationItem 
+                  key={edu.id} 
+                  edu={edu} 
+                  handleEducationChange={handleEducationChange} 
+                  removeEducation={removeEducation} 
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
           {data.education.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">No has añadido educación todavía.</p>
           )}
