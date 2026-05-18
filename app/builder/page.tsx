@@ -7,9 +7,20 @@ import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Printer, ArrowLeft } from "lucide-react";
+import { Printer, ArrowLeft, Save, LogOut } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
+import { useSession, signOut } from "next-auth/react";
+import { saveCV, loadCV } from "@/app/actions/cv";
+import { toast } from "sonner";
+import { useEffect } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const initialData: CVData = {
   personalInfo: {
@@ -37,6 +48,32 @@ const initialData: CVData = {
 
 export default function BuilderPage() {
   const [cvData, setCvData] = useState<CVData>(initialData);
+  const [isSaving, setIsSaving] = useState(false);
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      loadCV().then((data) => {
+        if (data) {
+          setCvData(data);
+          toast.success("CV cargado correctamente desde la nube");
+        }
+      }).catch(console.error);
+    }
+  }, [status]);
+
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      await saveCV(cvData);
+      toast.success("CV guardado correctamente");
+    } catch (error) {
+      toast.error("Error al guardar el CV");
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handlePrint = () => {
     window.print();
@@ -58,6 +95,34 @@ export default function BuilderPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
+            {status === "authenticated" ? (
+              <>
+                <Button onClick={handleSave} disabled={isSaving} variant="outline" className="gap-2">
+                  <Save className="w-4 h-4" />
+                  {isSaving ? "Guardando..." : "Guardar CV"}
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2">
+                      <Avatar className="h-9 w-9 border border-border">
+                        <AvatarImage src={session.user?.image || ""} alt={session.user?.name || ""} />
+                        <AvatarFallback>{session.user?.name?.charAt(0) || "U"}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Cerrar sesión</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : status === "unauthenticated" ? (
+              <Button asChild variant="outline" className="mr-2">
+                <Link href="/login">Iniciar Sesión para guardar</Link>
+              </Button>
+            ) : null}
             <Button onClick={handlePrint} className="gap-2">
               <Printer className="w-4 h-4" />
               Exportar a PDF
