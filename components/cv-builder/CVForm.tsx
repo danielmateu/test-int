@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
+import { AIEnhanceButton } from "./AIEnhanceButton";
 import { CVData, Experience, Education } from "./types";
 
 interface CVFormProps {
@@ -92,56 +93,69 @@ export function CVForm({ data, setData }: CVFormProps) {
         <CardHeader>
           <CardTitle>Datos Personales</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2 md:col-span-2">
-            <Label htmlFor="imageUpload">Foto de Perfil</Label>
-            {data.personalInfo.imageUrl ? (
-              <div className="flex items-center gap-4 mt-2">
-                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-slate-200">
+        <CardContent className="space-y-6">
+          {/* Top Row: Avatar + Basic Info */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+            <div className="shrink-0 space-y-2 flex flex-col items-center sm:items-start">
+              <Label htmlFor="imageUpload">Foto de Perfil</Label>
+              {data.personalInfo.imageUrl ? (
+                <div className="relative group w-24 h-24 rounded-full overflow-hidden border-4 border-slate-100 shadow-sm">
                   <img
                     src={data.personalInfo.imageUrl}
                     alt="Perfil"
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handlePersonalInfoChange("imageUrl", "")}
+                      className="text-white hover:text-red-400 hover:bg-transparent"
+                      title="Eliminar foto"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </Button>
+                  </div>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePersonalInfoChange("imageUrl", "")}
-                  className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
-                >
-                  Eliminar foto
-                </Button>
+              ) : (
+                <div className="w-24 h-24 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors relative">
+                  <Input
+                    id="imageUpload"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    title="Subir foto de perfil"
+                  />
+                  <Plus className="w-6 h-6 text-slate-400" />
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Nombre Completo</Label>
+                <Input
+                  id="fullName"
+                  value={data.personalInfo.fullName}
+                  onChange={(e) => handlePersonalInfoChange("fullName", e.target.value)}
+                  placeholder="Ej. Juan Pérez"
+                />
               </div>
-            ) : (
-              <Input
-                id="imageUpload"
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="cursor-pointer"
-              />
-            )}
+              <div className="space-y-2">
+                <Label htmlFor="jobTitle">Título Profesional</Label>
+                <Input
+                  id="jobTitle"
+                  value={data.personalInfo.jobTitle}
+                  onChange={(e) => handlePersonalInfoChange("jobTitle", e.target.value)}
+                  placeholder="Ej. Desarrollador Frontend"
+                />
+              </div>
+            </div>
           </div>
+
+          {/* Bottom Grid: Contact & Links */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="fullName">Nombre Completo</Label>
-              <Input
-                id="fullName"
-                value={data.personalInfo.fullName}
-                onChange={(e) => handlePersonalInfoChange("fullName", e.target.value)}
-                placeholder="Ej. Juan Pérez"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="jobTitle">Título Profesional</Label>
-              <Input
-                id="jobTitle"
-                value={data.personalInfo.jobTitle}
-                onChange={(e) => handlePersonalInfoChange("jobTitle", e.target.value)}
-                placeholder="Ej. Desarrollador Frontend"
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -211,7 +225,14 @@ export function CVForm({ data, setData }: CVFormProps) {
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="summary">Perfil Profesional</Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="summary">Perfil Profesional</Label>
+                <AIEnhanceButton 
+                  text={data.personalInfo.summary} 
+                  context="summary" 
+                  onEnhance={(text) => handlePersonalInfoChange("summary", text)} 
+                />
+              </div>
               <Textarea
                 id="summary"
                 value={data.personalInfo.summary}
@@ -286,7 +307,14 @@ export function CVForm({ data, setData }: CVFormProps) {
                   </div>
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <Label>Descripción</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Descripción</Label>
+                    <AIEnhanceButton 
+                      text={exp.description} 
+                      context="experience" 
+                      onEnhance={(text) => handleExperienceChange(exp.id, "description", text)} 
+                    />
+                  </div>
                   <Textarea
                     value={exp.description}
                     onChange={(e) => handleExperienceChange(exp.id, "description", e.target.value)}
@@ -395,7 +423,14 @@ export function CVForm({ data, setData }: CVFormProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="coverLetter">Contenido de la carta (opcional)</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="coverLetter">Contenido de la carta (opcional)</Label>
+              <AIEnhanceButton 
+                text={data.coverLetter} 
+                context="coverLetter" 
+                onEnhance={(text) => setData(prev => ({ ...prev, coverLetter: text }))} 
+              />
+            </div>
             <Textarea
               id="coverLetter"
               value={data.coverLetter}
