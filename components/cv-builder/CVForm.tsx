@@ -149,9 +149,10 @@ function SortableEducationItem({ edu, handleEducationChange, removeEducation }: 
 interface CVFormProps {
   data: CVData;
   setData: React.Dispatch<React.SetStateAction<CVData>>;
+  status: "authenticated" | "unauthenticated" | "loading";
 }
 
-export function CVForm({ data, setData }: CVFormProps) {
+export function CVForm({ data, setData, status }: CVFormProps) {
   const [isUploading, setIsUploading] = useState(false);
 
   const handlePersonalInfoChange = (field: keyof CVData["personalInfo"], value: string) => {
@@ -294,47 +295,51 @@ export function CVForm({ data, setData }: CVFormProps) {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div className="shrink-0 space-y-2 flex flex-col items-center sm:items-start">
-              <Label htmlFor="imageUpload">Foto de Perfil</Label>
-              {data.personalInfo.imageUrl ? (
-                <div className="relative group w-24 h-24 rounded-full overflow-hidden border-4 border-slate-100 shadow-sm">
-                  <img
-                    src={data.personalInfo.imageUrl}
-                    alt="Perfil"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handlePersonalInfoChange("imageUrl", "")}
-                      className="text-white hover:text-red-400 hover:bg-transparent"
-                      title="Eliminar foto"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="w-24 h-24 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors relative">
-                  {isUploading ? (
-                    <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
-                  ) : (
-                    <>
-                      <Input
-                        id="imageUpload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        title="Subir foto de perfil"
+            {
+              status === "authenticated" && (
+                <div className="shrink-0 space-y-2 flex flex-col items-center sm:items-start">
+                  <Label htmlFor="imageUpload">Foto de Perfil</Label>
+                  {data.personalInfo.imageUrl ? (
+                    <div className="relative group w-24 h-24 rounded-full overflow-hidden border-4 border-slate-100 shadow-sm">
+                      <img
+                        src={data.personalInfo.imageUrl}
+                        alt="Perfil"
+                        className="w-full h-full object-cover"
                       />
-                      <Plus className="w-6 h-6 text-slate-400" />
-                    </>
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handlePersonalInfoChange("imageUrl", "")}
+                          className="text-white hover:text-red-400 hover:bg-transparent"
+                          title="Eliminar foto"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors relative">
+                      {isUploading ? (
+                        <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+                      ) : (
+                        <>
+                          <Input
+                            id="imageUpload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                            title="Subir foto de perfil"
+                          />
+                          <Plus className="w-6 h-6 text-slate-400" />
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
-            </div>
+              )
+            }
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
               <div className="space-y-2">

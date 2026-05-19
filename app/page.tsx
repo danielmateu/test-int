@@ -44,6 +44,12 @@ export default function LandingPage() {
           </Link>
           <div className="flex items-center gap-4">
             <Button variant="ghost" className="hidden sm:inline-flex hover:bg-primary/10" asChild>
+              <Link href="/builder">
+                <Zap className="w-4 h-4 mr-1.5" />
+                Demo
+              </Link>
+            </Button>
+            <Button variant="ghost" className="hidden sm:inline-flex hover:bg-primary/10" asChild>
               <Link href="/login">Iniciar Sesión</Link>
             </Button>
             <Button className="rounded-full shadow-lg shadow-primary/25 transition-transform hover:scale-105" asChild>
@@ -91,7 +97,7 @@ export default function LandingPage() {
                     Crear mi CV gratis <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                   </span>
                   {/* Shimmer Effect */}
-                  <div className="absolute inset-0 -translate-x-[150%] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] z-0"></div>
+                  <div className="absolute inset-0 -translate-x-[150%] bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] z-0"></div>
                 </Link>
               </Button>
               <Button size="lg" variant="outline" className="rounded-full h-14 px-8 text-lg w-full sm:w-auto border-border/50 hover:bg-muted/50 transition-all" asChild>

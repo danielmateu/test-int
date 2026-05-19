@@ -7,7 +7,7 @@ import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Printer, ArrowLeft, Save, LogOut, User } from "lucide-react";
+import { Printer, ArrowLeft, Save, LogOut, User, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useSession, signOut } from "next-auth/react";
@@ -98,18 +98,36 @@ function BuilderPageContent() {
 
   return (
     <div className="min-h-screen print:min-h-0 bg-zinc-50 dark:bg-zinc-950 font-sans print:bg-white print:p-0">
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @page { size: auto; margin: 0mm; }
         @media print {
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
       `}} />
+
+      {/* Demo mode banner */}
+      {status === "unauthenticated" && (
+        <div className="bg-linear-to-r from-primary/90 via-purple-600/90 to-blue-600/90 text-white text-sm py-2.5 px-4 flex items-center justify-center gap-3 print:hidden flex-wrap">
+          <Sparkles className="w-4 h-4 shrink-0" />
+          <span className="text-center">Estás usando el <strong>modo demo</strong> — tu CV no se guardará. Regístrate gratis para guardar y exportar tu trabajo.</span>
+          <div className="flex gap-2 shrink-0">
+            <Button size="sm" variant="secondary" className="h-7 text-xs rounded-full" asChild>
+              <Link href="/register">Crear cuenta gratis</Link>
+            </Button>
+            <Button size="sm" variant="ghost" className="h-7 text-xs rounded-full text-white hover:bg-white/20" asChild>
+              <Link href="/login">Iniciar sesión</Link>
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Header bar - hidden when printing */}
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:hidden">
         <nav className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-full">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild className="shrink-0">
-              <Link href="/dashboard">
+              <Link href={status === "authenticated" ? "/dashboard" : "/"}>
                 <ArrowLeft className="w-5 h-5" />
               </Link>
             </Button>
@@ -172,14 +190,14 @@ function BuilderPageContent() {
       <main className="container flex flex-col xl:flex-row gap-8 p-4 md:p-8 max-w-full print:p-0 print:gap-0 print:m-0 print:block">
 
         {/* Left column: Form & Styles */}
-        <div className="flex-1 xl:max-w-[800px] xl:h-[calc(100vh-8rem)] xl:overflow-y-auto print:hidden no-scrollbar pr-2">
+        <div className="flex-1 xl:max-w-200 xl:h-[calc(100vh-8rem)] xl:overflow-y-auto print:hidden no-scrollbar pr-2">
           <Tabs defaultValue="content" className="w-full">
             <TabsList className="w-full grid grid-cols-2 mb-8">
               <TabsTrigger value="content">Contenido</TabsTrigger>
               <TabsTrigger value="styles">Diseño</TabsTrigger>
             </TabsList>
             <TabsContent value="content" className="mt-0 outline-none">
-              <CVForm data={cvData} setData={setCvData} />
+              <CVForm data={cvData} setData={setCvData} status={status} />
             </TabsContent>
             <TabsContent value="styles" className="mt-0 outline-none">
               <CVStyleEditor data={cvData} setData={setCvData} />
