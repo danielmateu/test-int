@@ -44,6 +44,7 @@ const initialData: CVData = {
   theme: {
     color: "#0f172a", // Default slate-900
     font: "font-sans",
+    layout: "classic",
   },
 };
 

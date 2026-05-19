@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CVData, CVTheme } from "./types";
-import { Paintbrush, Type } from "lucide-react";
+import { Paintbrush, Type, LayoutTemplate } from "lucide-react";
 
 interface CVStyleEditorProps {
   data: CVData;
@@ -22,6 +22,12 @@ const FONTS = [
   { name: "Sans (Moderno)", value: "font-sans", className: "font-sans" },
   { name: "Serif (Clásico)", value: "font-serif", className: "font-serif" },
   { name: "Mono (Técnico)", value: "font-mono", className: "font-mono" },
+];
+
+const LAYOUTS = [
+  { name: "Clásico", value: "classic", description: "Diseño lineal tradicional de una sola columna" },
+  { name: "Dos Columnas", value: "two-column", description: "Moderno, con barra lateral para contacto y habilidades" },
+  { name: "Minimalista", value: "minimalist", description: "Limpio, centrado y sin distracciones visuales" },
 ];
 
 export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
@@ -110,6 +116,47 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                   <p className="text-sm text-muted-foreground font-sans mt-1">
                     El veloz murciélago hindú comía feliz cardillo y kiwi.
                   </p>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+              <LayoutTemplate className="w-4 h-4" />
+            </div>
+            Estructura del Documento
+          </CardTitle>
+          <CardDescription>
+            Selecciona la distribución visual de tu currículum.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RadioGroup
+            value={data.theme.layout || "classic"}
+            onValueChange={(val) => handleThemeChange("layout", val)}
+            className="flex flex-col gap-3"
+          >
+            {LAYOUTS.map((layout) => (
+              <div 
+                key={layout.value} 
+                className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-all ${data.theme.layout === layout.value || (!data.theme.layout && layout.value === "classic") ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
+                onClick={() => handleThemeChange("layout", layout.value)}
+              >
+                <RadioGroupItem value={layout.value} id={`layout-${layout.value}`} />
+                <Label
+                  htmlFor={`layout-${layout.value}`}
+                  className="cursor-pointer flex-1"
+                  onClick={(e) => e.preventDefault()} // Let parent div handle the click to select radio
+                >
+                  <div className="font-semibold text-base">{layout.name}</div>
+                  <div className="text-sm text-muted-foreground font-normal mt-1">
+                    {layout.description}
+                  </div>
                 </Label>
               </div>
             ))}

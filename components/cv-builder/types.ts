@@ -33,6 +33,7 @@ export interface Education {
 export interface CVTheme {
   color: string;
   font: string;
+  layout: "classic" | "two-column" | "minimalist";
 }
 
 export interface CVData {
