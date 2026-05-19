@@ -13,7 +13,8 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { useSession, signOut } from "next-auth/react";
 import { saveCV, loadCV } from "@/app/actions/cv";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -47,28 +48,43 @@ const initialData: CVData = {
 };
 
 export default function BuilderPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Cargando...</div>}>
+      <BuilderPageContent />
+    </Suspense>
+  );
+}
+
+function BuilderPageContent() {
+  const searchParams = useSearchParams();
+  const cvId = searchParams.get("id");
+  const router = useRouter();
+
   const [cvData, setCvData] = useState<CVData>(initialData);
   const [isSaving, setIsSaving] = useState(false);
   const { data: session, status } = useSession();
 
   useEffect(() => {
     if (status === "authenticated") {
-      loadCV().then((data) => {
+      loadCV(cvId || undefined).then((data) => {
         if (data) {
-          setCvData(data);
+          setCvData(data.content);
           toast.success("CV cargado correctamente desde la nube");
         }
       }).catch(console.error);
     }
-  }, [status]);
+  }, [status, cvId]);
 
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      await saveCV(cvData);
+      const res = await saveCV(cvData, cvId || undefined);
       toast.success("CV guardado correctamente");
-    } catch (error) {
-      toast.error("Error al guardar el CV");
+      if (res.id && res.id !== cvId) {
+        router.push(`/builder?id=${res.id}`);
+      }
+    } catch (error: any) {
+      toast.error(error.message || "Error al guardar el CV");
       console.error(error);
     } finally {
       setIsSaving(false);
@@ -86,12 +102,20 @@ export default function BuilderPage() {
         <div className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-full">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild className="shrink-0">
-              <Link href="/">
+              <Link href="/dashboard">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
             </Button>
-            <div className="font-bold text-xl tracking-tight hidden sm:block">
-              CV AI <span className="text-muted-foreground font-normal">Builder</span>
+            <div className="font-bold text-xl tracking-tight hidden sm:flex items-center gap-2">
+              <span>CV AI <span className="text-muted-foreground font-normal">Builder</span></span>
+              <span className="text-muted-foreground mx-2">|</span>
+              <input 
+                type="text" 
+                value={cvData.title || ""} 
+                onChange={(e) => setCvData({...cvData, title: e.target.value})}
+                className="bg-transparent border-none outline-none focus:ring-1 focus:ring-primary rounded px-2 py-1 text-base font-medium max-w-[200px]"
+                placeholder="Mi CV"
+              />
             </div>
           </div>
           <div className="flex items-center gap-4">

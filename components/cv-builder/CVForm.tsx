@@ -3,10 +3,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, GripVertical } from "lucide-react";
+import { Plus, Trash2, GripVertical, Loader2 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { AIEnhanceButton } from "./AIEnhanceButton";
 import { CVData, Experience, Education } from "./types";
+import { useState } from "react";
+import { toast } from "sonner";
+import { uploadImage } from "@/app/actions/upload";
 import {
   DndContext,
   closestCenter,
@@ -149,6 +152,8 @@ interface CVFormProps {
 }
 
 export function CVForm({ data, setData }: CVFormProps) {
+  const [isUploading, setIsUploading] = useState(false);
+
   const handlePersonalInfoChange = (field: keyof CVData["personalInfo"], value: string) => {
     setData((prev) => ({
       ...prev,
@@ -156,11 +161,35 @@ export function CVForm({ data, setData }: CVFormProps) {
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      handlePersonalInfoChange("imageUrl", url);
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen es demasiado grande. Máximo 5MB.");
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      const base64Image = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const result = await uploadImage(base64Image);
+      if (result.success && result.url) {
+        handlePersonalInfoChange("imageUrl", result.url);
+        toast.success("Foto de perfil subida correctamente");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error al subir la imagen");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -288,15 +317,21 @@ export function CVForm({ data, setData }: CVFormProps) {
                 </div>
               ) : (
                 <div className="w-24 h-24 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors relative">
-                  <Input
-                    id="imageUpload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    title="Subir foto de perfil"
-                  />
-                  <Plus className="w-6 h-6 text-slate-400" />
+                  {isUploading ? (
+                    <Loader2 className="w-6 h-6 text-slate-400 animate-spin" />
+                  ) : (
+                    <>
+                      <Input
+                        id="imageUpload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        title="Subir foto de perfil"
+                      />
+                      <Plus className="w-6 h-6 text-slate-400" />
+                    </>
+                  )}
                 </div>
               )}
             </div>

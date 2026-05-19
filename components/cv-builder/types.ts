@@ -36,6 +36,7 @@ export interface CVTheme {
 }
 
 export interface CVData {
+  title?: string;
   personalInfo: PersonalInfo;
   experience: Experience[];
   education: Education[];
