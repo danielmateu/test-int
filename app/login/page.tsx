@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { FileText, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { CustomCursor } from "@/components/custom-cursor";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -45,17 +46,24 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-4 relative">
-      <Button variant="ghost" className="absolute top-4 left-4 sm:top-8 sm:left-8" asChild>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden selection:bg-primary/20">
+      <CustomCursor />
+      
+      {/* Animated Background Gradients */}
+      <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob"></div>
+      <div className="absolute top-0 -right-4 w-72 h-72 bg-primary rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-blob animation-delay-4000"></div>
+
+      <Button variant="ghost" className="absolute top-4 left-4 sm:top-8 sm:left-8 z-10 hover:bg-primary/10 transition-all" asChild>
         <Link href="/">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Volver
         </Link>
       </Button>
 
-      <Card className="w-full max-w-md shadow-xl">
+      <Card className="w-full max-w-md shadow-2xl relative z-10 bg-background/60 backdrop-blur-xl border-border/50">
         <CardHeader className="space-y-2 text-center pb-6">
-          <div className="w-12 h-12 bg-primary text-primary-foreground rounded-xl flex items-center justify-center mx-auto mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 text-primary-foreground rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
             <FileText className="w-6 h-6" />
           </div>
           <CardTitle className="text-2xl font-bold">Bienvenido de nuevo</CardTitle>
