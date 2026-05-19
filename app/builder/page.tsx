@@ -7,7 +7,7 @@ import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Printer, ArrowLeft, Save, LogOut } from "lucide-react";
+import { Printer, ArrowLeft, Save, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useSession, signOut } from "next-auth/react";
@@ -96,10 +96,16 @@ function BuilderPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 font-sans print:bg-white print:p-0">
+    <div className="min-h-screen print:min-h-0 bg-zinc-50 dark:bg-zinc-950 font-sans print:bg-white print:p-0">
+      <style dangerouslySetInnerHTML={{ __html: `
+        @page { size: auto; margin: 0mm; }
+        @media print {
+          body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+      `}} />
       {/* Header bar - hidden when printing */}
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:hidden">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-full">
+        <nav className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-full">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild className="shrink-0">
               <Link href="/dashboard">
@@ -109,10 +115,10 @@ function BuilderPageContent() {
             <div className="font-bold text-xl tracking-tight hidden sm:flex items-center gap-2">
               <span>CV AI <span className="text-muted-foreground font-normal">Builder</span></span>
               <span className="text-muted-foreground mx-2">|</span>
-              <input 
-                type="text" 
-                value={cvData.title || ""} 
-                onChange={(e) => setCvData({...cvData, title: e.target.value})}
+              <input
+                type="text"
+                value={cvData.title || ""}
+                onChange={(e) => setCvData({ ...cvData, title: e.target.value })}
                 className="bg-transparent border-none outline-none focus:ring-1 focus:ring-primary rounded px-2 py-1 text-base font-medium max-w-[200px]"
                 placeholder="Mi CV"
               />
@@ -125,6 +131,10 @@ function BuilderPageContent() {
                   <Save className="w-4 h-4" />
                   {isSaving ? "Guardando..." : "Guardar CV"}
                 </Button>
+                <Button onClick={handlePrint} className="gap-2">
+                  <Printer className="w-4 h-4" />
+                  Exportar a PDF
+                </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2">
@@ -135,6 +145,10 @@ function BuilderPageContent() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Dashboard</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
                       <LogOut className="mr-2 h-4 w-4" />
                       <span>Cerrar sesión</span>
@@ -147,14 +161,10 @@ function BuilderPageContent() {
                 <Link href="/login">Iniciar Sesión para guardar</Link>
               </Button>
             ) : null}
-            <Button onClick={handlePrint} className="gap-2">
-              <Printer className="w-4 h-4" />
-              Exportar a PDF
-            </Button>
+
             <ModeToggle />
           </div>
-        </div>
-
+        </nav>
       </header>
 
       {/* Main content */}
