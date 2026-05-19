@@ -15,16 +15,50 @@ export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Error al registrarse");
+        setIsLoading(false);
+        return;
+      }
+
       toast.success("¡Cuenta creada correctamente!");
-      router.push("/builder");
-    }, 1000);
+      
+      // Auto login
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Error al iniciar sesión automáticamente");
+        setIsLoading(false);
+      } else {
+        router.push("/builder");
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error("Ocurrió un error inesperado");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,15 +84,15 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Nombre completo</Label>
-              <Input id="name" placeholder="Juan Pérez" required />
+              <Input id="name" name="name" placeholder="Juan Pérez" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="tu@email.com" required />
+              <Input id="email" name="email" type="email" placeholder="tu@email.com" required />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Contraseña</Label>
-              <Input id="password" type="password" required minLength={6} />
+              <Input id="password" name="password" type="password" required minLength={6} />
             </div>
             <Button type="submit" className="w-full h-11 mt-6" disabled={isLoading}>
               {isLoading ? "Creando cuenta..." : "Registrarse"}

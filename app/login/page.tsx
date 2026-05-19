@@ -15,16 +15,33 @@ export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        toast.error("Credenciales inválidas");
+        setIsLoading(false);
+      } else {
+        toast.success("¡Inicio de sesión exitoso!");
+        router.push("/builder");
+        router.refresh();
+      }
+    } catch (error) {
+      toast.error("Ocurrió un error al iniciar sesión");
       setIsLoading(false);
-      toast.success("¡Inicio de sesión exitoso!");
-      router.push("/builder");
-    }, 1000);
+    }
   };
 
   return (
@@ -50,7 +67,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="tu@email.com" required />
+              <Input id="email" name="email" type="email" placeholder="tu@email.com" required />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -59,7 +76,7 @@ export default function LoginPage() {
                   ¿Olvidaste tu contraseña?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input id="password" name="password" type="password" required />
             </div>
             <Button type="submit" className="w-full h-11 mt-6" disabled={isLoading}>
               {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
