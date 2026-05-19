@@ -13,7 +13,7 @@ const COLORS = [
   { name: "Slate", value: "#0f172a", className: "bg-slate-900" },
   { name: "Azul", value: "#2563eb", className: "bg-blue-600" },
   { name: "Esmeralda", value: "#059669", className: "bg-emerald-600" },
-  { name: "Rosa", value: "#e11d48", className: "bg-rose-600" },
+  { name: "Rosa", value: "#d88295ff", className: "bg-rose-400" },
   { name: "Púrpura", value: "#7c3aed", className: "bg-violet-600" },
   { name: "Naranja", value: "#ea580c", className: "bg-orange-600" },
 ];
@@ -51,7 +51,7 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
             Color Principal
           </CardTitle>
           <CardDescription>
-            Elige un color para los acentos, iconos y títulos principales.
+            Elige un color para los iconos y títulos principales.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -69,9 +69,8 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                 />
                 <Label
                   htmlFor={`color-${color.value}`}
-                  className={`w-12 h-12 rounded-full cursor-pointer ring-offset-2 ring-offset-background transition-all hover:scale-110 ${color.className} ${
-                    data.theme.color === color.value ? "ring-2 ring-primary" : "ring-1 ring-slate-200"
-                  }`}
+                  className={`w-12 h-12 rounded-full cursor-pointer ring-offset-2 ring-offset-background transition-all hover:scale-110 ${color.className} ${data.theme.color === color.value ? "ring-2 ring-primary" : "ring-1 ring-slate-200"
+                    }`}
                 >
                   <span className="sr-only">{color.name}</span>
                 </Label>
