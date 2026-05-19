@@ -127,7 +127,7 @@
 
 @page {
   size: auto;
-  margin: 0mm;
+  margin: 20mm 0mm;
 }
 
 @media print {
