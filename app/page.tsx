@@ -271,7 +271,7 @@ export default function LandingPage() {
               whileHover={{ y: -5 }}
               className="md:col-span-2 row-span-1 bg-card rounded-3xl p-8 border border-border/50 shadow-sm relative overflow-hidden group"
             >
-              <div className="absolute left-0 bottom-0 w-full h-1/2 bg-gradient-to-t from-background to-transparent z-0"></div>
+              <div className="absolute left-0 bottom-0 w-full h-1/2 bg-linear-to-t from-background to-transparent z-0"></div>
               <div className="relative z-10 flex items-center gap-8 h-full">
                 <div className="flex-1">
                   <div className="w-12 h-12 bg-green-500/10 text-green-500 rounded-xl flex items-center justify-center mb-4">
@@ -281,7 +281,7 @@ export default function LandingPage() {
                   <p className="text-muted-foreground">Aplicación rápida, fluida y segura. Tu información se guarda automáticamente en la nube.</p>
                 </div>
                 <div className="hidden md:flex flex-1 items-center justify-center">
-                  <div className="w-full max-w-[200px] space-y-3">
+                  <div className="w-full max-w-50 space-y-3">
                     <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
@@ -316,7 +316,7 @@ export default function LandingPage() {
 
           <div className="relative">
             {/* Connecting Line */}
-            <div className="absolute left-[27px] md:left-1/2 top-0 bottom-0 w-0.5 bg-border -translate-x-1/2 hidden md:block"></div>
+            <div className="absolute left-6.75 md:left-1/2 top-0 bottom-0 w-0.5 bg-border -translate-x-1/2 hidden md:block"></div>
 
             <div className="space-y-12 relative">
               {/* Step 1 */}
@@ -406,7 +406,7 @@ export default function LandingPage() {
                 Crear mi CV Gratis <Sparkles className="ml-2 w-5 h-5 transition-transform group-hover:scale-110 " />
               </span>
               {/* Shimmer Effect */}
-              <div className="absolute inset-0 -translate-x-[150%] bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] z-0"></div>
+              <div className="absolute inset-0 -translate-x-[150%] bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.5s_infinite] z-0"></div>
             </Link>
           </Button>
         </div>
