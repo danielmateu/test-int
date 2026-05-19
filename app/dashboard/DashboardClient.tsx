@@ -11,11 +11,32 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { CVPreview } from "@/components/cv-builder/CVPreview";
+import { CVData } from "@/components/cv-builder/types";
 
 interface CVList {
   id: string;
   updated_at: string;
   title: string;
+  content: CVData;
+}
+
+function CVThumbnail({ content }: { content: CVData }) {
+  return (
+    <div
+      className="w-full overflow-hidden rounded-sm bg-white border border-slate-100 relative select-none pointer-events-none"
+      style={{ height: '158px' }}
+    >
+      <div
+        className="absolute top-0 left-0"
+        style={{ transform: 'scale(0.35)', transformOrigin: 'top left', width: '793px' }}
+      >
+        <CVPreview data={content} />
+      </div>
+      {/* Fade overlay */}
+      <div className="absolute inset-x-0 bottom-0 h-10 bg-linear-to-t from-white to-transparent" />
+    </div>
+  );
 }
 
 export function DashboardClient({
@@ -28,6 +49,7 @@ export function DashboardClient({
   userImage?: string | null
 }) {
   const [cvs, setCvs] = useState(initialCvs);
+  const router = useRouter();
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -72,35 +94,33 @@ export function DashboardClient({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cvs.map((cv) => (
-            <Link key={cv.id} href={`/builder?id=${cv.id}`}>
-              <Card className="hover:border-primary transition-colors cursor-pointer group h-full flex flex-col">
-                <CardHeader>
-                  <CardTitle className="flex justify-between items-start text-lg">
-                    <span className="truncate pr-2">{cv.title}</span>
-                    <FileText className="w-5 h-5 text-muted-foreground group-hover:text-primary shrink-0" />
-                  </CardTitle>
-                  <CardDescription>
-                    Actualizado: {new Date(cv.updated_at).toLocaleDateString()}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex-grow">
-                  <div className="w-full h-32 bg-zinc-100 dark:bg-zinc-900 rounded-md flex items-center justify-center">
-                    <span className="text-muted-foreground text-sm font-medium">Ver en el editor</span>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex justify-between border-t pt-4">
-                  <Button variant="ghost" size="sm" asChild>
-                    <span>
-                      <Edit2 className="w-4 h-4 mr-2" />
-                      Editar
-                    </span>
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" onClick={(e) => handleDelete(cv.id, e)}>
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            </Link>
+            <Card
+              key={cv.id}
+              className="hover:border-primary transition-colors cursor-pointer group h-full flex flex-col"
+              onClick={() => router.push(`/builder?id=${cv.id}`)}
+            >
+              <CardHeader>
+                <CardTitle className="flex justify-between items-start text-lg">
+                  <span className="truncate pr-2">{cv.title}</span>
+                  <FileText className="w-5 h-5 text-muted-foreground group-hover:text-primary shrink-0" />
+                </CardTitle>
+                <CardDescription>
+                  Actualizado: {new Date(cv.updated_at).toLocaleDateString()}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-grow">
+                <CVThumbnail content={cv.content} />
+              </CardContent>
+              <CardFooter className="flex justify-between border-t pt-4">
+                <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); router.push(`/builder?id=${cv.id}`); }}>
+                  <Edit2 className="w-4 h-4 mr-2" />
+                  Editar
+                </Button>
+                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" onClick={(e) => handleDelete(cv.id, e)}>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              </CardFooter>
+            </Card>
           ))}
 
           {/* Create New Card */}

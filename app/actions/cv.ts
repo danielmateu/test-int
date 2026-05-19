@@ -15,7 +15,7 @@ export async function getCVs() {
 
   const { data, error } = await supabase
     .from("cv_documents")
-    .select("id, updated_at, content->title")
+    .select("id, updated_at, content")
     .eq("user_id", session.user.id)
     .order("updated_at", { ascending: false });
 
@@ -27,7 +27,8 @@ export async function getCVs() {
   return data.map((doc: any) => ({
     id: doc.id,
     updated_at: doc.updated_at,
-    title: doc.title || "CV Sin Título",
+    title: doc.content?.title || "CV Sin Título",
+    content: doc.content as CVData,
   }));
 }
 
