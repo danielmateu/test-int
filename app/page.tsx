@@ -324,7 +324,7 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold mb-2">1. Completa tu Perfil</h3>
                   <p className="text-muted-foreground">Introduce tus datos, experiencia y educación en nuestros formularios guiados. La IA puede ayudarte a redactar tus logros.</p>
                 </div>
-                <div className="absolute left-0 md:left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-background border-4 border-primary flex items-center justify-center z-10 shadow-lg shadow-primary/20 font-bold text-xl text-primary">
+                <div className="absolute left-0 -top-5 md:top-4 md:left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-background border-4 border-primary flex items-center justify-center z-10 shadow-lg shadow-primary/20 font-bold text-xl text-primary ">
                   1
                 </div>
                 <div className="md:w-1/2 md:pl-12 hidden md:block">
@@ -349,7 +349,7 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold mb-2">2. Personaliza el Diseño</h3>
                   <p className="text-muted-foreground">Elige entre múltiples plantillas profesionales. Cambia colores, tipografías y el orden de las secciones en tiempo real.</p>
                 </div>
-                <div className="absolute left-0 md:left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-background border-4 border-purple-500 flex items-center justify-center z-10 shadow-lg shadow-purple-500/20 font-bold text-xl text-purple-500">
+                <div className="absolute left-0 -top-5 md:top-0 md:left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-background border-4 border-purple-500 flex items-center justify-center z-10 shadow-lg shadow-purple-500/20 font-bold text-xl text-purple-500">
                   2
                 </div>
                 <div className="md:w-1/2 md:pr-12 hidden md:block text-right">
@@ -372,7 +372,7 @@ export default function LandingPage() {
                   <h3 className="text-2xl font-bold mb-2">3. Descarga y Triunfa</h3>
                   <p className="text-muted-foreground">Exporta tu CV en un PDF perfecto y listo para imprimir, sin marcas de agua ni bordes extraños.</p>
                 </div>
-                <div className="absolute left-0 md:left-1/2 -translate-x-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground border-4 border-background flex items-center justify-center z-10 shadow-lg font-bold text-xl">
+                <div className="absolute left-0 md:left-1/2 -top-5 md:top-4 -translate-x-1/2 w-14 h-14 rounded-full bg-primary text-primary-foreground border-4 border-background flex items-center justify-center z-10 shadow-lg font-bold text-xl">
                   <CheckCircle className="w-6 h-6" />
                 </div>
                 <div className="md:w-1/2 md:pl-12 hidden md:block">
