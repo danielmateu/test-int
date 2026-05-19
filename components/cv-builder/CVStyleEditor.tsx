@@ -48,121 +48,123 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
         <p className="text-muted-foreground">Personaliza el aspecto visual de tu currículum.</p>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <Paintbrush className="w-4 h-4" />
-            </div>
-            Color Principal
-          </CardTitle>
-          <CardDescription>
-            Elige un color para los iconos y títulos principales.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup
-            value={data.theme.color}
-            onValueChange={(val) => handleThemeChange("color", val)}
-            className="grid grid-cols-3 sm:grid-cols-6 gap-4"
-          >
-            {COLORS.map((color) => (
-              <div key={color.value} className="flex flex-col items-center gap-2">
-                <RadioGroupItem
-                  value={color.value}
-                  id={`color-${color.value}`}
-                  className="sr-only"
-                />
-                <Label
-                  htmlFor={`color-${color.value}`}
-                  className={`w-12 h-12 rounded-full cursor-pointer ring-offset-2 ring-offset-background transition-all hover:scale-110 ${color.className} ${data.theme.color === color.value ? "ring-2 ring-primary" : "ring-1 ring-slate-200"
-                    }`}
-                >
-                  <span className="sr-only">{color.name}</span>
-                </Label>
-                <span className="text-xs font-medium text-muted-foreground">{color.name}</span>
+      <div className="grid grid-cols-1 gap-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <Paintbrush className="w-4 h-4" />
               </div>
-            ))}
-          </RadioGroup>
-        </CardContent>
-      </Card>
+              Color Principal
+            </CardTitle>
+            <CardDescription>
+              Elige un color para los iconos y títulos principales.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup
+              value={data.theme.color}
+              onValueChange={(val) => handleThemeChange("color", val)}
+              className="grid grid-cols-3 sm:grid-cols-6 gap-4"
+            >
+              {COLORS.map((color) => (
+                <div key={color.value} className="flex flex-col items-center gap-2">
+                  <RadioGroupItem
+                    value={color.value}
+                    id={`color-${color.value}`}
+                    className="sr-only"
+                  />
+                  <Label
+                    htmlFor={`color-${color.value}`}
+                    className={`w-12 h-12 rounded-full cursor-pointer ring-offset-2 ring-offset-background transition-all hover:scale-110 ${color.className} ${data.theme.color === color.value ? "ring-2 ring-primary" : "ring-1 ring-slate-200"
+                      }`}
+                  >
+                    <span className="sr-only">{color.name}</span>
+                  </Label>
+                  <span className="text-xs font-medium text-muted-foreground">{color.name}</span>
+                </div>
+              ))}
+            </RadioGroup>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <Type className="w-4 h-4" />
-            </div>
-            Tipografía
-          </CardTitle>
-          <CardDescription>
-            Selecciona la fuente que mejor encaje con tu perfil profesional.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup
-            value={data.theme.font}
-            onValueChange={(val) => handleThemeChange("font", val)}
-            className="flex flex-col gap-4"
-          >
-            {FONTS.map((font) => (
-              <div key={font.value} className="flex items-center space-x-2">
-                <RadioGroupItem value={font.value} id={`font-${font.value}`} />
-                <Label
-                  htmlFor={`font-${font.value}`}
-                  className={`text-lg cursor-pointer ${font.className}`}
-                >
-                  {font.name}
-                  <p className="text-sm text-muted-foreground font-sans mt-1">
-                    El veloz murciélago hindú comía feliz cardillo y kiwi.
-                  </p>
-                </Label>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <Type className="w-4 h-4" />
               </div>
-            ))}
-          </RadioGroup>
-        </CardContent>
-      </Card>
+              Tipografía
+            </CardTitle>
+            <CardDescription>
+              Selecciona la fuente que mejor encaje con tu perfil profesional.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup
+              value={data.theme.font}
+              onValueChange={(val) => handleThemeChange("font", val)}
+              className="flex flex-col gap-4"
+            >
+              {FONTS.map((font) => (
+                <div key={font.value} className="flex items-center space-x-2">
+                  <RadioGroupItem value={font.value} id={`font-${font.value}`} />
+                  <Label
+                    htmlFor={`font-${font.value}`}
+                    className={`text-lg cursor-pointer ${font.className}`}
+                  >
+                    {font.name}
+                    <p className="text-sm text-muted-foreground font-sans mt-1">
+                      El veloz murciélago hindú comía feliz cardillo y kiwi.
+                    </p>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-              <LayoutTemplate className="w-4 h-4" />
-            </div>
-            Estructura del Documento
-          </CardTitle>
-          <CardDescription>
-            Selecciona la distribución visual de tu currículum.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <RadioGroup
-            value={data.theme.layout || "classic"}
-            onValueChange={(val) => handleThemeChange("layout", val)}
-            className="flex flex-col gap-3"
-          >
-            {LAYOUTS.map((layout) => (
-              <div 
-                key={layout.value} 
-                className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-all ${data.theme.layout === layout.value || (!data.theme.layout && layout.value === "classic") ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
-                onClick={() => handleThemeChange("layout", layout.value)}
-              >
-                <RadioGroupItem value={layout.value} id={`layout-${layout.value}`} />
-                <Label
-                  htmlFor={`layout-${layout.value}`}
-                  className="cursor-pointer flex-1"
-                  onClick={(e) => e.preventDefault()} // Let parent div handle the click to select radio
-                >
-                  <div className="font-semibold text-base">{layout.name}</div>
-                  <div className="text-sm text-muted-foreground font-normal mt-1">
-                    {layout.description}
-                  </div>
-                </Label>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <LayoutTemplate className="w-4 h-4" />
               </div>
-            ))}
-          </RadioGroup>
-        </CardContent>
-      </Card>
+              Estructura del Documento
+            </CardTitle>
+            <CardDescription>
+              Selecciona la distribución visual de tu currículum.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <RadioGroup
+              value={data.theme.layout || "classic"}
+              onValueChange={(val) => handleThemeChange("layout", val)}
+              className="flex flex-col gap-3"
+            >
+              {LAYOUTS.map((layout) => (
+                <div
+                  key={layout.value}
+                  className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-all ${data.theme.layout === layout.value || (!data.theme.layout && layout.value === "classic") ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
+                  onClick={() => handleThemeChange("layout", layout.value)}
+                >
+                  <RadioGroupItem value={layout.value} id={`layout-${layout.value}`} />
+                  <Label
+                    htmlFor={`layout-${layout.value}`}
+                    className="cursor-pointer flex-1"
+                    onClick={(e) => e.preventDefault()} // Let parent div handle the click to select radio
+                  >
+                    <div className="font-semibold text-base">{layout.name}</div>
+                    <div className="text-sm text-muted-foreground font-normal mt-1">
+                      {layout.description}
+                    </div>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
