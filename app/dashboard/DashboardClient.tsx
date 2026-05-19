@@ -10,6 +10,7 @@ import { deleteCV } from "@/app/actions/cv";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 interface CVList {
   id: string;
@@ -17,22 +18,22 @@ interface CVList {
   title: string;
 }
 
-export function DashboardClient({ 
-  initialCvs, 
-  userName, 
-  userImage 
-}: { 
-  initialCvs: CVList[], 
-  userName: string, 
-  userImage?: string | null 
+export function DashboardClient({
+  initialCvs,
+  userName,
+  userImage
+}: {
+  initialCvs: CVList[],
+  userName: string,
+  userImage?: string | null
 }) {
   const [cvs, setCvs] = useState(initialCvs);
-  
+
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (!confirm("¿Seguro que quieres eliminar este CV? Esta acción no se puede deshacer.")) return;
-    
+
     try {
       await deleteCV(id);
       setCvs(cvs.filter(cv => cv.id !== id));
@@ -45,22 +46,28 @@ export function DashboardClient({
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-6 md:p-12">
       <div className="max-w-5xl mx-auto space-y-8">
-        
+
         <header className="flex justify-between items-center border-b pb-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Mis Currículums</h1>
             <p className="text-muted-foreground mt-2">Gestiona tus CVs y crea nuevos ({cvs.length}/4 usados)</p>
           </div>
-          <div className="flex items-center gap-4">
-             <Button variant="ghost" onClick={() => signOut({ callbackUrl: "/" })}>
-               <LogOut className="w-4 h-4 mr-2" />
-               Cerrar Sesión
-             </Button>
-             <Avatar>
-               <AvatarImage src={userImage || ""} />
-               <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-             </Avatar>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 cursor-pointer">
+                <Avatar>
+                  <AvatarImage src={userImage || ""} />
+                  <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Cerrar sesión</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -114,12 +121,12 @@ export function DashboardClient({
               </div>
               <h3 className="font-medium text-lg text-muted-foreground">Límite alcanzado</h3>
               <p className="text-sm text-muted-foreground mt-1 text-center px-4">
-                Has alcanzado el límite de 4 CVs gratuitos. <br/> Pronto podrás acceder a más mediante suscripción.
+                Has alcanzado el límite de 4 CVs gratuitos. <br /> Pronto podrás acceder a más mediante suscripción.
               </p>
             </Card>
           )}
         </div>
-        
+
       </div>
     </div>
   );
