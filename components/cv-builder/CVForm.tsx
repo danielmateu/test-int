@@ -10,6 +10,7 @@ import { CVData, Experience, Education } from "./types";
 import { useState } from "react";
 import { toast } from "sonner";
 import { uploadImage } from "@/app/actions/upload";
+import { RichTextEditor } from "./RichTextEditor";
 import {
   DndContext,
   closestCenter,
@@ -80,7 +81,7 @@ function SortableExperienceItem({ exp, handleExperienceChange, removeExperience 
             <Label>Descripción</Label>
             <AIEnhanceButton text={exp.description} context="experience" onEnhance={(text) => handleExperienceChange(exp.id, "description", text)} />
           </div>
-          <Textarea value={exp.description} onChange={(e) => handleExperienceChange(exp.id, "description", e.target.value)} placeholder="Describe tus responsabilidades y logros..." className="h-20" />
+          <RichTextEditor value={exp.description} onChange={(val) => handleExperienceChange(exp.id, "description", val)} placeholder="Describe tus responsabilidades y logros..." className="h-40" />
         </div>
       </div>
     </div>
@@ -139,7 +140,7 @@ function SortableEducationItem({ edu, handleEducationChange, removeEducation }: 
             <Label>Descripción (opcional)</Label>
             <AIEnhanceButton text={edu.description || ""} context="education" onEnhance={(text) => handleEducationChange(edu.id, "description", text)} />
           </div>
-          <Textarea value={edu.description || ""} onChange={(e) => handleEducationChange(edu.id, "description", e.target.value)} placeholder="Describe los logros, proyectos o habilidades adquiridas..." className="h-20" />
+          <RichTextEditor value={edu.description || ""} onChange={(val) => handleEducationChange(edu.id, "description", val)} placeholder="Describe los logros, proyectos o habilidades adquiridas..." className="h-40" />
         </div>
       </div>
     </div>
@@ -441,12 +442,11 @@ export function CVForm({ data, setData, status }: CVFormProps) {
                   onEnhance={(text) => handlePersonalInfoChange("summary", text)}
                 />
               </div>
-              <Textarea
-                id="summary"
+              <RichTextEditor
                 value={data.personalInfo.summary}
-                onChange={(e) => handlePersonalInfoChange("summary", e.target.value)}
+                onChange={(val) => handlePersonalInfoChange("summary", val)}
                 placeholder="Breve descripción de tu perfil y objetivos..."
-                className=""
+                className="h-40"
               />
             </div>
           </div>
@@ -537,10 +537,9 @@ export function CVForm({ data, setData, status }: CVFormProps) {
                 onEnhance={(text) => setData(prev => ({ ...prev, coverLetter: text }))}
               />
             </div>
-            <Textarea
-              id="coverLetter"
+            <RichTextEditor
               value={data.coverLetter}
-              onChange={(e) => setData(prev => ({ ...prev, coverLetter: e.target.value }))}
+              onChange={(val) => setData(prev => ({ ...prev, coverLetter: val }))}
               placeholder="Escribe aquí tu carta de presentación..."
               className="min-h-[200px]"
             />

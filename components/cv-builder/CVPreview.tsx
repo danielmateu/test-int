@@ -76,9 +76,10 @@ export function CVPreview({ data }: CVPreviewProps) {
                 <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{exp.company || "Empresa"}</div>
               </div>
               {exp.description && (
-                <p className={`text-slate-600 text-sm leading-relaxed whitespace-pre-wrap ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}>
-                  {exp.description}
-                </p>
+                <div 
+                  className={`text-slate-600 text-[0.875em] whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
+                  dangerouslySetInnerHTML={{ __html: exp.description }}
+                />
               )}
             </div>
           ))}
@@ -107,9 +108,10 @@ export function CVPreview({ data }: CVPreviewProps) {
                 <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{edu.institution || "Institución"}</div>
               </div>
               {edu.description && (
-                <p className={`text-slate-600 text-sm leading-relaxed whitespace-pre-wrap ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}>
-                  {edu.description}
-                </p>
+                <div 
+                  className={`text-slate-600 text-[0.875em] whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
+                  dangerouslySetInnerHTML={{ __html: edu.description }}
+                />
               )}
             </div>
           ))}
@@ -123,9 +125,10 @@ export function CVPreview({ data }: CVPreviewProps) {
     return (
       <section className="mb-6">
         {centered && <h2 className="text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid text-center">Perfil</h2>}
-        <p className={`leading-relaxed text-slate-700 whitespace-pre-wrap text-sm ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}>
-          {personalInfo.summary}
-        </p>
+        <div 
+          className={`text-slate-700 whitespace-pre-wrap text-[0.875em] [&>b]:font-bold [&>i]:italic [&>u]:underline ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
+          dangerouslySetInnerHTML={{ __html: personalInfo.summary }}
+        />
       </section>
     );
   }
@@ -133,7 +136,12 @@ export function CVPreview({ data }: CVPreviewProps) {
   return (
     <div
       className={`flex flex-col gap-8 w-full max-w-[210mm] mx-auto print:gap-0 print:block ${data.theme.font}`}
-      style={{ "--theme-color": data.theme.color } as React.CSSProperties}
+      style={{
+        "--theme-color": data.theme.color,
+        fontSize: `${theme.typography?.fontSize || 16}px`,
+        lineHeight: theme.typography?.lineHeight || 1.5,
+        wordSpacing: `${theme.typography?.wordSpacing || 0}px`
+      } as React.CSSProperties}
     >
       {/* CV Page */}
       <div className="w-full bg-white text-slate-900 shadow-2xl overflow-hidden print:overflow-visible print:shadow-none print:w-full print:max-w-none print:min-h-0 max-w-[210mm] min-h-[297mm] mx-auto box-border">
@@ -247,7 +255,10 @@ export function CVPreview({ data }: CVPreviewProps) {
               {personalInfo.summary && (
                 <section className="grid grid-cols-[110px_1fr] gap-8 break-inside-avoid">
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">Perfil</p>
-                  <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{personalInfo.summary}</p>
+                  <div 
+                    className="text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" 
+                    dangerouslySetInnerHTML={{ __html: personalInfo.summary }} 
+                  />
                 </section>
               )}
 
@@ -265,7 +276,10 @@ export function CVPreview({ data }: CVPreviewProps) {
                         </div>
                         <p className="text-xs text-slate-400 mb-1.5">{exp.company || "Empresa"}</p>
                         {exp.description && (
-                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{exp.description}</p>
+                          <div 
+                            className="text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" 
+                            dangerouslySetInnerHTML={{ __html: exp.description }} 
+                          />
                         )}
                       </div>
                     ))}
@@ -287,7 +301,10 @@ export function CVPreview({ data }: CVPreviewProps) {
                         </div>
                         <p className="text-xs text-slate-400 mb-1.5">{edu.institution || "Institución"}</p>
                         {edu.description && (
-                          <p className="text-sm text-slate-600 leading-relaxed whitespace-pre-wrap">{edu.description}</p>
+                          <div 
+                            className="text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" 
+                            dangerouslySetInnerHTML={{ __html: edu.description }} 
+                          />
                         )}
                       </div>
                     ))}
@@ -300,6 +317,196 @@ export function CVPreview({ data }: CVPreviewProps) {
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">Habilidades</p>
                   <p className="text-sm text-slate-600 leading-relaxed">
                     {skills.filter((s) => s.trim()).join(" · ")}
+                  </p>
+                </section>
+              )}
+            </div>
+          </div>
+        )}
+
+        {layout === "modern" && (
+          <div className="flex flex-col min-h-[297mm]">
+            <header className="bg-(--theme-color) text-white p-10 print:p-10 break-inside-avoid">
+              <div className="flex justify-between items-center gap-6">
+                <div>
+                  <h1 className="text-5xl font-black tracking-tight mb-2 uppercase drop-shadow-md">
+                    {personalInfo.fullName || "Tu Nombre"}
+                  </h1>
+                  <p className="text-2xl font-medium opacity-90 tracking-wide">
+                    {personalInfo.jobTitle || "Tu Título Profesional"}
+                  </p>
+                </div>
+                {personalInfo.imageUrl && (
+                  <img src={personalInfo.imageUrl} alt="Profile" className="w-28 h-28 rounded-xl object-cover shadow-xl border-2 border-white/20" />
+                )}
+              </div>
+              <div className="mt-8 pt-6 border-t border-white/20 flex flex-wrap gap-x-6 gap-y-3 text-sm font-medium opacity-90">
+                {personalInfo.email && <span className="flex items-center gap-2"><Mail className="w-4 h-4" />{personalInfo.email}</span>}
+                {personalInfo.phone && <span className="flex items-center gap-2"><Phone className="w-4 h-4" />{personalInfo.phone}</span>}
+                {personalInfo.location && <span className="flex items-center gap-2"><MapPin className="w-4 h-4" />{personalInfo.location}</span>}
+                {personalInfo.linkedinUrl && <a href={personalInfo.linkedinUrl} className="flex items-center gap-2 hover:text-white"><Linkedin className="w-4 h-4" />LinkedIn</a>}
+                {personalInfo.githubUrl && <a href={personalInfo.githubUrl} className="flex items-center gap-2 hover:text-white"><Github className="w-4 h-4" />GitHub</a>}
+              </div>
+            </header>
+
+            <div className="p-10 flex-1 bg-slate-50 print:bg-white space-y-10">
+              {personalInfo.summary && (
+                <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid">
+                  <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                    <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Perfil
+                  </h2>
+                  <div className="text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: personalInfo.summary }} />
+                </section>
+              )}
+
+              {experience.length > 0 && (
+                <section>
+                  <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                    <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Experiencia
+                  </h2>
+                  <div className="space-y-6">
+                    {experience.map((exp) => (
+                      <div key={exp.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid relative overflow-hidden">
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <h3 className="text-lg font-bold text-slate-900">{exp.role || "Puesto"}</h3>
+                            <p className="text-sm font-semibold text-(--theme-color) mt-1">{exp.company || "Empresa"}</p>
+                          </div>
+                          <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium whitespace-nowrap">
+                            {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
+                          </span>
+                        </div>
+                        {exp.description && (
+                          <div className="mt-4 text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: exp.description }} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                {education.length > 0 && (
+                  <section>
+                    <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Educación
+                    </h2>
+                    <div className="space-y-4">
+                      {education.map((edu) => (
+                        <div key={edu.id} className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                          <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
+                          <p className="text-sm font-medium text-(--theme-color) mt-0.5">{edu.institution || "Institución"}</p>
+                          <p className="text-xs text-slate-500 mt-1">{edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}</p>
+                          {edu.description && (
+                            <div className="mt-3 text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: edu.description }} />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                )}
+
+                {skills.some((s) => s.trim()) && (
+                  <section>
+                    <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Habilidades
+                    </h2>
+                    <div className="flex flex-wrap gap-2">
+                      {skills.filter((s) => s.trim()).map((skill, index) => (
+                        <span key={index} className="px-4 py-2 bg-white border border-slate-200 text-slate-700 shadow-sm text-sm font-medium rounded-xl">{skill}</span>
+                      ))}
+                    </div>
+                  </section>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {layout === "corporate" && (
+          <div className="p-12 print:p-12 min-h-[297mm]">
+            <header className="border-b-4 border-slate-900 pb-8 mb-8 text-center break-inside-avoid">
+              <h1 className="text-5xl font-serif font-bold text-slate-900 mb-2 uppercase tracking-wider">
+                {personalInfo.fullName || "Tu Nombre"}
+              </h1>
+              <p className="text-xl text-slate-600 font-medium tracking-widest uppercase mb-6">
+                {personalInfo.jobTitle || "Tu Título Profesional"}
+              </p>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-600">
+                {personalInfo.email && <span>{personalInfo.email}</span>}
+                {personalInfo.phone && <span>• {personalInfo.phone}</span>}
+                {personalInfo.location && <span>• {personalInfo.location}</span>}
+                {personalInfo.linkedinUrl && <span>• <a href={personalInfo.linkedinUrl} className="hover:underline">LinkedIn</a></span>}
+              </div>
+            </header>
+
+            <div className="space-y-8">
+              {personalInfo.summary && (
+                <section className="break-inside-avoid">
+                  <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
+                    Resumen Ejecutivo
+                  </h2>
+                  <div className="text-[0.875em] text-slate-700 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: personalInfo.summary }} />
+                </section>
+              )}
+
+              {experience.length > 0 && (
+                <section>
+                  <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
+                    Experiencia Profesional
+                  </h2>
+                  <div className="space-y-6">
+                    {experience.map((exp) => (
+                      <div key={exp.id} className="break-inside-avoid">
+                        <div className="flex justify-between items-baseline mb-1">
+                          <h3 className="font-bold text-slate-900 text-lg">{exp.role || "Puesto"}</h3>
+                          <span className="text-sm font-bold text-slate-500 whitespace-nowrap">
+                            {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
+                          </span>
+                        </div>
+                        <p className="text-base font-semibold text-slate-700 italic mb-2">{exp.company || "Empresa"}</p>
+                        {exp.description && (
+                          <div className="text-[0.875em] text-slate-700 whitespace-pre-wrap pl-4 border-l-2 border-slate-200 [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: exp.description }} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {education.length > 0 && (
+                <section>
+                  <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
+                    Educación Formal
+                  </h2>
+                  <div className="space-y-4">
+                    {education.map((edu) => (
+                      <div key={edu.id} className="break-inside-avoid flex justify-between items-start">
+                        <div>
+                          <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
+                          <p className="text-slate-700">{edu.institution || "Institución"}</p>
+                          {edu.description && (
+                            <div className="mt-2 text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: edu.description }} />
+                          )}
+                        </div>
+                        <span className="text-sm font-bold text-slate-500 whitespace-nowrap text-right">
+                          {edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {skills.some((s) => s.trim()) && (
+                <section className="break-inside-avoid">
+                  <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
+                    Competencias Clave
+                  </h2>
+                  <p className="text-[0.875em] text-slate-700 font-medium">
+                    {skills.filter((s) => s.trim()).join(" • ")}
                   </p>
                 </section>
               )}
@@ -321,9 +528,10 @@ export function CVPreview({ data }: CVPreviewProps) {
             </p>
             {layout === 'minimalist' && <div className="h-px bg-slate-200 mt-5" />}
           </header>
-          <div className="leading-relaxed text-slate-700 whitespace-pre-wrap text-base">
-            {data.coverLetter}
-          </div>
+          <div 
+            className="text-slate-700 whitespace-pre-wrap text-[1em] [&>b]:font-bold [&>i]:italic [&>u]:underline"
+            dangerouslySetInnerHTML={{ __html: data.coverLetter }}
+          />
         </div>
       )}
     </div>

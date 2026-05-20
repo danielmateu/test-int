@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CVData, CVTheme } from "./types";
-import { Paintbrush, Type, LayoutTemplate } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { CVData, CVTheme, TypographySettings } from "./types";
+import { Paintbrush, Type, LayoutTemplate, SlidersHorizontal } from "lucide-react";
 
 interface CVStyleEditorProps {
   data: CVData;
@@ -22,12 +23,17 @@ const FONTS = [
   { name: "Sans (Moderno)", value: "font-sans", className: "font-sans" },
   { name: "Serif (Clásico)", value: "font-serif", className: "font-serif" },
   { name: "Mono (Técnico)", value: "font-mono", className: "font-mono" },
+  { name: "Arial (Estándar)", value: "font-[Arial]", className: "font-[Arial]" },
+  { name: "Georgia (Elegante)", value: "font-[Georgia]", className: "font-[Georgia]" },
+  { name: "Verdana (Legible)", value: "font-[Verdana]", className: "font-[Verdana]" },
 ];
 
 const LAYOUTS = [
   { name: "Clásico", value: "classic", description: "Diseño lineal tradicional de una sola columna" },
   { name: "Dos Columnas", value: "two-column", description: "Moderno, con barra lateral para contacto y habilidades" },
   { name: "Minimalista", value: "minimalist", description: "Limpio, centrado y sin distracciones visuales" },
+  { name: "Moderno", value: "modern", description: "Vibrante y contemporáneo, con toques de color y tarjetas" },
+  { name: "Corporativo", value: "corporate", description: "Estructurado, profesional y muy claro para entornos formales" },
 ];
 
 export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
@@ -37,6 +43,21 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
       theme: { ...prev.theme, [field]: value },
     }));
   };
+
+  const handleTypographyChange = (field: keyof TypographySettings, value: number) => {
+    setData((prev) => ({
+      ...prev,
+      theme: {
+        ...prev.theme,
+        typography: {
+          ...(prev.theme.typography || { fontSize: 16, lineHeight: 1.5, wordSpacing: 0 }),
+          [field]: value
+        }
+      },
+    }));
+  };
+
+  const currentTypography = data.theme.typography || { fontSize: 16, lineHeight: 1.5, wordSpacing: 0 };
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto pb-20">
@@ -121,6 +142,63 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                 </div>
               ))}
             </RadioGroup>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <SlidersHorizontal className="w-4 h-4" />
+              </div>
+              Ajustes de Tipografía
+            </CardTitle>
+            <CardDescription>
+              Ajusta el tamaño, interlineado y espaciado de palabras.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Tamaño de Fuente (Base)</Label>
+                <span className="text-sm text-muted-foreground">{currentTypography.fontSize}px</span>
+              </div>
+              <Slider
+                min={12}
+                max={24}
+                step={1}
+                value={[currentTypography.fontSize]}
+                onValueChange={([val]) => handleTypographyChange("fontSize", val)}
+              />
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Alto de Línea</Label>
+                <span className="text-sm text-muted-foreground">{currentTypography.lineHeight}</span>
+              </div>
+              <Slider
+                min={1}
+                max={2.5}
+                step={0.1}
+                value={[currentTypography.lineHeight]}
+                onValueChange={([val]) => handleTypographyChange("lineHeight", val)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Separación de Palabras</Label>
+                <span className="text-sm text-muted-foreground">{currentTypography.wordSpacing}px</span>
+              </div>
+              <Slider
+                min={-2}
+                max={10}
+                step={0.5}
+                value={[currentTypography.wordSpacing]}
+                onValueChange={([val]) => handleTypographyChange("wordSpacing", val)}
+              />
+            </div>
           </CardContent>
         </Card>
 

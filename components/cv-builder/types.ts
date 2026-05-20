@@ -30,10 +30,17 @@ export interface Education {
   description?: string;
 }
 
+export interface TypographySettings {
+  lineHeight: number;
+  fontSize: number;
+  wordSpacing: number;
+}
+
 export interface CVTheme {
   color: string;
   font: string;
-  layout: "classic" | "two-column" | "minimalist";
+  layout: "classic" | "two-column" | "minimalist" | "modern" | "corporate";
+  typography?: TypographySettings;
 }
 
 export interface CVData {
