@@ -15,6 +15,9 @@ import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
 import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { CVUploader } from "@/components/cv-builder/CVUploader";
+import { ATSResults, ATSAnalysis } from "@/components/cv-builder/ATSResults";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CVList {
   id: string;
@@ -51,6 +54,8 @@ export function DashboardClient({
   userImage?: string | null
 }) {
   const [cvs, setCvs] = useState(initialCvs);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [atsAnalysis, setAtsAnalysis] = useState<ATSAnalysis | null>(null);
   const router = useRouter();
   const t = useTranslations("Dashboard");
 
@@ -67,6 +72,34 @@ export function DashboardClient({
       toast.error(t("deleteError"));
     }
   }
+
+  const handleATSUpload = async (file: File) => {
+    setIsAnalyzing(true);
+    setAtsAnalysis(null);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/validate-ats", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Error al analizar el CV");
+      }
+
+      setAtsAnalysis(data.analysis);
+      toast.success("Análisis ATS completado");
+    } catch (error: any) {
+      toast.error(error.message || "Error al analizar el CV");
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-6 md:p-12">
@@ -98,7 +131,14 @@ export function DashboardClient({
           </div>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Tabs defaultValue="cvs" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="cvs">Mis CVs</TabsTrigger>
+            <TabsTrigger value="ats">Validador ATS</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="cvs" className="mt-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {cvs.map((cv) => (
             <Card
               key={cv.id}
@@ -114,7 +154,7 @@ export function DashboardClient({
                   {t("updated")} {new Date(cv.updated_at).toLocaleDateString()}
                 </CardDescription>
               </CardHeader>
-              <CardContent className="flex-grow">
+              <CardContent className="grow">
                 <CVThumbnail content={cv.content} />
               </CardContent>
               <CardFooter className="flex justify-between border-t pt-4">
@@ -132,7 +172,7 @@ export function DashboardClient({
           {/* Create New Card */}
           {cvs.length < 4 ? (
             <Link href="/builder">
-              <Card className="border-dashed hover:border-primary transition-colors cursor-pointer h-full min-h-[250px] flex flex-col items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900">
+              <Card className="border-dashed hover:border-primary transition-colors cursor-pointer h-full min-h-62.5 flex flex-col items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Plus className="w-6 h-6 text-primary" />
                 </div>
@@ -141,7 +181,7 @@ export function DashboardClient({
               </Card>
             </Link>
           ) : (
-            <Card className="border-dashed h-full min-h-[250px] flex flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-900 opacity-75">
+            <Card className="border-dashed h-full min-h-62.5 flex flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-900 opacity-75">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
                 <FileText className="w-6 h-6 text-muted-foreground" />
               </div>
@@ -152,6 +192,18 @@ export function DashboardClient({
             </Card>
           )}
         </div>
+          </TabsContent>
+
+          <TabsContent value="ats" className="mt-6">
+            <div className="space-y-6">
+              <CVUploader onUpload={handleATSUpload} isAnalyzing={isAnalyzing} />
+              
+              {atsAnalysis && (
+                <ATSResults analysis={atsAnalysis} />
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
 
       </div>
     </div>

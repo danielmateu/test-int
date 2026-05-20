@@ -290,7 +290,7 @@ export default function LandingPage() {
           <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
             {t("ctaSubtitle")}
           </p>
-          <Button size="lg" className="relative overflow-hidden rounded-full h-16 px-10 text-xl shadow-xl shadow-primary/30 transition-all hover:shadow-primary/60 hover:scale-[1.03] active:scale-95 group" asChild>
+          <Button size="lg" className="relative overflow-hidden rounded-full h-16 px-10 text-xl shadow-xl shadow-primary/30 transition-all hover:shadow-primary/40 active:scale-95 group" asChild>
             <Link href="/register">
               <span className="relative z-10 flex items-center">
                 {t("createCVFree")} <Sparkles className="ml-2 w-5 h-5 transition-transform group-hover:scale-110 " />
