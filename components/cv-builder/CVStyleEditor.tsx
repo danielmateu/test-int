@@ -84,7 +84,7 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
         <p className="text-muted-foreground">Personaliza el aspecto visual de tu currículum.</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -93,9 +93,9 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
               </div>
               Color Principal
             </CardTitle>
-            <CardDescription>
+            {/* <CardDescription>
               Elige un color para los iconos y títulos principales.
-            </CardDescription>
+            </CardDescription> */}
           </CardHeader>
           <CardContent>
             <RadioGroup
@@ -132,12 +132,12 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
               </div>
               Tipografía
             </CardTitle>
-            <CardDescription>
+            {/* <CardDescription>
               Selecciona la fuente que mejor encaje con tu perfil profesional.
-            </CardDescription>
+            </CardDescription> */}
           </CardHeader>
           <CardContent>
-            <RadioGroup
+            {/* <RadioGroup
               value={data.theme.font}
               onValueChange={(val) => handleThemeChange("font", val)}
               className="flex flex-col gap-4"
@@ -156,7 +156,25 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                   </Label>
                 </div>
               ))}
-            </RadioGroup>
+            </RadioGroup> */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {FONTS.map((font) => (
+                <div key={font.value} className={`truncate flex items-center space-x-1 border rounded-lg p-2 cursor-pointer transition-all ${data.theme.font === font.value || (!data.theme.font && font.value === "font-sans") ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`} onClick={() => handleThemeChange("font", font.value)}>
+                  {/* <RadioGroupItem value={font.value} id={`font-${font.value}`} /> */}
+                  <Label
+                    htmlFor={`font-${font.value}`}
+                    className={`text-sm cursor-pointer ${font.className}`}
+                    onClick={(e) => e.preventDefault()} // Let parent div handle the click to select radio
+                  >
+                    {font.name}
+                    {/* <p className="text-sm text-muted-foreground font-sans mt-1">
+                      El veloz murciélago hindú comía feliz cardillo y kiwi.
+                    </p> */}
+                  </Label>
+                </div>
+              ))}
+            </div>
+
           </CardContent>
         </Card>
 
@@ -168,9 +186,9 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
               </div>
               Ajustes de Tipografía
             </CardTitle>
-            <CardDescription>
+            {/* <CardDescription>
               Ajusta el tamaño, interlineado y espaciado de palabras.
-            </CardDescription>
+            </CardDescription> */}
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
@@ -186,7 +204,7 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                 onValueChange={([val]) => handleTypographyChange("fontSize", val)}
               />
             </div>
-            
+
             <div className="space-y-3">
               <div className="flex justify-between">
                 <Label>Alto de Línea</Label>
@@ -225,9 +243,9 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
               </div>
               Ajustes de Espaciado (Bloques y Párrafos)
             </CardTitle>
-            <CardDescription>
+            {/* <CardDescription>
               Ajusta los márgenes de página, y separación de secciones, elementos y párrafos.
-            </CardDescription>
+            </CardDescription> */}
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">
@@ -272,7 +290,7 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
               />
             </div>
 
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <div className="flex justify-between">
                 <Label>Espaciado entre Párrafos</Label>
                 <span className="text-sm text-muted-foreground">{currentSpacing.paragraphSpacing}px</span>
@@ -284,11 +302,13 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                 value={[currentSpacing.paragraphSpacing || 8]}
                 onValueChange={([val]) => handleSpacingChange("paragraphSpacing", val)}
               />
-            </div>
+            </div> */}
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className="col-span-2"
+        >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
@@ -296,15 +316,15 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
               </div>
               Estructura del Documento
             </CardTitle>
-            <CardDescription>
+            {/* <CardDescription>
               Selecciona la distribución visual de tu currículum.
-            </CardDescription>
+            </CardDescription> */}
           </CardHeader>
           <CardContent>
-            <RadioGroup
+            {/* <RadioGroup
               value={data.theme.layout || "classic"}
               onValueChange={(val) => handleThemeChange("layout", val)}
-              className="flex flex-col gap-3"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
               {LAYOUTS.map((layout) => (
                 <div
@@ -325,7 +345,28 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                   </Label>
                 </div>
               ))}
-            </RadioGroup>
+            </RadioGroup> */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {LAYOUTS.map((layout) => (
+                <div
+                  key={layout.value}
+                  className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-all ${data.theme.layout === layout.value || (!data.theme.layout && layout.value === "classic") ? "border-primary bg-primary/5" : "hover:bg-muted/50"}`}
+                  onClick={() => handleThemeChange("layout", layout.value)}
+                >
+                  {/* <RadioGroupItem value={layout.value} id={`layout-${layout.value}`} /> */}
+                  <Label
+                    htmlFor={`layout-${layout.value}`}
+                    className="cursor-pointer flex-1"
+                    onClick={(e) => e.preventDefault()} // Let parent div handle the click to select radio
+                  >
+                    <div className="font-semibold text-base truncate">{layout.name}</div>
+                    {/* <div className="text-sm text-muted-foreground font-normal mt-1">
+                      {layout.description}
+                    </div> */}
+                  </Label>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
