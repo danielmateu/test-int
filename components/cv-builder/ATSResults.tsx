@@ -27,6 +27,8 @@ interface ATSResultsProps {
 }
 
 export function ATSResults({ analysis }: ATSResultsProps) {
+
+  console.log(analysis)
   const getScoreColor = (score: number): string => {
     if (score >= 80) return "text-green-600 dark:text-green-400";
     if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
@@ -230,8 +232,8 @@ export function ATSResults({ analysis }: ATSResultsProps) {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Sobre este análisis</AlertTitle>
         <AlertDescription className="text-xs">
-          Este análisis proporciona una evaluación general de la compatibilidad ATS. 
-          Los resultados pueden variar según el sistema ATS específico usado por cada empresa. 
+          Este análisis proporciona una evaluación general de la compatibilidad ATS.
+          Los resultados pueden variar según el sistema ATS específico usado por cada empresa.
           Te recomendamos siempre adaptar tu CV a cada oferta de trabajo.
         </AlertDescription>
       </Alert>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { getDocumentProxy, extractText as unpdfExtractText } from "unpdf";
 
 interface ATSAnalysis {
   score: number;
@@ -38,27 +39,24 @@ const standardSections = [
 async function extractText(buffer: Buffer, mimeType: string): Promise<string> {
   if (mimeType === "application/pdf") {
     try {
-      // Intentar parsear usando pdf-parse como CommonJS
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const pdfParse = require("pdf-parse");
-      
-      // Parsear el PDF
-      const data = await pdfParse(buffer);
-      return data.text;
+      // Parsear el PDF usando unpdf (pure JS, compatible con Turbopack)
+      const pdf = await getDocumentProxy(new Uint8Array(buffer));
+      const { text } = await unpdfExtractText(pdf, { mergePages: true });
+      return text;
     } catch (error: any) {
-      console.error("Error parsing PDF:", error);
-      
+      console.error("Error parsing PDF:", error.stack || error);
+
       // Si falla pdf-parse, analizar el buffer como texto plano
       // Esto permite hacer un análisis básico aunque no sea perfecto
       try {
         const textContent = buffer.toString('utf-8', 0, Math.min(50000, buffer.length));
-        
+
         // Filtrar caracteres no imprimibles pero mantener texto
         const cleanText = textContent
           .replace(/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F-\x9F]/g, ' ')
           .replace(/\s+/g, ' ')
           .trim();
-        
+
         if (cleanText.length > 100) {
           console.log("Usando análisis de texto plano como fallback");
           return cleanText;
@@ -66,11 +64,11 @@ async function extractText(buffer: Buffer, mimeType: string): Promise<string> {
       } catch (fallbackError) {
         console.error("Error en fallback:", fallbackError);
       }
-      
+
       throw new Error("No se pudo extraer texto del PDF. Asegúrate de que contiene texto seleccionable (no es una imagen escaneada).");
     }
   }
-  
+
   // Para DOCX, necesitaríamos una librería adicional como mammoth
   // Por ahora, lanzamos un error informativo
   throw new Error("El análisis de archivos DOCX estará disponible próximamente. Por favor, usa PDF.");
@@ -78,7 +76,7 @@ async function extractText(buffer: Buffer, mimeType: string): Promise<string> {
 
 function analyzeATSCompatibility(text: string): ATSAnalysis {
   const lowerText = text.toLowerCase();
-  
+
   // Verificar información de contacto
   const hasEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(text);
   const hasPhone = /(\+?[\d\s\-()]{9,})|(\d{3}[-.\s]?\d{3}[-.\s]?\d{4})/g.test(text);
@@ -107,9 +105,11 @@ function analyzeATSCompatibility(text: string): ATSAnalysis {
   // Verificar formato simple (heurísticas básicas)
   const hasNoTables = !text.includes("|") && !text.match(/\t.*\t.*\t/);
   const hasNoImages = true; // PDF parse ya elimina imágenes, solo texto
-  
+
   // Verificar caracteres especiales excesivos que pueden confundir ATS
-  const specialCharsRatio = (text.match(/[^a-zA-Z0-9\s.,;:()\-]/g) || []).length / text.length;
+  // Usamos clases de caracteres Unicode (\p{L} para letras, \p{N} para números)
+  // para evitar penalizar caracteres del español como acentos y la eñe.
+  const specialCharsRatio = (text.match(/[^\p{L}\p{N}\s.,;:()\-]/gu) || []).length / text.length;
   const hasSimpleFormatting = specialCharsRatio < 0.05;
 
   // Verificar longitud razonable
@@ -133,7 +133,7 @@ function analyzeATSCompatibility(text: string): ATSAnalysis {
 
   // Generar sugerencias
   const suggestions: string[] = [];
-  
+
   if (!hasContactInfo) {
     if (!hasEmail) {
       suggestions.push("Añade tu dirección de email en una sección visible, preferiblemente en el encabezado.");
