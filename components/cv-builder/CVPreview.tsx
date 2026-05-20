@@ -68,7 +68,14 @@ export function CVPreview({ data }: CVPreviewProps) {
 
         // Reconstruir la posición original (sin espaciador) en el flujo del documento
         const originalTop = (rect.top - parentRect.top) - currentSpacer - col.current;
-        const height = rect.height;
+
+        // Incluir el div de descripción hermano (rich-text-content) si existe fuera del bloque
+        let height = rect.height;
+        const nextSibling = el.nextElementSibling;
+        if (nextSibling && nextSibling.classList.contains('rich-text-content')) {
+          height += nextSibling.getBoundingClientRect().height;
+        }
+
         const originalBottom = originalTop + height;
 
         col.current += currentSpacer;
@@ -81,8 +88,9 @@ export function CVPreview({ data }: CVPreviewProps) {
 
         // Si el elemento cruza el límite de la página o cae dentro de la zona de divisor (40px)
         if (originalTop < gapEnd && originalBottom > gapStart && height < pageHeightInPx) {
-          // Empujar al inicio de la siguiente página (justo después del divisor de 40px)
-          const spacerNeeded = gapEnd - originalTop;
+          // Empujar al inicio de la siguiente página (después del divisor + margen superior de página)
+          const topPagePadding = theme.spacing?.pagePadding ?? 48;
+          const spacerNeeded = gapEnd - originalTop + topPagePadding;
           newSpacers[id] = spacerNeeded;
           col.new += spacerNeeded;
         } else {
@@ -107,7 +115,7 @@ export function CVPreview({ data }: CVPreviewProps) {
 
     const timeoutId = setTimeout(calculateSpacers, 100);
     return () => clearTimeout(timeoutId);
-  }, [data, theme.layout, pageHeightInPx, spacers]);
+  }, [data, theme.layout, theme.spacing?.pagePadding, pageHeightInPx, spacers]);
 
   const renderSpacer = (id: string) => {
     const height = spacers[id] || 0;
@@ -352,7 +360,7 @@ export function CVPreview({ data }: CVPreviewProps) {
         <div ref={contentWrapperRef} className="w-full">
 
         {layout === "classic" && (
-          <div className="preview-page-padding print:px-[20mm] print:py-[15mm]">
+          <div className="preview-page-padding print:px-[20mm] print:py-0">
             <header className="preview-section flex justify-between items-start gap-6 break-inside-avoid">
               <div className="flex-1">
                 <h1 className="text-4xl font-extrabold tracking-tight text-(--theme-color) mb-1 uppercase">
@@ -406,7 +414,7 @@ export function CVPreview({ data }: CVPreviewProps) {
             </div>
 
             {/* Right Content */}
-            <div className="w-[65%] preview-page-padding">
+            <div className="w-[65%] preview-page-padding print:py-0">
               <SummarySection />
               <ExperienceSection />
               <EducationSection />
@@ -415,7 +423,7 @@ export function CVPreview({ data }: CVPreviewProps) {
         )}
 
         {layout === "minimalist" && (
-          <div className="preview-page-padding print:px-[22mm] print:py-[18mm]">
+          <div className="preview-page-padding print:px-[22mm] print:py-0">
             {/* Header */}
             <header className="preview-section break-inside-avoid">
               <div className="flex items-start justify-between gap-6 mb-6">
@@ -572,7 +580,7 @@ export function CVPreview({ data }: CVPreviewProps) {
               </div>
             </header>
 
-            <div className="preview-page-padding flex-1 bg-slate-50 print:bg-white flex flex-col">
+            <div className="preview-page-padding print:py-0 flex-1 bg-slate-50 print:bg-white flex flex-col">
               {personalInfo.summary && (
                 <>
                   {renderSpacer("summary")}
@@ -711,7 +719,7 @@ export function CVPreview({ data }: CVPreviewProps) {
         )}
 
         {layout === "corporate" && (
-          <div className="preview-page-padding min-h-[297mm]">
+          <div className="preview-page-padding print:py-0 min-h-[297mm]">
             <header className="border-b-4 border-slate-900 pb-8 preview-section text-center break-inside-avoid">
               <h1 className="text-5xl font-serif font-bold text-slate-900 mb-2 uppercase tracking-wider">
                 {personalInfo.fullName || defaultName}

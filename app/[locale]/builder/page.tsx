@@ -101,7 +101,7 @@ function BuilderPageContent() {
     <div className="min-h-screen print:min-h-0 bg-zinc-50 dark:bg-zinc-950 font-sans print:bg-white print:p-0">
       <style dangerouslySetInnerHTML={{
         __html: `
-        @page { size: auto; margin: 0mm; }
+        @page { size: A4; margin: 8mm 0mm; }
         @media print {
           body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }

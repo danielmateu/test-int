@@ -38,11 +38,11 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="font-bold text-xl tracking-tight flex items-center gap-2 group">
             <motion.div
-              className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 text-primary-foreground rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 transition-transform duration-200 group-hover:scale-105 group-hover:transition-transform"
+              className="w-8 h-8 bg-linear-to-br from-primary to-purple-600 text-primary-foreground rounded-lg flex items-center justify-center shadow-lg shadow-primary/20 transition-transform duration-200 group-hover:scale-105 group-hover:transition-transform"
             >
               <FileText className="w-5 h-5" />
             </motion.div>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">CV AI Builder</span>
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-foreground to-foreground/70">CV AI Builder</span>
           </Link>
           <div className="flex items-center gap-4">
             <Button variant="ghost" className="hidden sm:inline-flex hover:bg-primary/10" asChild>
@@ -84,7 +84,7 @@ export default function LandingPage() {
 
             <motion.h1 variants={fadeIn} className="text-5xl md:text-7xl font-extrabold tracking-tight mb-8 leading-[1.1]">
               {t("heroTitle1")} <br className="hidden md:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-purple-500 to-blue-600 animate-gradient-x">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-purple-500 to-blue-600 animate-gradient-x">
                 {t("heroTitle2")}
               </span>
             </motion.h1>
@@ -195,7 +195,7 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            <motion.div whileHover={{ y: -5 }} className="col-span-1 row-span-1 bg-gradient-to-br from-primary to-purple-600 rounded-3xl p-8 text-primary-foreground shadow-lg relative overflow-hidden">
+            <motion.div whileHover={{ y: -5 }} className="col-span-1 row-span-1 bg-linear-to-br from-primary to-purple-600 rounded-3xl p-8 text-primary-foreground shadow-lg relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-20"><Sparkles className="w-24 h-24" /></div>
               <div className="relative z-10 h-full flex flex-col justify-end">
                 <h3 className="text-2xl font-bold mb-2">{t("f2Title")}</h3>
