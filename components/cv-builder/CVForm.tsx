@@ -547,7 +547,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
               value={data.coverLetter}
               onChange={(val) => setData(prev => ({ ...prev, coverLetter: val }))}
               placeholder={t("coverLetter.placeholder")}
-              className="min-h-[200px]"
+              className="min-h-50"
             />
           </div>
         </CardContent>

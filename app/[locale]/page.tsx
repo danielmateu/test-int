@@ -128,7 +128,7 @@ export default function LandingPage() {
               <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
               <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
             </div>
-            <div className="flex h-[400px] p-2 gap-4 opacity-80 select-none pointer-events-none">
+            <div className="flex h-100 p-2 gap-4 opacity-80 select-none pointer-events-none">
               <div className="w-1/3 flex flex-col gap-4">
                 <div className="flex bg-muted/50 rounded-lg p-1">
                   <div className="flex-1 bg-background shadow-sm rounded-md h-8 flex items-center justify-center text-xs font-medium">Contenido</div>
@@ -145,7 +145,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <div className="flex-1 bg-zinc-200/50 dark:bg-zinc-800/50 rounded-lg p-4 flex justify-center overflow-hidden">
-                <div className="w-full max-w-[220px] bg-white shadow-xl shadow-black/10 rounded-sm p-4 flex flex-col gap-3 relative overflow-hidden">
+                <div className="w-full max-w-55 bg-white shadow-xl shadow-black/10 rounded-sm p-4 flex flex-col gap-3 relative overflow-hidden">
                   <div className="flex gap-3 items-center border-b pb-3 border-gray-200">
                     <div className="w-10 h-10 rounded-full bg-slate-200 shrink-0"></div>
                     <div className="flex-1 space-y-1.5">
@@ -168,7 +168,7 @@ export default function LandingPage() {
                 </div>
               </div>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent pointer-events-none"></div>
+            <div className="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent pointer-events-none"></div>
           </div>
         </div>
       </motion.section>
