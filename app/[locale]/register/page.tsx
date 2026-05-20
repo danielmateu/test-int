@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { CustomCursor } from "@/components/custom-cursor";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,10 +21,28 @@ export default function LoginPage() {
     setIsLoading(true);
     
     const formData = new FormData(e.currentTarget);
+    const name = formData.get("name") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
     try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Error al registrarse");
+        setIsLoading(false);
+        return;
+      }
+
+      toast.success("¡Cuenta creada correctamente!");
+      
+      // Auto login
       const result = await signIn("credentials", {
         email,
         password,
@@ -32,15 +50,14 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        toast.error("Credenciales inválidas");
+        toast.error("Error al iniciar sesión automáticamente");
         setIsLoading(false);
       } else {
-        toast.success("¡Inicio de sesión exitoso!");
         router.push("/dashboard");
         router.refresh();
       }
     } catch (error) {
-      toast.error("Ocurrió un error al iniciar sesión");
+      toast.error("Ocurrió un error inesperado");
       setIsLoading(false);
     }
   };
@@ -66,28 +83,27 @@ export default function LoginPage() {
           <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 text-primary-foreground rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
             <FileText className="w-6 h-6" />
           </div>
-          <CardTitle className="text-2xl font-bold">Bienvenido de nuevo</CardTitle>
+          <CardTitle className="text-2xl font-bold">Crea tu cuenta</CardTitle>
           <CardDescription>
-            Inicia sesión con tu cuenta para continuar editando tu CV
+            Únete a CV AI Builder y empieza a destacar
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
+              <Label htmlFor="name">Nombre completo</Label>
+              <Input id="name" name="name" placeholder="Juan Pérez" required />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" name="email" type="email" placeholder="tu@email.com" required />
             </div>
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Contraseña</Label>
-                <Link href="#" className="text-sm text-primary hover:underline">
-                  ¿Olvidaste tu contraseña?
-                </Link>
-              </div>
-              <Input id="password" name="password" type="password" required />
+              <Label htmlFor="password">Contraseña</Label>
+              <Input id="password" name="password" type="password" required minLength={6} />
             </div>
             <Button type="submit" className="w-full h-11 mt-6" disabled={isLoading}>
-              {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
+              {isLoading ? "Creando cuenta..." : "Registrarse"}
             </Button>
           </form>
 
@@ -114,13 +130,12 @@ export default function LoginPage() {
             </svg>
             Google
           </Button>
-
         </CardContent>
         <CardFooter className="flex justify-center border-t p-6">
           <p className="text-sm text-muted-foreground">
-            ¿No tienes cuenta?{" "}
-            <Link href="/register" className="text-primary font-medium hover:underline">
-              Regístrate gratis
+            ¿Ya tienes cuenta?{" "}
+            <Link href="/login" className="text-primary font-medium hover:underline">
+              Inicia sesión
             </Link>
           </p>
         </CardFooter>

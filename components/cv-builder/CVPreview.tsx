@@ -1,5 +1,6 @@
 import { CVData } from "./types";
 import { Mail, Phone, MapPin, Github, Linkedin, Globe, Twitter } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface CVPreviewProps {
   data: CVData;
@@ -8,6 +9,11 @@ interface CVPreviewProps {
 export function CVPreview({ data }: CVPreviewProps) {
   const { personalInfo, experience, education, skills, theme } = data;
   const layout = theme.layout || "classic";
+  const t = useTranslations("CVPreview.sections");
+
+  // For generic defaults we use form placeholders usually, but let's leave generic fallbacks if empty
+  const defaultName = "Tu Nombre";
+  const defaultTitle = "Tu Título Profesional";
 
   const ContactItems = ({ layoutStyle }: { layoutStyle?: 'column' | 'row' }) => {
     const wrapperClass = layoutStyle === 'column' ? "flex flex-col gap-3" : layoutStyle === 'row' ? "flex flex-wrap justify-center gap-x-4 gap-y-2" : "flex flex-wrap gap-x-5 gap-y-2";
@@ -44,7 +50,7 @@ export function CVPreview({ data }: CVPreviewProps) {
     return (
       <section className="break-inside-avoid mb-6">
         <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'} ${sidebar ? 'text-sm mt-2' : ''}`}>
-          Habilidades
+          {t("skills")}
         </h2>
         <div className={`flex flex-wrap gap-2 ${centered ? 'justify-center' : ''}`}>
           {skills.map((skill, index) => {
@@ -61,7 +67,7 @@ export function CVPreview({ data }: CVPreviewProps) {
     return (
       <section className="mb-6">
         <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'}`}>
-          Experiencia
+          {t("experience")}
         </h2>
         <div className="space-y-6">
           {experience.map((exp) => (
@@ -93,7 +99,7 @@ export function CVPreview({ data }: CVPreviewProps) {
     return (
       <section className="mb-6">
         <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'}`}>
-          Educación
+          {t("education")}
         </h2>
         <div className="space-y-4">
           {education.map((edu) => (
@@ -124,7 +130,7 @@ export function CVPreview({ data }: CVPreviewProps) {
     if (!personalInfo.summary) return null;
     return (
       <section className="mb-6">
-        {centered && <h2 className="text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid text-center">Perfil</h2>}
+        {centered && <h2 className="text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid text-center">{t("summary")}</h2>}
         <div 
           className={`text-slate-700 whitespace-pre-wrap text-[0.875em] [&>b]:font-bold [&>i]:italic [&>u]:underline ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
           dangerouslySetInnerHTML={{ __html: personalInfo.summary }}
@@ -151,10 +157,10 @@ export function CVPreview({ data }: CVPreviewProps) {
             <header className="mb-6 flex justify-between items-start gap-6 break-inside-avoid">
               <div className="flex-1">
                 <h1 className="text-4xl font-extrabold tracking-tight text-(--theme-color) mb-1 uppercase">
-                  {personalInfo.fullName || "Tu Nombre"}
+                  {personalInfo.fullName || defaultName}
                 </h1>
                 <p className="text-xl font-medium text-slate-500 mb-4 tracking-tight">
-                  {personalInfo.jobTitle || "Tu Título Profesional"}
+                  {personalInfo.jobTitle || defaultTitle}
                 </p>
                 <ContactItems />
               </div>
@@ -185,15 +191,15 @@ export function CVPreview({ data }: CVPreviewProps) {
 
               <div className="text-center">
                 <h1 className="text-2xl font-extrabold tracking-tight text-(--theme-color) mb-1 uppercase leading-tight">
-                  {personalInfo.fullName || "Tu Nombre"}
+                  {personalInfo.fullName || defaultName}
                 </h1>
                 <p className="text-sm font-medium text-slate-500">
-                  {personalInfo.jobTitle || "Tu Título"}
+                  {personalInfo.jobTitle || defaultTitle}
                 </p>
               </div>
 
               <div>
-                <h2 className="text-sm font-bold uppercase tracking-wider text-(--theme-color) border-b border-slate-300 pb-2 mb-3">Contacto</h2>
+                <h2 className="text-sm font-bold uppercase tracking-wider text-(--theme-color) border-b border-slate-300 pb-2 mb-3">{t("contact")}</h2>
                 <ContactItems layoutStyle="column" />
               </div>
 
@@ -216,10 +222,10 @@ export function CVPreview({ data }: CVPreviewProps) {
               <div className="flex items-start justify-between gap-6 mb-6">
                 <div className="flex-1 min-w-0">
                   <h1 className="text-4xl font-extralight tracking-tight text-slate-900 mb-2">
-                    {personalInfo.fullName || "Tu Nombre"}
+                    {personalInfo.fullName || defaultName}
                   </h1>
                   <p className="text-[11px] font-medium text-slate-400 tracking-[0.22em] uppercase">
-                    {personalInfo.jobTitle || "Tu Título Profesional"}
+                    {personalInfo.jobTitle || defaultTitle}
                   </p>
                 </div>
                 {personalInfo.imageUrl && (
@@ -254,7 +260,7 @@ export function CVPreview({ data }: CVPreviewProps) {
             <div className="space-y-8">
               {personalInfo.summary && (
                 <section className="grid grid-cols-[110px_1fr] gap-8 break-inside-avoid">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">Perfil</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("summary")}</p>
                   <div 
                     className="text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" 
                     dangerouslySetInnerHTML={{ __html: personalInfo.summary }} 
@@ -264,7 +270,7 @@ export function CVPreview({ data }: CVPreviewProps) {
 
               {experience.length > 0 && (
                 <section className="grid grid-cols-[110px_1fr] gap-8">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">Experiencia</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("experience")}</p>
                   <div className="space-y-6">
                     {experience.map((exp) => (
                       <div key={exp.id} className="break-inside-avoid">
@@ -289,7 +295,7 @@ export function CVPreview({ data }: CVPreviewProps) {
 
               {education.length > 0 && (
                 <section className="grid grid-cols-[110px_1fr] gap-8">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">Educación</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("education")}</p>
                   <div className="space-y-5">
                     {education.map((edu) => (
                       <div key={edu.id} className="break-inside-avoid">
@@ -314,7 +320,7 @@ export function CVPreview({ data }: CVPreviewProps) {
 
               {skills.some((s) => s.trim()) && (
                 <section className="grid grid-cols-[110px_1fr] gap-8 break-inside-avoid">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">Habilidades</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("skills")}</p>
                   <p className="text-sm text-slate-600 leading-relaxed">
                     {skills.filter((s) => s.trim()).join(" · ")}
                   </p>
@@ -330,10 +336,10 @@ export function CVPreview({ data }: CVPreviewProps) {
               <div className="flex justify-between items-center gap-6">
                 <div>
                   <h1 className="text-5xl font-black tracking-tight mb-2 uppercase drop-shadow-md">
-                    {personalInfo.fullName || "Tu Nombre"}
+                    {personalInfo.fullName || defaultName}
                   </h1>
                   <p className="text-2xl font-medium opacity-90 tracking-wide">
-                    {personalInfo.jobTitle || "Tu Título Profesional"}
+                    {personalInfo.jobTitle || defaultTitle}
                   </p>
                 </div>
                 {personalInfo.imageUrl && (
@@ -353,7 +359,7 @@ export function CVPreview({ data }: CVPreviewProps) {
               {personalInfo.summary && (
                 <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid">
                   <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
-                    <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Perfil
+                    <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("summary")}
                   </h2>
                   <div className="text-[0.875em] text-slate-600 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: personalInfo.summary }} />
                 </section>
@@ -362,7 +368,7 @@ export function CVPreview({ data }: CVPreviewProps) {
               {experience.length > 0 && (
                 <section>
                   <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                    <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Experiencia
+                    <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("experience")}
                   </h2>
                   <div className="space-y-6">
                     {experience.map((exp) => (
@@ -390,7 +396,7 @@ export function CVPreview({ data }: CVPreviewProps) {
                 {education.length > 0 && (
                   <section>
                     <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Educación
+                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("education")}
                     </h2>
                     <div className="space-y-4">
                       {education.map((edu) => (
@@ -411,7 +417,7 @@ export function CVPreview({ data }: CVPreviewProps) {
                 {skills.some((s) => s.trim()) && (
                   <section>
                     <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> Habilidades
+                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("skills")}
                     </h2>
                     <div className="flex flex-wrap gap-2">
                       {skills.filter((s) => s.trim()).map((skill, index) => (
@@ -429,10 +435,10 @@ export function CVPreview({ data }: CVPreviewProps) {
           <div className="p-12 print:p-12 min-h-[297mm]">
             <header className="border-b-4 border-slate-900 pb-8 mb-8 text-center break-inside-avoid">
               <h1 className="text-5xl font-serif font-bold text-slate-900 mb-2 uppercase tracking-wider">
-                {personalInfo.fullName || "Tu Nombre"}
+                {personalInfo.fullName || defaultName}
               </h1>
               <p className="text-xl text-slate-600 font-medium tracking-widest uppercase mb-6">
-                {personalInfo.jobTitle || "Tu Título Profesional"}
+                {personalInfo.jobTitle || defaultTitle}
               </p>
               <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-600">
                 {personalInfo.email && <span>{personalInfo.email}</span>}
@@ -446,7 +452,7 @@ export function CVPreview({ data }: CVPreviewProps) {
               {personalInfo.summary && (
                 <section className="break-inside-avoid">
                   <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
-                    Resumen Ejecutivo
+                    {t("summary")}
                   </h2>
                   <div className="text-[0.875em] text-slate-700 whitespace-pre-wrap [&>b]:font-bold [&>i]:italic [&>u]:underline" dangerouslySetInnerHTML={{ __html: personalInfo.summary }} />
                 </section>
@@ -455,7 +461,7 @@ export function CVPreview({ data }: CVPreviewProps) {
               {experience.length > 0 && (
                 <section>
                   <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
-                    Experiencia Profesional
+                    {t("experience")}
                   </h2>
                   <div className="space-y-6">
                     {experience.map((exp) => (
@@ -479,7 +485,7 @@ export function CVPreview({ data }: CVPreviewProps) {
               {education.length > 0 && (
                 <section>
                   <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
-                    Educación Formal
+                    {t("education")}
                   </h2>
                   <div className="space-y-4">
                     {education.map((edu) => (
@@ -503,7 +509,7 @@ export function CVPreview({ data }: CVPreviewProps) {
               {skills.some((s) => s.trim()) && (
                 <section className="break-inside-avoid">
                   <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
-                    Competencias Clave
+                    {t("skills")}
                   </h2>
                   <p className="text-[0.875em] text-slate-700 font-medium">
                     {skills.filter((s) => s.trim()).join(" • ")}
@@ -521,10 +527,10 @@ export function CVPreview({ data }: CVPreviewProps) {
         <div className="w-full bg-white text-slate-900 shadow-2xl overflow-hidden print:shadow-none print:w-full print:max-w-none max-w-[210mm] min-h-[297mm] mx-auto box-border p-[15mm] sm:p-[20mm] print:p-[20mm] text-sm break-before-page print:break-before-page mt-8">
           <header className={`pb-6 mb-6 ${layout === 'minimalist' ? 'border-none' : 'border-b-2 border-slate-900'}`}>
             <h1 className={`tracking-tight uppercase mb-1 ${layout === 'minimalist' ? 'text-2xl font-semibold text-slate-900' : 'text-4xl font-extrabold text-(--theme-color)'}`}>
-              {personalInfo.fullName || "Tu Nombre"}
+              {personalInfo.fullName || defaultName}
             </h1>
             <p className={`font-medium ${layout === 'minimalist' ? 'text-xs text-slate-400 tracking-widest uppercase' : 'text-xl text-slate-600'}`}>
-              Carta de Presentación
+              {t("coverLetter")}
             </p>
             {layout === 'minimalist' && <div className="h-px bg-slate-200 mt-5" />}
           </header>

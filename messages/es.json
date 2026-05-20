@@ -1,0 +1,144 @@
+{
+  "Common": {
+    "appName": "CV AI Builder"
+  },
+  "Navigation": {
+    "dashboard": "Mi Panel",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "startFree": "Empezar Gratis",
+    "demo": "Demo"
+  },
+  "LanguageSwitcher": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "de": "Deutsch",
+    "it": "Italiano",
+    "pt": "Português",
+    "ca": "Català"
+  },
+  "Dashboard": {
+    "title": "Mis Currículums",
+    "subtitle": "Gestiona tus CVs y crea nuevos",
+    "used": "usados",
+    "logout": "Cerrar sesión",
+    "updated": "Actualizado:",
+    "edit": "Editar",
+    "createNew": "Crear Nuevo CV",
+    "available": "disponibles",
+    "limitReached": "Límite alcanzado",
+    "limitMsg": "Has alcanzado el límite de 4 CVs gratuitos. Pronto podrás acceder a más mediante suscripción.",
+    "deleteConfirm": "¿Seguro que quieres eliminar este CV? Esta acción no se puede deshacer.",
+    "deleteSuccess": "CV eliminado correctamente",
+    "deleteError": "Error al eliminar el CV"
+  },
+  "LandingPage": {
+    "heroBadge": "La nueva era de los currículums",
+    "heroTitle1": "Crea tu currículum perfecto en",
+    "heroTitle2": "cuestión de minutos",
+    "heroSubtitle": "Nuestra herramienta impulsada por IA maquetará tu CV en tiempo real con un diseño profesional, destacando lo mejor de ti.",
+    "createCVFree": "Crear mi CV gratis",
+    "tryInteractiveDemo": "Probar Demo Interactiva",
+    "featuresTitle": "Herramientas Premium",
+    "featuresSubtitle": "Todo el poder de un diseñador profesional, simplificado en una interfaz intuitiva.",
+    "f1Title": "Diseño en Tiempo Real",
+    "f1Desc": "Previsualiza instantáneamente cada cambio. Ajusta tipografías, colores y espaciados sin recargar la página.",
+    "f2Title": "Asistencia de IA",
+    "f2Desc": "Genera resúmenes y descripciones impactantes con un solo clic.",
+    "f3Title": "Exportación Perfecta",
+    "f3Desc": "PDFs optimizados para ATS (Sistemas de Seguimiento de Candidatos), en formato A4 perfecto.",
+    "f4Title": "Rendimiento Extremo",
+    "f4Desc": "Aplicación rápida, fluida y segura. Tu información se guarda automáticamente en la nube.",
+    "howItWorks": "Cómo Funciona",
+    "howItWorksSubtitle": "Tres simples pasos para conseguir el trabajo de tus sueños.",
+    "step1Title": "1. Completa tu Perfil",
+    "step1Desc": "Introduce tus datos, experiencia y educación en nuestros formularios guiados. La IA puede ayudarte a redactar tus logros.",
+    "step2Title": "2. Personaliza el Diseño",
+    "step2Desc": "Elige entre múltiples plantillas profesionales. Cambia colores, tipografías y el orden de las secciones en tiempo real.",
+    "step3Title": "3. Descarga y Triunfa",
+    "step3Desc": "Exporta tu CV en un PDF perfecto y listo para imprimir, sin marcas de agua ni bordes extraños.",
+    "ctaTitle": "¿Listo para destacar?",
+    "ctaSubtitle": "Únete a miles de profesionales que ya han mejorado sus oportunidades laborales con un currículum impactante.",
+    "rights": "Todos los derechos reservados."
+  },
+  "CVForm": {
+    "title": "Tu Información",
+    "subtitle": "Completa los datos para generar tu CV profesional.",
+    "personalInfo": {
+      "title": "Datos Personales",
+      "photo": "Foto de Perfil",
+      "uploadPhoto": "Subir foto",
+      "deletePhoto": "Eliminar foto",
+      "photoSuccess": "Foto de perfil subida correctamente",
+      "photoError": "Error al subir la imagen",
+      "photoSizeError": "La imagen es demasiado grande. Máximo 5MB.",
+      "fullName": "Nombre Completo",
+      "fullNamePlaceholder": "Ej. Juan Pérez",
+      "jobTitle": "Título Profesional",
+      "jobTitlePlaceholder": "Ej. Desarrollador Frontend",
+      "email": "Email",
+      "phone": "Teléfono",
+      "location": "Ubicación",
+      "locationPlaceholder": "Madrid, España",
+      "github": "GitHub URL",
+      "linkedin": "LinkedIn URL",
+      "portfolio": "Portfolio URL",
+      "twitter": "X (Twitter) URL",
+      "summary": "Perfil Profesional",
+      "summaryPlaceholder": "Breve descripción de tu perfil y objetivos..."
+    },
+    "experience": {
+      "title": "Experiencia",
+      "add": "Añadir",
+      "empty": "No has añadido experiencia todavía.",
+      "company": "Empresa",
+      "companyPlaceholder": "Nombre de la empresa",
+      "role": "Puesto",
+      "rolePlaceholder": "Ej. Software Engineer",
+      "startDate": "Fecha Inicio",
+      "endDate": "Fecha Fin",
+      "current": "Actual",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe tus responsabilidades y logros..."
+    },
+    "education": {
+      "title": "Educación",
+      "add": "Añadir",
+      "empty": "No has añadido educación todavía.",
+      "institution": "Institución",
+      "institutionPlaceholder": "Universidad o Centro",
+      "degree": "Titulación",
+      "degreePlaceholder": "Ej. Grado en Ingeniería Informática",
+      "startDate": "Fecha Inicio",
+      "endDate": "Fecha Fin",
+      "current": "Actual",
+      "description": "Descripción (opcional)",
+      "descriptionPlaceholder": "Describe los logros, proyectos o habilidades adquiridas..."
+    },
+    "skills": {
+      "title": "Habilidades",
+      "label": "Tus habilidades (separadas por comas)",
+      "placeholder": "React, TypeScript, Node.js, Diseño UI..."
+    },
+    "coverLetter": {
+      "title": "Carta de Presentación",
+      "label": "Contenido de la carta (opcional)",
+      "placeholder": "Escribe aquí tu carta de presentación..."
+    }
+  },
+  "CVPreview": {
+    "sections": {
+      "summary": "Perfil Profesional",
+      "experience": "Experiencia Profesional",
+      "education": "Educación",
+      "skills": "Habilidades",
+      "contact": "Contacto",
+      "coverLetter": "Carta de Presentación"
+    },
+    "dates": {
+      "present": "Actualidad"
+    }
+  }
+}

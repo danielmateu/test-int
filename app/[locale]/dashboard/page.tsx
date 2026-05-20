@@ -1,6 +1,6 @@
 import { getCVs } from "@/app/actions/cv";
 // import { DashboardClient } from "./DashboardClient";
-import { redirect } from "next/navigation";
+import { redirect } from "@/i18n/routing";
 import { auth } from "@/auth";
 import { DashboardClient } from "./DashboardClient";
 

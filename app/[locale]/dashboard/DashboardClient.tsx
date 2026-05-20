@@ -4,8 +4,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { FileText, Plus, Trash2, Edit2, LogOut } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
 import { deleteCV } from "@/app/actions/cv";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -13,6 +13,8 @@ import { signOut } from "next-auth/react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 interface CVList {
   id: string;
@@ -50,18 +52,19 @@ export function DashboardClient({
 }) {
   const [cvs, setCvs] = useState(initialCvs);
   const router = useRouter();
+  const t = useTranslations("Dashboard");
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (!confirm("¿Seguro que quieres eliminar este CV? Esta acción no se puede deshacer.")) return;
+    if (!confirm(t("deleteConfirm"))) return;
 
     try {
       await deleteCV(id);
       setCvs(cvs.filter(cv => cv.id !== id));
-      toast.success("CV eliminado correctamente");
+      toast.success(t("deleteSuccess"));
     } catch (error) {
-      toast.error("Error al eliminar el CV");
+      toast.error(t("deleteError"));
     }
   }
 
@@ -71,10 +74,12 @@ export function DashboardClient({
 
         <header className="flex justify-between items-center border-b pb-6">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Mis Currículums</h1>
-            <p className="text-muted-foreground mt-2">Gestiona tus CVs y crea nuevos ({cvs.length}/4 usados)</p>
+            <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
+            <p className="text-muted-foreground mt-2">{t("subtitle")} ({cvs.length}/4 {t("used")})</p>
           </div>
-          <DropdownMenu>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 cursor-pointer">
                 <Avatar>
@@ -86,10 +91,11 @@ export function DashboardClient({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Cerrar sesión</span>
+                <span>{t("logout")}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -105,7 +111,7 @@ export function DashboardClient({
                   <FileText className="w-5 h-5 text-muted-foreground group-hover:text-primary shrink-0" />
                 </CardTitle>
                 <CardDescription>
-                  Actualizado: {new Date(cv.updated_at).toLocaleDateString()}
+                  {t("updated")} {new Date(cv.updated_at).toLocaleDateString()}
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
@@ -114,7 +120,7 @@ export function DashboardClient({
               <CardFooter className="flex justify-between border-t pt-4">
                 <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); router.push(`/builder?id=${cv.id}`); }}>
                   <Edit2 className="w-4 h-4 mr-2" />
-                  Editar
+                  {t("edit")}
                 </Button>
                 <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" onClick={(e) => handleDelete(cv.id, e)}>
                   <Trash2 className="w-4 h-4" />
@@ -130,8 +136,8 @@ export function DashboardClient({
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                   <Plus className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-medium text-lg">Crear Nuevo CV</h3>
-                <p className="text-sm text-muted-foreground mt-1">{4 - cvs.length} disponibles</p>
+                <h3 className="font-medium text-lg">{t("createNew")}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{4 - cvs.length} {t("available")}</p>
               </Card>
             </Link>
           ) : (
@@ -139,9 +145,9 @@ export function DashboardClient({
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
                 <FileText className="w-6 h-6 text-muted-foreground" />
               </div>
-              <h3 className="font-medium text-lg text-muted-foreground">Límite alcanzado</h3>
+              <h3 className="font-medium text-lg text-muted-foreground">{t("limitReached")}</h3>
               <p className="text-sm text-muted-foreground mt-1 text-center px-4">
-                Has alcanzado el límite de 4 CVs gratuitos. <br /> Pronto podrás acceder a más mediante suscripción.
+                {t("limitMsg")}
               </p>
             </Card>
           )}

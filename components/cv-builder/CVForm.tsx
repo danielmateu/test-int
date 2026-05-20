@@ -11,6 +11,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { uploadImage } from "@/app/actions/upload";
 import { RichTextEditor } from "./RichTextEditor";
+import { useTranslations } from "next-intl";
 import {
   DndContext,
   closestCenter,
@@ -33,9 +34,10 @@ interface SortableExperienceItemProps {
   exp: Experience;
   handleExperienceChange: (id: string, field: keyof Experience, value: string) => void;
   removeExperience: (id: string) => void;
+  t: any;
 }
 
-function SortableExperienceItem({ exp, handleExperienceChange, removeExperience }: SortableExperienceItemProps) {
+function SortableExperienceItem({ exp, handleExperienceChange, removeExperience, t }: SortableExperienceItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: exp.id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -56,32 +58,32 @@ function SortableExperienceItem({ exp, handleExperienceChange, removeExperience 
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-20 pt-2">
         <div className="space-y-2">
-          <Label>Empresa</Label>
-          <Input value={exp.company} onChange={(e) => handleExperienceChange(exp.id, "company", e.target.value)} placeholder="Nombre de la empresa" />
+          <Label>{t("experience.company")}</Label>
+          <Input value={exp.company} onChange={(e) => handleExperienceChange(exp.id, "company", e.target.value)} placeholder={t("experience.companyPlaceholder")} />
         </div>
         <div className="space-y-2">
-          <Label>Puesto</Label>
-          <Input value={exp.role} onChange={(e) => handleExperienceChange(exp.id, "role", e.target.value)} placeholder="Ej. Software Engineer" />
+          <Label>{t("experience.role")}</Label>
+          <Input value={exp.role} onChange={(e) => handleExperienceChange(exp.id, "role", e.target.value)} placeholder={t("experience.rolePlaceholder")} />
         </div>
         <div className="space-y-2">
-          <Label>Fecha Inicio</Label>
-          <DatePicker value={exp.startDate} onChange={(val) => handleExperienceChange(exp.id, "startDate", val)} placeholder="Fecha inicio" />
+          <Label>{t("experience.startDate")}</Label>
+          <DatePicker value={exp.startDate} onChange={(val) => handleExperienceChange(exp.id, "startDate", val)} placeholder={t("experience.startDate")} />
         </div>
         <div className="space-y-2">
-          <Label>Fecha Fin</Label>
+          <Label>{t("experience.endDate")}</Label>
           <div className="flex gap-2">
             <div className="flex-1">
-              <DatePicker value={exp.endDate} onChange={(val) => handleExperienceChange(exp.id, "endDate", val)} placeholder="Fecha fin" />
+              <DatePicker value={exp.endDate} onChange={(val) => handleExperienceChange(exp.id, "endDate", val)} placeholder={t("experience.endDate")} />
             </div>
-            <Button variant="outline" onClick={() => handleExperienceChange(exp.id, "endDate", "Actualidad")} className="px-3" title="Marcar como Actualidad">Actual</Button>
+            <Button variant="outline" onClick={() => handleExperienceChange(exp.id, "endDate", t("experience.current"))} className="px-3" title={t("experience.current")}>{t("experience.current")}</Button>
           </div>
         </div>
         <div className="space-y-2 md:col-span-2">
           <div className="flex items-center justify-between">
-            <Label>Descripción</Label>
+            <Label>{t("experience.description")}</Label>
             <AIEnhanceButton text={exp.description} context="experience" onEnhance={(text) => handleExperienceChange(exp.id, "description", text)} />
           </div>
-          <RichTextEditor value={exp.description} onChange={(val) => handleExperienceChange(exp.id, "description", val)} placeholder="Describe tus responsabilidades y logros..." className="h-40" />
+          <RichTextEditor value={exp.description} onChange={(val) => handleExperienceChange(exp.id, "description", val)} placeholder={t("experience.descriptionPlaceholder")} className="h-40" />
         </div>
       </div>
     </div>
@@ -92,9 +94,10 @@ interface SortableEducationItemProps {
   edu: Education;
   handleEducationChange: (id: string, field: keyof Education, value: string) => void;
   removeEducation: (id: string) => void;
+  t: any;
 }
 
-function SortableEducationItem({ edu, handleEducationChange, removeEducation }: SortableEducationItemProps) {
+function SortableEducationItem({ edu, handleEducationChange, removeEducation, t }: SortableEducationItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: edu.id });
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -115,32 +118,32 @@ function SortableEducationItem({ edu, handleEducationChange, removeEducation }: 
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-20 pt-2">
         <div className="space-y-2 md:col-span-2">
-          <Label>Institución</Label>
-          <Input value={edu.institution} onChange={(e) => handleEducationChange(edu.id, "institution", e.target.value)} placeholder="Universidad o Centro" />
+          <Label>{t("education.institution")}</Label>
+          <Input value={edu.institution} onChange={(e) => handleEducationChange(edu.id, "institution", e.target.value)} placeholder={t("education.institutionPlaceholder")} />
         </div>
         <div className="space-y-2 md:col-span-2">
-          <Label>Titulación</Label>
-          <Input value={edu.degree} onChange={(e) => handleEducationChange(edu.id, "degree", e.target.value)} placeholder="Ej. Grado en Ingeniería Informática" />
+          <Label>{t("education.degree")}</Label>
+          <Input value={edu.degree} onChange={(e) => handleEducationChange(edu.id, "degree", e.target.value)} placeholder={t("education.degreePlaceholder")} />
         </div>
         <div className="space-y-2">
-          <Label>Fecha Inicio</Label>
-          <DatePicker value={edu.startDate} onChange={(val) => handleEducationChange(edu.id, "startDate", val)} placeholder="Fecha inicio" />
+          <Label>{t("education.startDate")}</Label>
+          <DatePicker value={edu.startDate} onChange={(val) => handleEducationChange(edu.id, "startDate", val)} placeholder={t("education.startDate")} />
         </div>
         <div className="space-y-2">
-          <Label>Fecha Fin</Label>
+          <Label>{t("education.endDate")}</Label>
           <div className="flex gap-2">
             <div className="flex-1">
-              <DatePicker value={edu.endDate} onChange={(val) => handleEducationChange(edu.id, "endDate", val)} placeholder="Fecha fin" />
+              <DatePicker value={edu.endDate} onChange={(val) => handleEducationChange(edu.id, "endDate", val)} placeholder={t("education.endDate")} />
             </div>
-            <Button variant="outline" onClick={() => handleEducationChange(edu.id, "endDate", "Actualidad")} className="px-3" title="Marcar como Actualidad">Actual</Button>
+            <Button variant="outline" onClick={() => handleEducationChange(edu.id, "endDate", t("education.current"))} className="px-3" title={t("education.current")}>{t("education.current")}</Button>
           </div>
         </div>
         <div className="space-y-2 md:col-span-2">
           <div className="flex items-center justify-between">
-            <Label>Descripción (opcional)</Label>
+            <Label>{t("education.description")}</Label>
             <AIEnhanceButton text={edu.description || ""} context="education" onEnhance={(text) => handleEducationChange(edu.id, "description", text)} />
           </div>
-          <RichTextEditor value={edu.description || ""} onChange={(val) => handleEducationChange(edu.id, "description", val)} placeholder="Describe los logros, proyectos o habilidades adquiridas..." className="h-40" />
+          <RichTextEditor value={edu.description || ""} onChange={(val) => handleEducationChange(edu.id, "description", val)} placeholder={t("education.descriptionPlaceholder")} className="h-40" />
         </div>
       </div>
     </div>
@@ -155,6 +158,7 @@ interface CVFormProps {
 
 export function CVForm({ data, setData, status }: CVFormProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const t = useTranslations("CVForm");
 
   const handlePersonalInfoChange = (field: keyof CVData["personalInfo"], value: string) => {
     setData((prev) => ({
@@ -168,7 +172,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
     if (!file) return;
 
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen es demasiado grande. Máximo 5MB.");
+      toast.error(t("personalInfo.photoSizeError"));
       return;
     }
 
@@ -185,11 +189,11 @@ export function CVForm({ data, setData, status }: CVFormProps) {
       const result = await uploadImage(base64Image);
       if (result.success && result.url) {
         handlePersonalInfoChange("imageUrl", result.url);
-        toast.success("Foto de perfil subida correctamente");
+        toast.success(t("personalInfo.photoSuccess"));
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error al subir la imagen");
+      toast.error(t("personalInfo.photoError"));
     } finally {
       setIsUploading(false);
     }
@@ -286,25 +290,25 @@ export function CVForm({ data, setData, status }: CVFormProps) {
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto pb-20">
       <div className="space-y-1">
-        <h2 className="text-3xl font-bold tracking-tight">Tu Información</h2>
-        <p className="text-muted-foreground">Completa los datos para generar tu CV profesional.</p>
+        <h2 className="text-3xl font-bold tracking-tight">{t("title")}</h2>
+        <p className="text-muted-foreground">{t("subtitle")}</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Datos Personales</CardTitle>
+          <CardTitle>{t("personalInfo.title")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
             {
               status === "authenticated" && (
                 <div className="shrink-0 space-y-2 flex flex-col items-center sm:items-start">
-                  <Label htmlFor="imageUpload">Foto de Perfil</Label>
+                  <Label htmlFor="imageUpload">{t("personalInfo.photo")}</Label>
                   {data.personalInfo.imageUrl ? (
                     <div className="relative group w-24 h-24 rounded-full overflow-hidden border-4 border-slate-100 shadow-sm">
                       <img
                         src={data.personalInfo.imageUrl}
-                        alt="Perfil"
+                        alt={t("personalInfo.photo")}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -313,7 +317,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
                           size="icon"
                           onClick={() => handlePersonalInfoChange("imageUrl", "")}
                           className="text-white hover:text-red-400 hover:bg-transparent"
-                          title="Eliminar foto"
+                          title={t("personalInfo.deletePhoto")}
                         >
                           <Trash2 className="w-5 h-5" />
                         </Button>
@@ -331,7 +335,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
                             accept="image/*"
                             onChange={handleImageChange}
                             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                            title="Subir foto de perfil"
+                            title={t("personalInfo.uploadPhoto")}
                           />
                           <Plus className="w-6 h-6 text-slate-400" />
                         </>
@@ -344,21 +348,21 @@ export function CVForm({ data, setData, status }: CVFormProps) {
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
               <div className="space-y-2">
-                <Label htmlFor="fullName">Nombre Completo</Label>
+                <Label htmlFor="fullName">{t("personalInfo.fullName")}</Label>
                 <Input
                   id="fullName"
                   value={data.personalInfo.fullName}
                   onChange={(e) => handlePersonalInfoChange("fullName", e.target.value)}
-                  placeholder="Ej. Juan Pérez"
+                  placeholder={t("personalInfo.fullNamePlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="jobTitle">Título Profesional</Label>
+                <Label htmlFor="jobTitle">{t("personalInfo.jobTitle")}</Label>
                 <Input
                   id="jobTitle"
                   value={data.personalInfo.jobTitle}
                   onChange={(e) => handlePersonalInfoChange("jobTitle", e.target.value)}
-                  placeholder="Ej. Desarrollador Frontend"
+                  placeholder={t("personalInfo.jobTitlePlaceholder")}
                 />
               </div>
             </div>
@@ -366,7 +370,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("personalInfo.email")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -376,7 +380,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Teléfono</Label>
+              <Label htmlFor="phone">{t("personalInfo.phone")}</Label>
               <Input
                 id="phone"
                 value={data.personalInfo.phone}
@@ -385,36 +389,36 @@ export function CVForm({ data, setData, status }: CVFormProps) {
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="location">Ubicación</Label>
+              <Label htmlFor="location">{t("personalInfo.location")}</Label>
               <Input
                 id="location"
                 value={data.personalInfo.location}
                 onChange={(e) => handlePersonalInfoChange("location", e.target.value)}
-                placeholder="Madrid, España"
+                placeholder={t("personalInfo.locationPlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="githubUrl">GitHub URL</Label>
+              <Label htmlFor="githubUrl">{t("personalInfo.github")}</Label>
               <Input
                 id="githubUrl"
                 type="url"
                 value={data.personalInfo.githubUrl || ""}
                 onChange={(e) => handlePersonalInfoChange("githubUrl", e.target.value)}
-                placeholder="https://github.com/tuusuario"
+                placeholder="https://github.com/usuario"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="linkedinUrl">LinkedIn URL</Label>
+              <Label htmlFor="linkedinUrl">{t("personalInfo.linkedin")}</Label>
               <Input
                 id="linkedinUrl"
                 type="url"
                 value={data.personalInfo.linkedinUrl || ""}
                 onChange={(e) => handlePersonalInfoChange("linkedinUrl", e.target.value)}
-                placeholder="https://linkedin.com/in/tuusuario"
+                placeholder="https://linkedin.com/in/usuario"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="portfolioUrl">Portfolio URL</Label>
+              <Label htmlFor="portfolioUrl">{t("personalInfo.portfolio")}</Label>
               <Input
                 id="portfolioUrl"
                 type="url"
@@ -424,18 +428,18 @@ export function CVForm({ data, setData, status }: CVFormProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="xUrl">X (Twitter) URL</Label>
+              <Label htmlFor="xUrl">{t("personalInfo.twitter")}</Label>
               <Input
                 id="xUrl"
                 type="url"
                 value={data.personalInfo.xUrl || ""}
                 onChange={(e) => handlePersonalInfoChange("xUrl", e.target.value)}
-                placeholder="https://x.com/tuusuario"
+                placeholder="https://x.com/usuario"
               />
             </div>
             <div className="space-y-2 md:col-span-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="summary">Perfil Profesional</Label>
+                <Label htmlFor="summary">{t("personalInfo.summary")}</Label>
                 <AIEnhanceButton
                   text={data.personalInfo.summary}
                   context="summary"
@@ -445,7 +449,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
               <RichTextEditor
                 value={data.personalInfo.summary}
                 onChange={(val) => handlePersonalInfoChange("summary", val)}
-                placeholder="Breve descripción de tu perfil y objetivos..."
+                placeholder={t("personalInfo.summaryPlaceholder")}
                 className="h-40"
               />
             </div>
@@ -455,10 +459,10 @@ export function CVForm({ data, setData, status }: CVFormProps) {
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Experiencia</CardTitle>
+          <CardTitle>{t("experience.title")}</CardTitle>
           <Button variant="outline" size="sm" onClick={addExperience}>
             <Plus className="w-4 h-4 mr-2" />
-            Añadir
+            {t("experience.add")}
           </Button>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -470,22 +474,23 @@ export function CVForm({ data, setData, status }: CVFormProps) {
                   exp={exp}
                   handleExperienceChange={handleExperienceChange}
                   removeExperience={removeExperience}
+                  t={t}
                 />
               ))}
             </SortableContext>
           </DndContext>
           {data.experience.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">No has añadido experiencia todavía.</p>
+            <p className="text-sm text-muted-foreground text-center py-4">{t("experience.empty")}</p>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle>Educación</CardTitle>
+          <CardTitle>{t("education.title")}</CardTitle>
           <Button variant="outline" size="sm" onClick={addEducation}>
             <Plus className="w-4 h-4 mr-2" />
-            Añadir
+            {t("education.add")}
           </Button>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -497,40 +502,41 @@ export function CVForm({ data, setData, status }: CVFormProps) {
                   edu={edu}
                   handleEducationChange={handleEducationChange}
                   removeEducation={removeEducation}
+                  t={t}
                 />
               ))}
             </SortableContext>
           </DndContext>
           {data.education.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">No has añadido educación todavía.</p>
+            <p className="text-sm text-muted-foreground text-center py-4">{t("education.empty")}</p>
           )}
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Habilidades</CardTitle>
+          <CardTitle>{t("skills.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <Label htmlFor="skills">Tus habilidades (separadas por comas)</Label>
+            <Label htmlFor="skills">{t("skills.label")}</Label>
             <Textarea
               id="skills"
               value={data.skills.join(", ")}
               onChange={(e) => handleSkillsChange(e.target.value)}
-              placeholder="React, TypeScript, Node.js, Diseño UI..."
+              placeholder={t("skills.placeholder")}
             />
           </div>
         </CardContent>
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Carta de Presentación</CardTitle>
+          <CardTitle>{t("coverLetter.title")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="coverLetter">Contenido de la carta (opcional)</Label>
+              <Label htmlFor="coverLetter">{t("coverLetter.label")}</Label>
               <AIEnhanceButton
                 text={data.coverLetter}
                 context="coverLetter"
@@ -540,7 +546,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
             <RichTextEditor
               value={data.coverLetter}
               onChange={(val) => setData(prev => ({ ...prev, coverLetter: val }))}
-              placeholder="Escribe aquí tu carta de presentación..."
+              placeholder={t("coverLetter.placeholder")}
               className="min-h-[200px]"
             />
           </div>

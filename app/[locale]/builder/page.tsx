@@ -8,13 +8,14 @@ import { CVData } from "@/components/cv-builder/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Printer, ArrowLeft, Save, LogOut, User, Sparkles } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useSession, signOut } from "next-auth/react";
 import { saveCV, loadCV } from "@/app/actions/cv";
 import { toast } from "sonner";
 import { useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,

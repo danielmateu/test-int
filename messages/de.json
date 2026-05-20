@@ -1,0 +1,144 @@
+{
+  "Common": {
+    "appName": "CV AI Builder"
+  },
+  "Navigation": {
+    "dashboard": "Mein Dashboard",
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "logout": "Abmelden",
+    "startFree": "Kostenlos starten",
+    "demo": "Demo"
+  },
+  "LanguageSwitcher": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "de": "Deutsch",
+    "it": "Italiano",
+    "pt": "Português",
+    "ca": "Català"
+  },
+  "Dashboard": {
+    "title": "Meine Lebensläufe",
+    "subtitle": "Verwalten Sie Ihre Lebensläufe und erstellen Sie neue",
+    "used": "verwendet",
+    "logout": "Abmelden",
+    "updated": "Aktualisiert:",
+    "edit": "Bearbeiten",
+    "createNew": "Neuen Lebenslauf erstellen",
+    "available": "verfügbar",
+    "limitReached": "Limit erreicht",
+    "limitMsg": "Sie haben das Limit von 4 kostenlosen Lebensläufen erreicht. Mit einem Abonnement erhalten Sie bald mehr.",
+    "deleteConfirm": "Sind Sie sicher, dass Sie diesen Lebenslauf löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "deleteSuccess": "Lebenslauf erfolgreich gelöscht",
+    "deleteError": "Fehler beim Löschen des Lebenslaufs"
+  },
+  "LandingPage": {
+    "heroBadge": "Die neue Ära der Lebensläufe",
+    "heroTitle1": "Erstellen Sie Ihren perfekten Lebenslauf in",
+    "heroTitle2": "wenigen Minuten",
+    "heroSubtitle": "Unser KI-gestütztes Tool formatiert Ihren Lebenslauf in Echtzeit mit einem professionellen Design und hebt das Beste an Ihnen hervor.",
+    "createCVFree": "Meinen Lebenslauf kostenlos erstellen",
+    "tryInteractiveDemo": "Interaktive Demo ausprobieren",
+    "featuresTitle": "Premium-Tools",
+    "featuresSubtitle": "Die gesamte Leistung eines professionellen Designers, vereinfacht in einer intuitiven Benutzeroberfläche.",
+    "f1Title": "Echtzeit-Design",
+    "f1Desc": "Sehen Sie jede Änderung sofort. Passen Sie Typografie, Farben und Abstände an, ohne die Seite neu zu laden.",
+    "f2Title": "KI-Unterstützung",
+    "f2Desc": "Erstellen Sie mit einem einzigen Klick aussagekräftige Zusammenfassungen und Beschreibungen.",
+    "f3Title": "Perfekter Export",
+    "f3Desc": "PDFs optimiert für ATS (Bewerbermanagement-Systeme) im perfekten A4-Format.",
+    "f4Title": "Extreme Leistung",
+    "f4Desc": "Schnelle, flüssige und sichere Anwendung. Ihre Informationen werden automatisch in der Cloud gespeichert.",
+    "howItWorks": "Wie es funktioniert",
+    "howItWorksSubtitle": "Drei einfache Schritte zu Ihrem Traumjob.",
+    "step1Title": "1. Profil vervollständigen",
+    "step1Desc": "Geben Sie Ihre Daten, Erfahrungen und Ausbildung in unsere geführten Formulare ein. Die KI kann Ihnen beim Verfassen Ihrer Erfolge helfen.",
+    "step2Title": "2. Design anpassen",
+    "step2Desc": "Wählen Sie aus mehreren professionellen Vorlagen. Ändern Sie Farben, Typografie und die Reihenfolge der Abschnitte in Echtzeit.",
+    "step3Title": "3. Herunterladen und erfolgreich sein",
+    "step3Desc": "Exportieren Sie Ihren Lebenslauf in ein perfektes, druckfertiges PDF ohne Wasserzeichen oder seltsame Ränder.",
+    "ctaTitle": "Bereit aufzufallen?",
+    "ctaSubtitle": "Schließen Sie sich Tausenden von Fachleuten an, die ihre Karrierechancen bereits mit einem beeindruckenden Lebenslauf verbessert haben.",
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "CVForm": {
+    "title": "Ihre Informationen",
+    "subtitle": "Geben Sie die Details ein, um Ihren professionellen Lebenslauf zu erstellen.",
+    "personalInfo": {
+      "title": "Persönliche Daten",
+      "photo": "Profilbild",
+      "uploadPhoto": "Foto hochladen",
+      "deletePhoto": "Foto löschen",
+      "photoSuccess": "Profilbild erfolgreich hochgeladen",
+      "photoError": "Fehler beim Hochladen des Bildes",
+      "photoSizeError": "Das Bild ist zu groß. Maximal 5 MB.",
+      "fullName": "Vollständiger Name",
+      "fullNamePlaceholder": "Z. B. Max Mustermann",
+      "jobTitle": "Berufsbezeichnung",
+      "jobTitlePlaceholder": "Z. B. Frontend-Entwickler",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "location": "Standort",
+      "locationPlaceholder": "Berlin, Deutschland",
+      "github": "GitHub-URL",
+      "linkedin": "LinkedIn-URL",
+      "portfolio": "Portfolio-URL",
+      "twitter": "X (Twitter)-URL",
+      "summary": "Berufsprofil",
+      "summaryPlaceholder": "Kurze Beschreibung Ihres Profils und Ihrer Ziele..."
+    },
+    "experience": {
+      "title": "Berufserfahrung",
+      "add": "Hinzufügen",
+      "empty": "Sie haben noch keine Erfahrung hinzugefügt.",
+      "company": "Unternehmen",
+      "companyPlaceholder": "Name des Unternehmens",
+      "role": "Position",
+      "rolePlaceholder": "Z. B. Softwareentwickler",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "current": "Aktuell",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreiben Sie Ihre Aufgaben und Erfolge..."
+    },
+    "education": {
+      "title": "Bildung",
+      "add": "Hinzufügen",
+      "empty": "Sie haben noch keine Ausbildung hinzugefügt.",
+      "institution": "Einrichtung",
+      "institutionPlaceholder": "Universität oder Zentrum",
+      "degree": "Abschluss",
+      "degreePlaceholder": "Z. B. Bachelor in Informatik",
+      "startDate": "Startdatum",
+      "endDate": "Enddatum",
+      "current": "Aktuell",
+      "description": "Beschreibung (optional)",
+      "descriptionPlaceholder": "Beschreiben Sie Erfolge, Projekte oder erworbene Fähigkeiten..."
+    },
+    "skills": {
+      "title": "Fähigkeiten",
+      "label": "Ihre Fähigkeiten (durch Kommas getrennt)",
+      "placeholder": "React, TypeScript, Node.js, UI-Design..."
+    },
+    "coverLetter": {
+      "title": "Anschreiben",
+      "label": "Inhalt des Schreibens (optional)",
+      "placeholder": "Schreiben Sie hier Ihr Anschreiben..."
+    }
+  },
+  "CVPreview": {
+    "sections": {
+      "summary": "Berufsprofil",
+      "experience": "Berufserfahrung",
+      "education": "Bildung",
+      "skills": "Fähigkeiten",
+      "contact": "Kontakt",
+      "coverLetter": "Anschreiben"
+    },
+    "dates": {
+      "present": "Heute"
+    }
+  }
+}

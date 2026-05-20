@@ -1,0 +1,144 @@
+{
+  "Common": {
+    "appName": "CV AI Builder"
+  },
+  "Navigation": {
+    "dashboard": "El meu tauler",
+    "login": "Iniciar Sessió",
+    "register": "Registrar-se",
+    "logout": "Tancar Sessió",
+    "startFree": "Començar de franc",
+    "demo": "Demostració"
+  },
+  "LanguageSwitcher": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "de": "Deutsch",
+    "it": "Italiano",
+    "pt": "Português",
+    "ca": "Català"
+  },
+  "Dashboard": {
+    "title": "Els meus currículums",
+    "subtitle": "Gestiona els teus CVs i crea'n de nous",
+    "used": "usats",
+    "logout": "Tancar sessió",
+    "updated": "Actualitzat:",
+    "edit": "Editar",
+    "createNew": "Crear Nou CV",
+    "available": "disponibles",
+    "limitReached": "Límit assolit",
+    "limitMsg": "Has arribat al límit de 4 CVs gratuïts. Aviat podràs accedir a més mitjançant subscripció.",
+    "deleteConfirm": "Estàs segur que vols eliminar aquest CV? Aquesta acció no es pot desfer.",
+    "deleteSuccess": "CV eliminat correctament",
+    "deleteError": "Error a l'eliminar el currículum"
+  },
+  "LandingPage": {
+    "heroBadge": "La nova era dels currículums",
+    "heroTitle1": "Crea el teu currículum perfecte en",
+    "heroTitle2": "qüestió de minuts",
+    "heroSubtitle": "La nostra eina impulsada per IA maquetarà el teu CV en temps real amb un disseny professional, destacant el millor de tu.",
+    "createCVFree": "Crear el meu CV de franc",
+    "tryInteractiveDemo": "Provar Demo Interactiva",
+    "featuresTitle": "Eines Premium",
+    "featuresSubtitle": "Tot el poder d'un dissenyador professional, simplificat en una interfície intuïtiva.",
+    "f1Title": "Disseny en temps real",
+    "f1Desc": "Previsualitza instantàniament cada canvi. Ajusta tipografies, colors i espaiats sense recarregar la pàgina.",
+    "f2Title": "Assistència per IA",
+    "f2Desc": "Genera resums i descripcions impactants amb un sol clic.",
+    "f3Title": "Exportació Perfecta",
+    "f3Desc": "PDFs optimitzats per ATS (Sistemes de Seguiment de Candidats), en format A4 perfecte.",
+    "f4Title": "Rendiment Extrem",
+    "f4Desc": "Aplicació ràpida, fluïda i segura. La teva informació es desa automàticament al núvol.",
+    "howItWorks": "Com Funciona",
+    "howItWorksSubtitle": "Tres passos simples per aconseguir la feina dels teus somnis.",
+    "step1Title": "1. Completa el teu Perfil",
+    "step1Desc": "Introdueix les teves dades, experiència i educació als nostres formularis guiats. La IA pot ajudar-te a redactar els teus èxits.",
+    "step2Title": "2. Personalitza el Disseny",
+    "step2Desc": "Tria entre diverses plantilles professionals. Canvia colors, tipografia i l'ordre de les seccions en temps real.",
+    "step3Title": "3. Descarrega i Triomfa",
+    "step3Desc": "Exporta el teu CV en un PDF perfecte i llest per imprimir, sense marques d'aigua ni vores estranyes.",
+    "ctaTitle": "A punt per destacar?",
+    "ctaSubtitle": "Uneix-te a milers de professionals que ja han millorat les seves oportunitats laborals amb un currículum impactant.",
+    "rights": "Tots els drets reservats."
+  },
+  "CVForm": {
+    "title": "La Teva Informació",
+    "subtitle": "Omple les dades per generar el teu CV professional.",
+    "personalInfo": {
+      "title": "Dades Personals",
+      "photo": "Foto de Perfil",
+      "uploadPhoto": "Pujar foto",
+      "deletePhoto": "Eliminar foto",
+      "photoSuccess": "Foto de perfil pujada correctament",
+      "photoError": "Error al pujar la imatge",
+      "photoSizeError": "La imatge és massa gran. Màxim 5MB.",
+      "fullName": "Nom Complet",
+      "fullNamePlaceholder": "Ex. Joan Pérez",
+      "jobTitle": "Títol Professional",
+      "jobTitlePlaceholder": "Ex. Desenvolupador Frontend",
+      "email": "Correu electrònic",
+      "phone": "Telèfon",
+      "location": "Ubicació",
+      "locationPlaceholder": "Barcelona, Catalunya",
+      "github": "URL de GitHub",
+      "linkedin": "URL de LinkedIn",
+      "portfolio": "URL del Portafoli",
+      "twitter": "URL d'X (Twitter)",
+      "summary": "Perfil Professional",
+      "summaryPlaceholder": "Breu descripció del teu perfil i objectius..."
+    },
+    "experience": {
+      "title": "Experiència",
+      "add": "Afegir",
+      "empty": "Encara no has afegit experiència.",
+      "company": "Empresa",
+      "companyPlaceholder": "Nom de l'empresa",
+      "role": "Càrrec",
+      "rolePlaceholder": "Ex. Enginyer de Programari",
+      "startDate": "Data d'Inici",
+      "endDate": "Data de Finalització",
+      "current": "Actualitat",
+      "description": "Descripció",
+      "descriptionPlaceholder": "Descriu les teves responsabilitats i èxits..."
+    },
+    "education": {
+      "title": "Educació",
+      "add": "Afegir",
+      "empty": "Encara no has afegit educació.",
+      "institution": "Institució",
+      "institutionPlaceholder": "Universitat o Centre",
+      "degree": "Titulació",
+      "degreePlaceholder": "Ex. Grau en Enginyeria Informàtica",
+      "startDate": "Data d'Inici",
+      "endDate": "Data de Finalització",
+      "current": "Actualitat",
+      "description": "Descripció (opcional)",
+      "descriptionPlaceholder": "Descriu els èxits, projectes o habilitats adquirides..."
+    },
+    "skills": {
+      "title": "Habilitats",
+      "label": "Les teves habilitats (separades per comes)",
+      "placeholder": "React, TypeScript, Node.js, Disseny d'UI..."
+    },
+    "coverLetter": {
+      "title": "Carta de Presentació",
+      "label": "Contingut de la carta (opcional)",
+      "placeholder": "Escriu la teva carta de presentació aquí..."
+    }
+  },
+  "CVPreview": {
+    "sections": {
+      "summary": "Perfil Professional",
+      "experience": "Experiència Professional",
+      "education": "Educació",
+      "skills": "Habilitats",
+      "contact": "Contacte",
+      "coverLetter": "Carta de Presentació"
+    },
+    "dates": {
+      "present": "Avui"
+    }
+  }
+}

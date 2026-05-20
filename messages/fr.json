@@ -1,0 +1,144 @@
+{
+  "Common": {
+    "appName": "CV AI Builder"
+  },
+  "Navigation": {
+    "dashboard": "Mon Tableau de Bord",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "logout": "Déconnexion",
+    "startFree": "Commencer Gratuitement",
+    "demo": "Démo"
+  },
+  "LanguageSwitcher": {
+    "es": "Español",
+    "en": "English",
+    "fr": "Français",
+    "de": "Deutsch",
+    "it": "Italiano",
+    "pt": "Português",
+    "ca": "Català"
+  },
+  "Dashboard": {
+    "title": "Mes CVs",
+    "subtitle": "Gérez vos CVs et créez-en de nouveaux",
+    "used": "utilisés",
+    "logout": "Déconnexion",
+    "updated": "Mis à jour:",
+    "edit": "Modifier",
+    "createNew": "Créer un nouveau CV",
+    "available": "disponibles",
+    "limitReached": "Limite atteinte",
+    "limitMsg": "Vous avez atteint la limite de 4 CVs gratuits. Vous pourrez bientôt en faire plus avec un abonnement.",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce CV ? Cette action est irréversible.",
+    "deleteSuccess": "CV supprimé avec succès",
+    "deleteError": "Erreur lors de la suppression du CV"
+  },
+  "LandingPage": {
+    "heroBadge": "La nouvelle ère des CV",
+    "heroTitle1": "Créez votre CV parfait en",
+    "heroTitle2": "quelques minutes",
+    "heroSubtitle": "Notre outil propulsé par l'IA mettra en page votre CV en temps réel avec un design professionnel, mettant en valeur le meilleur de vous-même.",
+    "createCVFree": "Créer mon CV gratuitement",
+    "tryInteractiveDemo": "Essayer la démo interactive",
+    "featuresTitle": "Outils Premium",
+    "featuresSubtitle": "Toute la puissance d'un designer professionnel, simplifiée dans une interface intuitive.",
+    "f1Title": "Design en temps réel",
+    "f1Desc": "Prévisualisez instantanément chaque changement. Ajustez la typographie, les couleurs et l'espacement sans recharger la page.",
+    "f2Title": "Assistance IA",
+    "f2Desc": "Générez des résumés et des descriptions percutants en un seul clic.",
+    "f3Title": "Exportation parfaite",
+    "f3Desc": "PDF optimisés pour ATS (Applicant Tracking Systems), au format A4 parfait.",
+    "f4Title": "Performance extrême",
+    "f4Desc": "Application rapide, fluide et sécurisée. Vos informations sont automatiquement sauvegardées dans le cloud.",
+    "howItWorks": "Comment ça marche",
+    "howItWorksSubtitle": "Trois étapes simples pour décrocher le job de vos rêves.",
+    "step1Title": "1. Complétez votre profil",
+    "step1Desc": "Saisissez vos coordonnées, votre expérience et votre formation dans nos formulaires guidés. L'IA peut vous aider à rédiger vos réalisations.",
+    "step2Title": "2. Personnalisez le design",
+    "step2Desc": "Choisissez parmi plusieurs modèles professionnels. Modifiez les couleurs, la typographie et l'ordre des sections en temps réel.",
+    "step3Title": "3. Téléchargez et réussissez",
+    "step3Desc": "Exportez votre CV dans un PDF parfait et prêt à imprimer, sans filigrane ni bordures étranges.",
+    "ctaTitle": "Prêt à vous démarquer ?",
+    "ctaSubtitle": "Rejoignez des milliers de professionnels qui ont déjà amélioré leurs opportunités de carrière avec un CV percutant.",
+    "rights": "Tous droits réservés."
+  },
+  "CVForm": {
+    "title": "Vos Informations",
+    "subtitle": "Remplissez les détails pour générer votre CV professionnel.",
+    "personalInfo": {
+      "title": "Données Personnelles",
+      "photo": "Photo de Profil",
+      "uploadPhoto": "Télécharger la photo",
+      "deletePhoto": "Supprimer la photo",
+      "photoSuccess": "Photo de profil téléchargée avec succès",
+      "photoError": "Erreur lors du téléchargement de l'image",
+      "photoSizeError": "L'image est trop grande. Maximum 5 Mo.",
+      "fullName": "Nom Complet",
+      "fullNamePlaceholder": "Ex. Jean Dupont",
+      "jobTitle": "Titre Professionnel",
+      "jobTitlePlaceholder": "Ex. Développeur Frontend",
+      "email": "Email",
+      "phone": "Téléphone",
+      "location": "Localisation",
+      "locationPlaceholder": "Paris, France",
+      "github": "URL GitHub",
+      "linkedin": "URL LinkedIn",
+      "portfolio": "URL du Portfolio",
+      "twitter": "URL X (Twitter)",
+      "summary": "Profil Professionnel",
+      "summaryPlaceholder": "Brève description de votre profil et de vos objectifs..."
+    },
+    "experience": {
+      "title": "Expérience",
+      "add": "Ajouter",
+      "empty": "Vous n'avez pas encore ajouté d'expérience.",
+      "company": "Entreprise",
+      "companyPlaceholder": "Nom de l'entreprise",
+      "role": "Poste",
+      "rolePlaceholder": "Ex. Ingénieur Logiciel",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "current": "Actuel",
+      "description": "Description",
+      "descriptionPlaceholder": "Décrivez vos responsabilités et vos réalisations..."
+    },
+    "education": {
+      "title": "Éducation",
+      "add": "Ajouter",
+      "empty": "Vous n'avez pas encore ajouté de formation.",
+      "institution": "Institution",
+      "institutionPlaceholder": "Université ou École",
+      "degree": "Diplôme",
+      "degreePlaceholder": "Ex. Licence en Informatique",
+      "startDate": "Date de début",
+      "endDate": "Date de fin",
+      "current": "Actuel",
+      "description": "Description (facultatif)",
+      "descriptionPlaceholder": "Décrivez vos réalisations, projets ou compétences acquises..."
+    },
+    "skills": {
+      "title": "Compétences",
+      "label": "Vos compétences (séparées par des virgules)",
+      "placeholder": "React, TypeScript, Node.js, Design UI..."
+    },
+    "coverLetter": {
+      "title": "Lettre de Motivation",
+      "label": "Contenu de la lettre (facultatif)",
+      "placeholder": "Rédigez votre lettre de motivation ici..."
+    }
+  },
+  "CVPreview": {
+    "sections": {
+      "summary": "Profil Professionnel",
+      "experience": "Expérience Professionnelle",
+      "education": "Éducation",
+      "skills": "Compétences",
+      "contact": "Contact",
+      "coverLetter": "Lettre de Motivation"
+    },
+    "dates": {
+      "present": "Présent"
+    }
+  }
+}
