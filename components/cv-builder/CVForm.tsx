@@ -83,7 +83,7 @@ function SortableExperienceItem({ exp, handleExperienceChange, removeExperience,
             <Label>{t("experience.description")}</Label>
             <AIEnhanceButton text={exp.description} context="experience" onEnhance={(text) => handleExperienceChange(exp.id, "description", text)} />
           </div>
-          <RichTextEditor value={exp.description} onChange={(val) => handleExperienceChange(exp.id, "description", val)} placeholder={t("experience.descriptionPlaceholder")} className="h-40" />
+          <RichTextEditor value={exp.description} onChange={(val) => handleExperienceChange(exp.id, "description", val)} placeholder={t("experience.descriptionPlaceholder")} className="h-fit" />
         </div>
       </div>
     </div>
@@ -143,7 +143,7 @@ function SortableEducationItem({ edu, handleEducationChange, removeEducation, t 
             <Label>{t("education.description")}</Label>
             <AIEnhanceButton text={edu.description || ""} context="education" onEnhance={(text) => handleEducationChange(edu.id, "description", text)} />
           </div>
-          <RichTextEditor value={edu.description || ""} onChange={(val) => handleEducationChange(edu.id, "description", val)} placeholder={t("education.descriptionPlaceholder")} className="h-40" />
+          <RichTextEditor value={edu.description || ""} onChange={(val) => handleEducationChange(edu.id, "description", val)} placeholder={t("education.descriptionPlaceholder")} className="h-fit" />
         </div>
       </div>
     </div>
@@ -450,7 +450,7 @@ export function CVForm({ data, setData, status }: CVFormProps) {
                 value={data.personalInfo.summary}
                 onChange={(val) => handlePersonalInfoChange("summary", val)}
                 placeholder={t("personalInfo.summaryPlaceholder")}
-                className="h-40"
+                className="h-fit"
               />
             </div>
           </div>

@@ -124,7 +124,7 @@ function BuilderPageContent() {
       )}
 
       {/* Header bar - hidden when printing */}
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 print:hidden">
+      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 print:hidden">
         <nav className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-full">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild className="shrink-0">
@@ -139,7 +139,7 @@ function BuilderPageContent() {
                 type="text"
                 value={cvData.title || ""}
                 onChange={(e) => setCvData({ ...cvData, title: e.target.value })}
-                className="bg-transparent border-none outline-none focus:ring-1 focus:ring-primary rounded px-2 py-1 text-base font-medium max-w-[200px]"
+                className="bg-transparent border-none outline-none focus:ring-1 focus:ring-primary rounded px-2 py-1 text-base font-medium max-w-50"
                 placeholder="Mi CV"
               />
             </div>
