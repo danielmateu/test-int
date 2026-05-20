@@ -183,33 +183,61 @@ export function CVPreview({ data }: CVPreviewProps) {
     if (!experience.length) return null;
     return (
       <section className="preview-section">
-        <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'}`}>
-          {t("experience")}
-        </h2>
         <div className="preview-item-list">
-          {experience.map((exp) => (
+          {experience.map((exp, index) => (
             <div key={exp.id}>
-              {renderSpacer(`exp-${exp.id}`)}
-              <div 
-                className="break-inside-avoid" 
-                data-page-break-target={`exp-${exp.id}`}
-              >
-                <div className="break-after-avoid">
-                  <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
-                    <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>{exp.role || "Puesto"}</h3>
-                    <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'}`}>
-                      {exp.startDate} {exp.startDate && exp.endDate && "–"} {exp.endDate}
-                    </span>
-                  </div>
-                  <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{exp.company || "Empresa"}</div>
-                </div>
-                {exp.description && (
+              {index === 0 ? (
+                <>
+                  {renderSpacer(`exp-${exp.id}`)}
                   <div 
-                    className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
-                    dangerouslySetInnerHTML={{ __html: exp.description }}
-                  />
-                )}
-              </div>
+                    className="break-inside-avoid" 
+                    data-page-break-target={`exp-${exp.id}`}
+                  >
+                    <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'}`}>
+                      {t("experience")}
+                    </h2>
+                    <div className="break-after-avoid">
+                      <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                        <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>{exp.role || "Puesto"}</h3>
+                        <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'}`}>
+                          {exp.startDate} {exp.startDate && exp.endDate && "–"} {exp.endDate}
+                        </span>
+                      </div>
+                      <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{exp.company || "Empresa"}</div>
+                    </div>
+                  </div>
+                  {exp.description && (
+                    <div 
+                      className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
+                      dangerouslySetInnerHTML={{ __html: exp.description }}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {renderSpacer(`exp-${exp.id}`)}
+                  <div 
+                    className="break-inside-avoid" 
+                    data-page-break-target={`exp-${exp.id}`}
+                  >
+                    <div className="break-after-avoid">
+                      <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                        <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>{exp.role || "Puesto"}</h3>
+                        <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'}`}>
+                          {exp.startDate} {exp.startDate && exp.endDate && "–"} {exp.endDate}
+                        </span>
+                      </div>
+                      <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{exp.company || "Empresa"}</div>
+                    </div>
+                  </div>
+                  {exp.description && (
+                    <div 
+                      className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
+                      dangerouslySetInnerHTML={{ __html: exp.description }}
+                    />
+                  )}
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -221,33 +249,61 @@ export function CVPreview({ data }: CVPreviewProps) {
     if (!education.length) return null;
     return (
       <section className="preview-section">
-        <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'}`}>
-          {t("education")}
-        </h2>
         <div className="preview-item-list">
-          {education.map((edu) => (
+          {education.map((edu, index) => (
             <div key={edu.id}>
-              {renderSpacer(`edu-${edu.id}`)}
-              <div 
-                className="break-inside-avoid" 
-                data-page-break-target={`edu-${edu.id}`}
-              >
-                <div className="break-after-avoid">
-                  <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
-                    <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>{edu.degree || "Titulación"}</h3>
-                    <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'}`}>
-                      {edu.startDate} {edu.startDate && edu.endDate && "–"} {edu.endDate}
-                    </span>
-                  </div>
-                  <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{edu.institution || "Institución"}</div>
-                </div>
-                {edu.description && (
+              {index === 0 ? (
+                <>
+                  {renderSpacer(`edu-${edu.id}`)}
                   <div 
-                    className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
-                    dangerouslySetInnerHTML={{ __html: edu.description }}
-                  />
-                )}
-              </div>
+                    className="break-inside-avoid" 
+                    data-page-break-target={`edu-${edu.id}`}
+                  >
+                    <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'}`}>
+                      {t("education")}
+                    </h2>
+                    <div className="break-after-avoid">
+                      <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                        <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>{edu.degree || "Titulación"}</h3>
+                        <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'}`}>
+                          {edu.startDate} {edu.startDate && edu.endDate && "–"} {edu.endDate}
+                        </span>
+                      </div>
+                      <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{edu.institution || "Institución"}</div>
+                    </div>
+                  </div>
+                  {edu.description && (
+                    <div 
+                      className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
+                      dangerouslySetInnerHTML={{ __html: edu.description }}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {renderSpacer(`edu-${edu.id}`)}
+                  <div 
+                    className="break-inside-avoid" 
+                    data-page-break-target={`edu-${edu.id}`}
+                  >
+                    <div className="break-after-avoid">
+                      <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                        <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>{edu.degree || "Titulación"}</h3>
+                        <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'}`}>
+                          {edu.startDate} {edu.startDate && edu.endDate && "–"} {edu.endDate}
+                        </span>
+                      </div>
+                      <div className={`text-sm font-semibold text-slate-700 mb-2 ${centered ? 'text-center' : ''}`}>{edu.institution || "Institución"}</div>
+                    </div>
+                  </div>
+                  {edu.description && (
+                    <div 
+                      className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''}`}
+                      dangerouslySetInnerHTML={{ __html: edu.description }}
+                    />
+                  )}
+                </>
+              )}
             </div>
           ))}
         </div>
@@ -415,20 +471,23 @@ export function CVPreview({ data }: CVPreviewProps) {
               )}
 
               {experience.length > 0 && (
-                <section className="grid grid-cols-[110px_1fr] gap-8 preview-section">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("experience")}</p>
-                  <div className="preview-item-list">
-                    {experience.map((exp) => (
-                      <div key={exp.id}>
-                        {renderSpacer(`exp-${exp.id}`)}
-                        <div className="break-inside-avoid" data-page-break-target={`exp-${exp.id}`}>
-                          <div className="flex justify-between items-baseline mb-0.5">
-                            <span className="text-sm font-semibold text-slate-900">{exp.role || "Puesto"}</span>
-                            <span className="text-xs text-slate-400 shrink-0 ml-4 tabular-nums">
-                              {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
-                            </span>
+                <div key="exp-section-wrapper" className="w-full">
+                  {renderSpacer(`exp-${experience[0].id}`)}
+                  <section className="grid grid-cols-[110px_1fr] gap-8 preview-section">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("experience")}</p>
+                    <div className="preview-item-list">
+                      {experience.map((exp, index) => (
+                        <div key={exp.id}>
+                          {index > 0 && renderSpacer(`exp-${exp.id}`)}
+                          <div className="break-inside-avoid" data-page-break-target={`exp-${exp.id}`}>
+                            <div className="flex justify-between items-baseline mb-0.5">
+                              <span className="text-sm font-semibold text-slate-900">{exp.role || "Puesto"}</span>
+                              <span className="text-xs text-slate-400 shrink-0 ml-4 tabular-nums">
+                                {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-400 mb-1.5">{exp.company || "Empresa"}</p>
                           </div>
-                          <p className="text-xs text-slate-400 mb-1.5">{exp.company || "Empresa"}</p>
                           {exp.description && (
                             <div 
                               className="text-[0.875em] text-slate-600 rich-text-content" 
@@ -436,27 +495,30 @@ export function CVPreview({ data }: CVPreviewProps) {
                             />
                           )}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                      ))}
+                    </div>
+                  </section>
+                </div>
               )}
 
               {education.length > 0 && (
-                <section className="grid grid-cols-[110px_1fr] gap-8 preview-section">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("education")}</p>
-                  <div className="preview-item-list">
-                    {education.map((edu) => (
-                      <div key={edu.id}>
-                        {renderSpacer(`edu-${edu.id}`)}
-                        <div className="break-inside-avoid" data-page-break-target={`edu-${edu.id}`}>
-                          <div className="flex justify-between items-baseline mb-0.5">
-                            <span className="text-sm font-semibold text-slate-900">{edu.degree || "Titulación"}</span>
-                            <span className="text-xs text-slate-400 shrink-0 ml-4 tabular-nums">
-                              {edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}
-                            </span>
+                <div key="edu-section-wrapper" className="w-full">
+                  {renderSpacer(`edu-${education[0].id}`)}
+                  <section className="grid grid-cols-[110px_1fr] gap-8 preview-section">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("education")}</p>
+                    <div className="preview-item-list">
+                      {education.map((edu, index) => (
+                        <div key={edu.id}>
+                          {index > 0 && renderSpacer(`edu-${edu.id}`)}
+                          <div className="break-inside-avoid" data-page-break-target={`edu-${edu.id}`}>
+                            <div className="flex justify-between items-baseline mb-0.5">
+                              <span className="text-sm font-semibold text-slate-900">{edu.degree || "Titulación"}</span>
+                              <span className="text-xs text-slate-400 shrink-0 ml-4 tabular-nums">
+                                {edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}
+                              </span>
+                            </div>
+                            <p className="text-xs text-slate-400 mb-1.5">{edu.institution || "Institución"}</p>
                           </div>
-                          <p className="text-xs text-slate-400 mb-1.5">{edu.institution || "Institución"}</p>
                           {edu.description && (
                             <div 
                               className="text-[0.875em] text-slate-600 rich-text-content" 
@@ -464,10 +526,10 @@ export function CVPreview({ data }: CVPreviewProps) {
                             />
                           )}
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
+                      ))}
+                    </div>
+                  </section>
+                </div>
               )}
 
               {skills.some((s) => s.trim()) && (
@@ -525,28 +587,56 @@ export function CVPreview({ data }: CVPreviewProps) {
 
               {experience.length > 0 && (
                 <section className="preview-section">
-                  <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                    <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("experience")}
-                  </h2>
                   <div className="preview-item-list">
-                    {experience.map((exp) => (
+                    {experience.map((exp, index) => (
                       <div key={exp.id}>
-                        {renderSpacer(`exp-${exp.id}`)}
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid relative overflow-hidden" data-page-break-target={`exp-${exp.id}`}>
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="text-lg font-bold text-slate-900">{exp.role || "Puesto"}</h3>
-                              <p className="text-sm font-semibold text-(--theme-color) mt-1">{exp.company || "Empresa"}</p>
+                        {index === 0 ? (
+                          <>
+                            {renderSpacer(`exp-${exp.id}`)}
+                            <div 
+                              className="break-inside-avoid" 
+                              data-page-break-target={`exp-${exp.id}`}
+                            >
+                              <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                                <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("experience")}
+                              </h2>
+                              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <h3 className="text-lg font-bold text-slate-900">{exp.role || "Puesto"}</h3>
+                                    <p className="text-sm font-semibold text-(--theme-color) mt-1">{exp.company || "Empresa"}</p>
+                                  </div>
+                                  <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium whitespace-nowrap">
+                                    {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
+                                  </span>
+                                </div>
+                                {exp.description && (
+                                  <div className="mt-4 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
+                                )}
+                              </div>
                             </div>
-                            <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium whitespace-nowrap">
-                              {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
-                            </span>
-                          </div>
-                          {exp.description && (
-                            <div className="mt-4 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
-                          )}
-                        </div>
+                          </>
+                        ) : (
+                          <>
+                            {renderSpacer(`exp-${exp.id}`)}
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid relative overflow-hidden" data-page-break-target={`exp-${exp.id}`}>
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <h3 className="text-lg font-bold text-slate-900">{exp.role || "Puesto"}</h3>
+                                  <p className="text-sm font-semibold text-(--theme-color) mt-1">{exp.company || "Empresa"}</p>
+                                </div>
+                                <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium whitespace-nowrap">
+                                  {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
+                                </span>
+                              </div>
+                              {exp.description && (
+                                <div className="mt-4 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: exp.description }} />
+                              )}
+                            </div>
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -556,22 +646,44 @@ export function CVPreview({ data }: CVPreviewProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 preview-section">
                 {education.length > 0 && (
                   <section>
-                    <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
-                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("education")}
-                    </h2>
                     <div className="preview-item-list">
-                      {education.map((edu) => (
+                      {education.map((edu, index) => (
                         <div key={edu.id}>
-                          {renderSpacer(`edu-${edu.id}`)}
-                          <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid relative overflow-hidden" data-page-break-target={`edu-${edu.id}`}>
-                            <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
-                            <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
-                            <p className="text-sm font-medium text-(--theme-color) mt-0.5">{edu.institution || "Institución"}</p>
-                            <p className="text-xs text-slate-500 mt-1">{edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}</p>
-                            {edu.description && (
-                              <div className="mt-3 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: edu.description }} />
-                            )}
-                          </div>
+                          {index === 0 ? (
+                            <>
+                              {renderSpacer(`edu-${edu.id}`)}
+                              <div 
+                                className="break-inside-avoid" 
+                                data-page-break-target={`edu-${edu.id}`}
+                              >
+                                <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                                  <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("education")}
+                                </h2>
+                                <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                                  <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
+                                  <p className="text-sm font-medium text-(--theme-color) mt-0.5">{edu.institution || "Institución"}</p>
+                                  <p className="text-xs text-slate-500 mt-1">{edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}</p>
+                                  {edu.description && (
+                                    <div className="mt-3 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: edu.description }} />
+                                  )}
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              {renderSpacer(`edu-${edu.id}`)}
+                              <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid relative overflow-hidden" data-page-break-target={`edu-${edu.id}`}>
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                                <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
+                                <p className="text-sm font-medium text-(--theme-color) mt-0.5">{edu.institution || "Institución"}</p>
+                                <p className="text-xs text-slate-500 mt-1">{edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}</p>
+                                {edu.description && (
+                                  <div className="mt-3 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: edu.description }} />
+                                )}
+                              </div>
+                            </>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -630,25 +742,51 @@ export function CVPreview({ data }: CVPreviewProps) {
 
               {experience.length > 0 && (
                 <section className="preview-section">
-                  <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
-                    {t("experience")}
-                  </h2>
                   <div className="preview-item-list">
-                    {experience.map((exp) => (
+                    {experience.map((exp, index) => (
                       <div key={exp.id}>
-                        {renderSpacer(`exp-${exp.id}`)}
-                        <div className="break-inside-avoid" data-page-break-target={`exp-${exp.id}`}>
-                          <div className="flex justify-between items-baseline mb-1">
-                            <h3 className="font-bold text-slate-900 text-lg">{exp.role || "Puesto"}</h3>
-                            <span className="text-sm font-bold text-slate-500 whitespace-nowrap">
-                              {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
-                            </span>
-                          </div>
-                          <p className="text-base font-semibold text-slate-700 italic mb-2">{exp.company || "Empresa"}</p>
-                          {exp.description && (
-                            <div className="text-[0.875em] text-slate-700 rich-text-content pl-4 border-l-2 border-slate-200" dangerouslySetInnerHTML={{ __html: exp.description }} />
-                          )}
-                        </div>
+                        {index === 0 ? (
+                          <>
+                            {renderSpacer(`exp-${exp.id}`)}
+                            <div 
+                              className="break-inside-avoid" 
+                              data-page-break-target={`exp-${exp.id}`}
+                            >
+                              <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
+                                {t("experience")}
+                              </h2>
+                              <div className="flex justify-between items-baseline mb-1">
+                                <h3 className="font-bold text-slate-900 text-lg">{exp.role || "Puesto"}</h3>
+                                <span className="text-sm font-bold text-slate-500 whitespace-nowrap">
+                                  {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
+                                </span>
+                              </div>
+                              <p className="text-base font-semibold text-slate-700 italic mb-2">{exp.company || "Empresa"}</p>
+                            </div>
+                            {exp.description && (
+                              <div className="text-[0.875em] text-slate-700 rich-text-content pl-4 border-l-2 border-slate-200" dangerouslySetInnerHTML={{ __html: exp.description }} />
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {renderSpacer(`exp-${exp.id}`)}
+                            <div 
+                              className="break-inside-avoid" 
+                              data-page-break-target={`exp-${exp.id}`}
+                            >
+                              <div className="flex justify-between items-baseline mb-1">
+                                <h3 className="font-bold text-slate-900 text-lg">{exp.role || "Puesto"}</h3>
+                                <span className="text-sm font-bold text-slate-500 whitespace-nowrap">
+                                  {exp.startDate}{exp.startDate && exp.endDate && " – "}{exp.endDate}
+                                </span>
+                              </div>
+                              <p className="text-base font-semibold text-slate-700 italic mb-2">{exp.company || "Empresa"}</p>
+                            </div>
+                            {exp.description && (
+                              <div className="text-[0.875em] text-slate-700 rich-text-content pl-4 border-l-2 border-slate-200" dangerouslySetInnerHTML={{ __html: exp.description }} />
+                            )}
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -657,25 +795,53 @@ export function CVPreview({ data }: CVPreviewProps) {
 
               {education.length > 0 && (
                 <section className="preview-section">
-                  <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
-                    {t("education")}
-                  </h2>
                   <div className="preview-item-list">
-                    {education.map((edu) => (
+                    {education.map((edu, index) => (
                       <div key={edu.id}>
-                        {renderSpacer(`edu-${edu.id}`)}
-                        <div className="break-inside-avoid flex justify-between items-start" data-page-break-target={`edu-${edu.id}`}>
-                          <div>
-                            <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
-                            <p className="text-slate-700">{edu.institution || "Institución"}</p>
+                        {index === 0 ? (
+                          <>
+                            {renderSpacer(`edu-${edu.id}`)}
+                            <div 
+                              className="break-inside-avoid" 
+                              data-page-break-target={`edu-${edu.id}`}
+                            >
+                              <h2 className="text-lg font-bold uppercase tracking-widest text-slate-900 border-b border-slate-300 pb-2 mb-4">
+                                {t("education")}
+                              </h2>
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
+                                  <p className="text-slate-700">{edu.institution || "Institución"}</p>
+                                </div>
+                                <span className="text-sm font-bold text-slate-500 whitespace-nowrap text-right">
+                                  {edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}
+                                </span>
+                              </div>
+                            </div>
                             {edu.description && (
-                              <div className="mt-2 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: edu.description }} />
+                              <div className="mt-2 text-[0.875em] text-slate-600 rich-text-content pl-4 border-l-2 border-slate-200" dangerouslySetInnerHTML={{ __html: edu.description }} />
                             )}
-                          </div>
-                          <span className="text-sm font-bold text-slate-500 whitespace-nowrap text-right">
-                            {edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}
-                          </span>
-                        </div>
+                          </>
+                        ) : (
+                          <>
+                            {renderSpacer(`edu-${edu.id}`)}
+                            <div 
+                              className="break-inside-avoid flex justify-between items-start" 
+                              data-page-break-target={`edu-${edu.id}`}
+                            >
+                              <div>
+                                <h3 className="font-bold text-slate-900">{edu.degree || "Titulación"}</h3>
+                                <p className="text-slate-700">{edu.institution || "Institución"}</p>
+                              </div>
+                              <span className="text-sm font-bold text-slate-500 whitespace-nowrap text-right">
+                                {edu.startDate}{edu.startDate && edu.endDate && " – "}{edu.endDate}
+                              </span>
+                            </div>
+                            {edu.description && (
+                              <div className="mt-2 text-[0.875em] text-slate-600 rich-text-content pl-4 border-l-2 border-slate-200" dangerouslySetInnerHTML={{ __html: edu.description }} />
+                            )}
+                          </>
+                        )}
                       </div>
                     ))}
                   </div>
