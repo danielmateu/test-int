@@ -36,11 +36,19 @@ export interface TypographySettings {
   wordSpacing: number;
 }
 
+export interface SpacingSettings {
+  sectionSpacing?: number;
+  itemSpacing?: number;
+  paragraphSpacing?: number;
+  pagePadding?: number;
+}
+
 export interface CVTheme {
   color: string;
   font: string;
   layout: "classic" | "two-column" | "minimalist" | "modern" | "corporate";
   typography?: TypographySettings;
+  spacing?: SpacingSettings;
 }
 
 export interface CVData {

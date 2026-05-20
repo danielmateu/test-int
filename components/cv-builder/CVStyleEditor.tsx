@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { CVData, CVTheme, TypographySettings } from "./types";
+import { CVData, CVTheme, TypographySettings, SpacingSettings } from "./types";
 import { Paintbrush, Type, LayoutTemplate, SlidersHorizontal } from "lucide-react";
 
 interface CVStyleEditorProps {
@@ -58,6 +58,21 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
   };
 
   const currentTypography = data.theme.typography || { fontSize: 16, lineHeight: 1.5, wordSpacing: 0 };
+
+  const handleSpacingChange = (field: keyof SpacingSettings, value: number) => {
+    setData((prev) => ({
+      ...prev,
+      theme: {
+        ...prev.theme,
+        spacing: {
+          ...(prev.theme.spacing || { pagePadding: 48, sectionSpacing: 24, itemSpacing: 16, paragraphSpacing: 8 }),
+          [field]: value
+        }
+      },
+    }));
+  };
+
+  const currentSpacing = data.theme.spacing || { pagePadding: 48, sectionSpacing: 24, itemSpacing: 16, paragraphSpacing: 8 };
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto pb-20">
@@ -197,6 +212,77 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                 step={0.5}
                 value={[currentTypography.wordSpacing]}
                 onValueChange={([val]) => handleTypographyChange("wordSpacing", val)}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                <SlidersHorizontal className="w-4 h-4" />
+              </div>
+              Ajustes de Espaciado (Bloques y Párrafos)
+            </CardTitle>
+            <CardDescription>
+              Ajusta los márgenes de página, y separación de secciones, elementos y párrafos.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Margen de la Página (Padding)</Label>
+                <span className="text-sm text-muted-foreground">{currentSpacing.pagePadding}px</span>
+              </div>
+              <Slider
+                min={16}
+                max={80}
+                step={2}
+                value={[currentSpacing.pagePadding || 48]}
+                onValueChange={([val]) => handleSpacingChange("pagePadding", val)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Espaciado entre Secciones</Label>
+                <span className="text-sm text-muted-foreground">{currentSpacing.sectionSpacing}px</span>
+              </div>
+              <Slider
+                min={8}
+                max={60}
+                step={2}
+                value={[currentSpacing.sectionSpacing || 24]}
+                onValueChange={([val]) => handleSpacingChange("sectionSpacing", val)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Espaciado entre Elementos</Label>
+                <span className="text-sm text-muted-foreground">{currentSpacing.itemSpacing}px</span>
+              </div>
+              <Slider
+                min={4}
+                max={40}
+                step={2}
+                value={[currentSpacing.itemSpacing || 16]}
+                onValueChange={([val]) => handleSpacingChange("itemSpacing", val)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Espaciado entre Párrafos</Label>
+                <span className="text-sm text-muted-foreground">{currentSpacing.paragraphSpacing}px</span>
+              </div>
+              <Slider
+                min={2}
+                max={24}
+                step={1}
+                value={[currentSpacing.paragraphSpacing || 8]}
+                onValueChange={([val]) => handleSpacingChange("paragraphSpacing", val)}
               />
             </div>
           </CardContent>

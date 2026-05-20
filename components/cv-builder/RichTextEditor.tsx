@@ -71,7 +71,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
       </div>
       <div
         ref={editorRef}
-        className="p-3 min-h-20 focus:outline-none focus:ring-1 focus:ring-ring text-sm whitespace-pre-wrap empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground"
+        className="p-3 min-h-20 focus:outline-none focus:ring-1 focus:ring-ring text-sm rich-text-content empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground"
         contentEditable
         onInput={handleInput}
         onBlur={handleInput}
