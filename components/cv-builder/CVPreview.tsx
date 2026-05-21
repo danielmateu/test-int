@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { CVData } from "./types";
+import { CVData, getHeaderDefaultSizes } from "./types";
 import { Mail, Phone, MapPin, Github, Linkedin, Globe, Twitter } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -130,6 +130,9 @@ export function CVPreview({ data }: CVPreviewProps) {
 
   const totalPages = pageHeightInPx > 0 ? Math.ceil(containerHeight / pageHeightInPx) : 1;
   const layout = theme.layout || "classic";
+  const defaultSizes = getHeaderDefaultSizes(layout);
+  const headerNameSize = theme.typography?.headerNameSize ?? defaultSizes.nameSize;
+  const headerTitleSize = theme.typography?.headerTitleSize ?? defaultSizes.titleSize;
   const t = useTranslations("CVPreview.sections");
 
   // For generic defaults we use form placeholders usually, but let's leave generic fallbacks if empty
@@ -454,10 +457,16 @@ export function CVPreview({ data }: CVPreviewProps) {
           <div className="preview-page-padding print:px-[20mm] print:py-0">
             <header className="preview-section flex justify-between items-start gap-6 break-inside-avoid">
               <div className="flex-1">
-                <h1 className="text-4xl font-extrabold tracking-tight text-(--theme-color) mb-1 uppercase">
+                <h1 
+                  className="text-4xl font-extrabold tracking-tight text-(--theme-color) mb-1 uppercase"
+                  style={{ fontSize: `${headerNameSize}px` }}
+                >
                   {personalInfo.fullName || defaultName}
                 </h1>
-                <p className="text-xl font-medium text-slate-500 mb-4 tracking-tight">
+                <p 
+                  className="text-xl font-medium text-slate-500 mb-4 tracking-tight"
+                  style={{ fontSize: `${headerTitleSize}px` }}
+                >
                   {personalInfo.jobTitle || defaultTitle}
                 </p>
                 <ContactItems />
@@ -490,10 +499,16 @@ export function CVPreview({ data }: CVPreviewProps) {
               )}
 
               <div className="text-center">
-                <h1 className="text-2xl font-extrabold tracking-tight text-(--theme-color) mb-1 uppercase leading-tight">
+                <h1 
+                  className="text-2xl font-extrabold tracking-tight text-(--theme-color) mb-1 uppercase leading-tight"
+                  style={{ fontSize: `${headerNameSize}px` }}
+                >
                   {personalInfo.fullName || defaultName}
                 </h1>
-                <p className="text-sm font-medium text-slate-500">
+                <p 
+                  className="text-sm font-medium text-slate-500"
+                  style={{ fontSize: `${headerTitleSize}px` }}
+                >
                   {personalInfo.jobTitle || defaultTitle}
                 </p>
               </div>
@@ -523,10 +538,16 @@ export function CVPreview({ data }: CVPreviewProps) {
             <header className="preview-section break-inside-avoid">
               <div className="flex items-start justify-between gap-6 mb-6">
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-4xl font-extralight tracking-tight text-slate-900 mb-2">
+                  <h1 
+                    className="text-4xl font-extralight tracking-tight text-slate-900 mb-2"
+                    style={{ fontSize: `${headerNameSize}px` }}
+                  >
                     {personalInfo.fullName || defaultName}
                   </h1>
-                  <p className="text-[11px] font-medium text-slate-400 tracking-[0.22em] uppercase">
+                  <p 
+                    className="text-[11px] font-medium text-slate-400 tracking-[0.22em] uppercase"
+                    style={{ fontSize: `${headerTitleSize}px` }}
+                  >
                     {personalInfo.jobTitle || defaultTitle}
                   </p>
                 </div>
@@ -705,10 +726,16 @@ export function CVPreview({ data }: CVPreviewProps) {
             <header className="bg-(--theme-color) text-white p-10 print:p-10 break-inside-avoid">
               <div className="flex justify-between items-center gap-6">
                 <div>
-                  <h1 className="text-5xl font-black tracking-tight mb-2 uppercase drop-shadow-md">
+                  <h1 
+                    className="text-5xl font-black tracking-tight mb-2 uppercase drop-shadow-md"
+                    style={{ fontSize: `${headerNameSize}px` }}
+                  >
                     {personalInfo.fullName || defaultName}
                   </h1>
-                  <p className="text-2xl font-medium opacity-90 tracking-wide">
+                  <p 
+                    className="text-2xl font-medium opacity-90 tracking-wide"
+                    style={{ fontSize: `${headerTitleSize}px` }}
+                  >
                     {personalInfo.jobTitle || defaultTitle}
                   </p>
                 </div>
@@ -948,10 +975,16 @@ export function CVPreview({ data }: CVPreviewProps) {
         {layout === "corporate" && (
           <div className="preview-page-padding print:py-0 min-h-[297mm]">
             <header className="border-b-4 border-slate-900 pb-8 preview-section text-center break-inside-avoid">
-              <h1 className="text-5xl font-serif font-bold text-slate-900 mb-2 uppercase tracking-wider">
+              <h1 
+                className="text-5xl font-serif font-bold text-slate-900 mb-2 uppercase tracking-wider"
+                style={{ fontSize: `${headerNameSize}px` }}
+              >
                 {personalInfo.fullName || defaultName}
               </h1>
-              <p className="text-xl text-slate-600 font-medium tracking-widest uppercase mb-6">
+              <p 
+                className="text-xl text-slate-600 font-medium tracking-widest uppercase mb-6"
+                style={{ fontSize: `${headerTitleSize}px` }}
+              >
                 {personalInfo.jobTitle || defaultTitle}
               </p>
               <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-600">

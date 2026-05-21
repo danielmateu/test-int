@@ -54,9 +54,9 @@ export default function LandingPage() {
             <Button variant="ghost" className="hidden sm:inline-flex hover:bg-primary/10" asChild>
               <Link href="/login">{navT("login")}</Link>
             </Button>
-            <Button className="rounded-full shadow-lg shadow-primary/25 transition-transform hover:scale-105" asChild>
+            {/* <Button className="rounded-full shadow-lg shadow-primary/25 transition-transform hover:scale-105" asChild>
               <Link href="/register">{navT("startFree")}</Link>
-            </Button>
+            </Button> */}
             <LanguageSwitcher />
             <ModeToggle />
           </div>

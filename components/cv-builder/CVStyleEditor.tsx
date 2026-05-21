@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { CVData, CVTheme, TypographySettings, SpacingSettings } from "./types";
+import { CVData, CVTheme, TypographySettings, SpacingSettings, getHeaderDefaultSizes } from "./types";
 import { Paintbrush, Type, LayoutTemplate, SlidersHorizontal } from "lucide-react";
 
 interface CVStyleEditorProps {
@@ -58,6 +58,10 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
   };
 
   const currentTypography = data.theme.typography || { fontSize: 16, lineHeight: 1.5, wordSpacing: 0 };
+  const layout = data.theme.layout || "classic";
+  const defaultSizes = getHeaderDefaultSizes(layout);
+  const headerNameSize = currentTypography.headerNameSize ?? defaultSizes.nameSize;
+  const headerTitleSize = currentTypography.headerTitleSize ?? defaultSizes.titleSize;
 
   const handleSpacingChange = (field: keyof SpacingSettings, value: number) => {
     setData((prev) => ({
@@ -230,6 +234,34 @@ export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {
                 step={0.5}
                 value={[currentTypography.wordSpacing]}
                 onValueChange={([val]) => handleTypographyChange("wordSpacing", val)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Tamaño del Nombre (Cabecera)</Label>
+                <span className="text-sm text-muted-foreground">{headerNameSize}px</span>
+              </div>
+              <Slider
+                min={16}
+                max={72}
+                step={1}
+                value={[headerNameSize]}
+                onValueChange={([val]) => handleTypographyChange("headerNameSize", val)}
+              />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex justify-between">
+                <Label>Tamaño del Cargo (Cabecera)</Label>
+                <span className="text-sm text-muted-foreground">{headerTitleSize}px</span>
+              </div>
+              <Slider
+                min={10}
+                max={36}
+                step={1}
+                value={[headerTitleSize]}
+                onValueChange={([val]) => handleTypographyChange("headerTitleSize", val)}
               />
             </div>
           </CardContent>
