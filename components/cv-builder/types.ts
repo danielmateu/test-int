@@ -51,12 +51,23 @@ export interface CVTheme {
   spacing?: SpacingSettings;
 }
 
+export interface Project {
+  id: string;
+  name: string;
+  startDate?: string;
+  endDate?: string;
+  description: string;
+  url?: string;
+}
+
 export interface CVData {
   title?: string;
   personalInfo: PersonalInfo;
   experience: Experience[];
   education: Education[];
   skills: string[];
+  projects?: Project[];
+  other?: string;
   coverLetter: string;
   theme: CVTheme;
 }

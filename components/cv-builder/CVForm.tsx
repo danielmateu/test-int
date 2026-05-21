@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2, GripVertical, Loader2 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { AIEnhanceButton } from "./AIEnhanceButton";
-import { CVData, Experience, Education } from "./types";
+import { CVData, Experience, Education, Project } from "./types";
 import { useState } from "react";
 import { toast } from "sonner";
 import { uploadImage } from "@/app/actions/upload";
@@ -150,6 +150,66 @@ function SortableEducationItem({ edu, handleEducationChange, removeEducation, t 
   );
 }
 
+interface SortableProjectItemProps {
+  proj: Project;
+  handleProjectChange: (id: string, field: keyof Project, value: string) => void;
+  removeProject: (id: string) => void;
+  t: any;
+}
+
+function SortableProjectItem({ proj, handleProjectChange, removeProject, t }: SortableProjectItemProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: proj.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 1,
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className={`space-y-4 relative border-b pb-6 last:border-0 last:pb-0 bg-card ${isDragging ? "shadow-lg rounded-lg border-b-0 p-4" : ""}`}>
+      <div className="absolute right-0 top-0 flex items-center gap-1">
+        <Button variant="ghost" size="icon" {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing hover:bg-slate-100 text-slate-400">
+          <GripVertical className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="icon" onClick={() => removeProject(proj.id)} className="text-red-500 hover:text-red-700">
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pr-20 pt-2">
+        <div className="space-y-2 md:col-span-2">
+          <Label>{t("projects.name")}</Label>
+          <Input value={proj.name} onChange={(e) => handleProjectChange(proj.id, "name", e.target.value)} placeholder={t("projects.namePlaceholder")} />
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <Label>{t("projects.url")}</Label>
+          <Input type="url" value={proj.url || ""} onChange={(e) => handleProjectChange(proj.id, "url", e.target.value)} placeholder={t("projects.urlPlaceholder")} />
+        </div>
+        <div className="space-y-2">
+          <Label>{t("projects.startDate")}</Label>
+          <DatePicker value={proj.startDate || ""} onChange={(val) => handleProjectChange(proj.id, "startDate", val)} placeholder={t("projects.startDate")} />
+        </div>
+        <div className="space-y-2">
+          <Label>{t("projects.endDate")}</Label>
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <DatePicker value={proj.endDate || ""} onChange={(val) => handleProjectChange(proj.id, "endDate", val)} placeholder={t("projects.endDate")} />
+            </div>
+            <Button variant="outline" onClick={() => handleProjectChange(proj.id, "endDate", t("experience.current"))} className="px-3" title={t("experience.current")}>{t("experience.current")}</Button>
+          </div>
+        </div>
+        <div className="space-y-2 md:col-span-2">
+          <div className="flex items-center justify-between">
+            <Label>{t("projects.description")}</Label>
+            <AIEnhanceButton text={proj.description} context="projects" onEnhance={(text) => handleProjectChange(proj.id, "description", text)} />
+          </div>
+          <RichTextEditor value={proj.description} onChange={(val) => handleProjectChange(proj.id, "description", val)} placeholder={t("projects.descriptionPlaceholder")} className="h-fit" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface CVFormProps {
   data: CVData;
   setData: React.Dispatch<React.SetStateAction<CVData>>;
@@ -247,6 +307,34 @@ export function CVForm({ data, setData, status }: CVFormProps) {
     }));
   };
 
+  const handleProjectChange = (id: string, field: keyof Project, value: string) => {
+    setData((prev) => ({
+      ...prev,
+      projects: (prev.projects || []).map((proj) => (proj.id === id ? { ...proj, [field]: value } : proj)),
+    }));
+  };
+
+  const addProject = () => {
+    setData((prev) => ({
+      ...prev,
+      projects: [
+        ...(prev.projects || []),
+        { id: Date.now().toString(), name: "", startDate: "", endDate: "", description: "", url: "" },
+      ],
+    }));
+  };
+
+  const removeProject = (id: string) => {
+    setData((prev) => ({
+      ...prev,
+      projects: (prev.projects || []).filter((proj) => proj.id !== id),
+    }));
+  };
+
+  const handleOtherChange = (value: string) => {
+    setData((prev) => ({ ...prev, other: value }));
+  };
+
   const handleSkillsChange = (value: string) => {
     const skillsArray = value.split(",").map((skill) => skill.trim());
     setData((prev) => ({ ...prev, skills: skillsArray }));
@@ -282,6 +370,20 @@ export function CVForm({ data, setData, status }: CVFormProps) {
         return {
           ...prev,
           education: arrayMove(prev.education, oldIndex, newIndex),
+        };
+      });
+    }
+  };
+
+  const handleDragEndProject = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setData((prev) => {
+        const oldIndex = (prev.projects || []).findIndex((item) => item.id === active.id);
+        const newIndex = (prev.projects || []).findIndex((item) => item.id === over.id);
+        return {
+          ...prev,
+          projects: arrayMove(prev.projects || [], oldIndex, newIndex),
         };
       });
     }
@@ -514,6 +616,34 @@ export function CVForm({ data, setData, status }: CVFormProps) {
       </Card>
 
       <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>{t("projects.title")}</CardTitle>
+          <Button variant="outline" size="sm" onClick={addProject}>
+            <Plus className="w-4 h-4 mr-2" />
+            {t("projects.add")}
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndProject}>
+            <SortableContext items={(data.projects || []).map(p => p.id)} strategy={verticalListSortingStrategy}>
+              {(data.projects || []).map((proj) => (
+                <SortableProjectItem
+                  key={proj.id}
+                  proj={proj}
+                  handleProjectChange={handleProjectChange}
+                  removeProject={removeProject}
+                  t={t}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+          {(!data.projects || data.projects.length === 0) && (
+            <p className="text-sm text-muted-foreground text-center py-4">{t("projects.empty")}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader>
           <CardTitle>{t("skills.title")}</CardTitle>
         </CardHeader>
@@ -529,6 +659,31 @@ export function CVForm({ data, setData, status }: CVFormProps) {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{t("other.title")}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="other">{t("other.label")}</Label>
+              <AIEnhanceButton
+                text={data.other || ""}
+                context="other"
+                onEnhance={(text) => handleOtherChange(text)}
+              />
+            </div>
+            <RichTextEditor
+              value={data.other || ""}
+              onChange={(val) => handleOtherChange(val)}
+              placeholder={t("other.placeholder")}
+              className="min-h-50"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>{t("coverLetter.title")}</CardTitle>

@@ -41,6 +41,8 @@ const initialData: CVData = {
   experience: [],
   education: [],
   skills: [],
+  projects: [],
+  other: "",
   coverLetter: "",
   theme: {
     color: "#0f172a", // Default slate-900
@@ -70,7 +72,10 @@ function BuilderPageContent() {
     if (status === "authenticated") {
       loadCV(cvId || undefined).then((data) => {
         if (data) {
-          setCvData(data.content);
+          const content = data.content;
+          if (!content.projects) content.projects = [];
+          if (!content.other) content.other = "";
+          setCvData(content);
           toast.success("CV cargado correctamente desde la nube");
         }
       }).catch(console.error);

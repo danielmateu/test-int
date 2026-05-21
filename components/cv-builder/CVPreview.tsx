@@ -8,7 +8,7 @@ interface CVPreviewProps {
 }
 
 export function CVPreview({ data }: CVPreviewProps) {
-  const { personalInfo, experience, education, skills, theme } = data;
+  const { personalInfo, experience, education, skills, projects = [], other = "", theme } = data;
   
   const [containerHeight, setContainerHeight] = useState(0);
   const [pageHeightInPx, setPageHeightInPx] = useState(0);
@@ -335,6 +335,97 @@ export function CVPreview({ data }: CVPreviewProps) {
     );
   };
 
+  const ProjectsSection = ({ centered = false, corporate = false }: { centered?: boolean, corporate?: boolean }) => {
+    if (!projects || !projects.length) return null;
+    return (
+      <section className="preview-section">
+        <div className="preview-item-list">
+          {projects.map((proj, index) => (
+            <div key={proj.id}>
+              {index === 0 ? (
+                <>
+                  {renderSpacer(`proj-${proj.id}`)}
+                  <div className="break-inside-avoid" data-page-break-target={`proj-${proj.id}`}>
+                    <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'} ${corporate ? 'tracking-widest text-slate-900 border-slate-900 border-b pb-2 mb-4' : ''}`}>
+                      {t("projects")}
+                    </h2>
+                    <div className="break-after-avoid">
+                      <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                        <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>
+                          {proj.name || "Proyecto"}
+                          {proj.url && (
+                            <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs font-normal text-slate-500 hover:text-(--theme-color) transition-colors ml-2 underline">
+                              {proj.url}
+                            </a>
+                          )}
+                        </h3>
+                        <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'} ${corporate ? 'text-slate-500 font-bold' : ''}`}>
+                          {proj.startDate} {proj.startDate && proj.endDate && "–"} {proj.endDate}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {proj.description && (
+                    <div 
+                      className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''} ${corporate ? 'pl-4 border-l-2 border-slate-200 text-slate-700 mb-6' : ''}`}
+                      dangerouslySetInnerHTML={{ __html: proj.description }}
+                    />
+                  )}
+                </>
+              ) : (
+                <>
+                  {renderSpacer(`proj-${proj.id}`)}
+                  <div className="break-inside-avoid" data-page-break-target={`proj-${proj.id}`}>
+                    <div className="break-after-avoid">
+                      <div className={`flex ${centered ? 'flex-col items-center' : 'justify-between items-baseline'} mb-1`}>
+                        <h3 className={`text-base font-bold text-slate-900 ${centered ? 'text-center' : ''}`}>
+                          {proj.name || "Proyecto"}
+                          {proj.url && (
+                            <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs font-normal text-slate-500 hover:text-(--theme-color) transition-colors ml-2 underline">
+                              {proj.url}
+                            </a>
+                          )}
+                        </h3>
+                        <span className={`text-sm font-medium text-(--theme-color) whitespace-nowrap ${centered ? 'mt-1' : 'ml-4'} ${corporate ? 'text-slate-500 font-bold' : ''}`}>
+                          {proj.startDate} {proj.startDate && proj.endDate && "–"} {proj.endDate}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {proj.description && (
+                    <div 
+                      className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''} ${corporate ? 'pl-4 border-l-2 border-slate-200 text-slate-700 mb-6' : ''}`}
+                      dangerouslySetInnerHTML={{ __html: proj.description }}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    );
+  };
+
+  const OtherSection = ({ centered = false, corporate = false, sidebar = false }: { centered?: boolean, corporate?: boolean, sidebar?: boolean }) => {
+    if (!other || !other.trim()) return null;
+    const targetId = sidebar ? "other-sidebar" : "other";
+    return (
+      <>
+        {renderSpacer(targetId)}
+        <section className="break-inside-avoid preview-section" data-page-break-target={targetId}>
+          <h2 className={`text-lg font-bold uppercase tracking-wider text-(--theme-color) pb-2 mb-4 break-after-avoid ${centered ? 'text-center border-none' : 'border-b border-slate-300'} ${corporate ? 'tracking-widest text-slate-900 border-slate-900 border-b pb-2 mb-4' : ''} ${sidebar ? 'text-sm mt-2' : ''}`}>
+            {t("other")}
+          </h2>
+          <div 
+            className={`rich-text-content text-slate-600 text-[0.875em] ${centered ? 'text-center mx-auto max-w-3xl' : ''} ${corporate ? 'pl-4 border-l-2 border-slate-200 text-slate-750' : ''} ${sidebar ? 'text-slate-700' : ''}`}
+            dangerouslySetInnerHTML={{ __html: other }}
+          />
+        </section>
+      </>
+    );
+  };
+
   return (
     <div
       className={`flex flex-col gap-8 w-full max-w-[210mm] mx-auto print:gap-0 print:block ${data.theme.font}`}
@@ -377,10 +468,12 @@ export function CVPreview({ data }: CVPreviewProps) {
                 </div>
               )}
             </header>
-            <SummarySection />
-            <ExperienceSection />
-            <EducationSection />
-            <SkillsSection />
+            {SummarySection({})}
+            {ExperienceSection({})}
+            {EducationSection({})}
+            {ProjectsSection({})}
+            {SkillsSection({})}
+            {OtherSection({})}
           </div>
         )}
 
@@ -410,14 +503,16 @@ export function CVPreview({ data }: CVPreviewProps) {
                 <ContactItems layoutStyle="column" />
               </div>
 
-              <SkillsSection sidebar />
+              {SkillsSection({ sidebar: true })}
+              {OtherSection({ sidebar: true })}
             </div>
 
             {/* Right Content */}
             <div className="w-[65%] preview-page-padding print:py-0">
-              <SummarySection />
-              <ExperienceSection />
-              <EducationSection />
+              {SummarySection({})}
+              {ExperienceSection({})}
+              {EducationSection({})}
+              {ProjectsSection({})}
             </div>
           </div>
         )}
@@ -540,6 +635,43 @@ export function CVPreview({ data }: CVPreviewProps) {
                 </div>
               )}
 
+              {projects && projects.length > 0 && (
+                <div key="proj-section-wrapper" className="w-full">
+                  {renderSpacer(`proj-${projects[0].id}`)}
+                  <section className="grid grid-cols-[110px_1fr] gap-8 preview-section">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("projects")}</p>
+                    <div className="preview-item-list">
+                      {projects.map((proj, index) => (
+                        <div key={proj.id}>
+                          {index > 0 && renderSpacer(`proj-${proj.id}`)}
+                          <div className="break-inside-avoid" data-page-break-target={`proj-${proj.id}`}>
+                            <div className="flex justify-between items-baseline mb-0.5">
+                              <span className="text-sm font-semibold text-slate-900">
+                                {proj.name || "Proyecto"}
+                                {proj.url && (
+                                  <a href={proj.url} target="_blank" rel="noreferrer" className="text-[10px] font-normal text-slate-400 hover:text-slate-600 ml-2 underline">
+                                    {proj.url}
+                                  </a>
+                                )}
+                              </span>
+                              <span className="text-xs text-slate-400 shrink-0 ml-4 tabular-nums">
+                                {proj.startDate}{proj.startDate && proj.endDate && " – "}{proj.endDate}
+                              </span>
+                            </div>
+                          </div>
+                          {proj.description && (
+                            <div 
+                              className="text-[0.875em] text-slate-600 rich-text-content" 
+                              dangerouslySetInnerHTML={{ __html: proj.description }} 
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </section>
+                </div>
+              )}
+
               {skills.some((s) => s.trim()) && (
                 <>
                   {renderSpacer("skills")}
@@ -548,6 +680,19 @@ export function CVPreview({ data }: CVPreviewProps) {
                     <p className="text-sm text-slate-600 leading-relaxed">
                       {skills.filter((s) => s.trim()).join(" · ")}
                     </p>
+                  </section>
+                </>
+              )}
+
+              {other && other.trim() && (
+                <>
+                  {renderSpacer("other")}
+                  <section className="grid grid-cols-[110px_1fr] gap-8 break-inside-avoid preview-section" data-page-break-target="other">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400 pt-0.5">{t("other")}</p>
+                    <div 
+                      className="text-[0.875em] text-slate-600 rich-text-content" 
+                      dangerouslySetInnerHTML={{ __html: other }} 
+                    />
                   </section>
                 </>
               )}
@@ -651,6 +796,76 @@ export function CVPreview({ data }: CVPreviewProps) {
                 </section>
               )}
 
+              {projects && projects.length > 0 && (
+                <section className="preview-section">
+                  <div className="preview-item-list">
+                    {projects.map((proj, index) => (
+                      <div key={proj.id}>
+                        {index === 0 ? (
+                          <>
+                            {renderSpacer(`proj-${proj.id}`)}
+                            <div 
+                              className="break-inside-avoid" 
+                              data-page-break-target={`proj-${proj.id}`}
+                            >
+                              <h2 className="text-xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                                <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("projects")}
+                              </h2>
+                              <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <h3 className="text-lg font-bold text-slate-900">
+                                      {proj.name || "Proyecto"}
+                                      {proj.url && (
+                                        <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs font-normal text-slate-500 hover:text-(--theme-color) transition-colors ml-2 underline block sm:inline">
+                                          {proj.url}
+                                        </a>
+                                      )}
+                                    </h3>
+                                  </div>
+                                  <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium whitespace-nowrap">
+                                    {proj.startDate}{proj.startDate && proj.endDate && " – "}{proj.endDate}
+                                  </span>
+                                </div>
+                                {proj.description && (
+                                  <div className="mt-4 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
+                                )}
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {renderSpacer(`proj-${proj.id}`)}
+                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid relative overflow-hidden" data-page-break-target={`proj-${proj.id}`}>
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-(--theme-color) opacity-50"></div>
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <h3 className="text-lg font-bold text-slate-900">
+                                    {proj.name || "Proyecto"}
+                                    {proj.url && (
+                                      <a href={proj.url} target="_blank" rel="noreferrer" className="text-xs font-normal text-slate-500 hover:text-(--theme-color) transition-colors ml-2 underline block sm:inline">
+                                        {proj.url}
+                                      </a>
+                                    )}
+                                  </h3>
+                                </div>
+                                <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-medium whitespace-nowrap">
+                                  {proj.startDate}{proj.startDate && proj.endDate && " – "}{proj.endDate}
+                                </span>
+                              </div>
+                              {proj.description && (
+                                <div className="mt-4 text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: proj.description }} />
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-10 preview-section">
                 {education.length > 0 && (
                   <section>
@@ -714,6 +929,18 @@ export function CVPreview({ data }: CVPreviewProps) {
                   </>
                 )}
               </div>
+
+              {other && other.trim() && (
+                <>
+                  {renderSpacer("other")}
+                  <section className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 break-inside-avoid preview-section" data-page-break-target="other">
+                    <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-3">
+                      <span className="w-8 h-1 bg-(--theme-color) rounded-full"></span> {t("other")}
+                    </h2>
+                    <div className="text-[0.875em] text-slate-600 rich-text-content" dangerouslySetInnerHTML={{ __html: other }} />
+                  </section>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -856,6 +1083,8 @@ export function CVPreview({ data }: CVPreviewProps) {
                 </section>
               )}
 
+              {ProjectsSection({ corporate: true })}
+
               {skills.some((s) => s.trim()) && (
                 <>
                   {renderSpacer("skills")}
@@ -869,6 +1098,8 @@ export function CVPreview({ data }: CVPreviewProps) {
                   </section>
                 </>
               )}
+
+              {OtherSection({ corporate: true })}
             </div>
           </div>
         )}

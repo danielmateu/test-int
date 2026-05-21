@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 interface AIEnhanceButtonProps {
   text: string;
-  context: "summary" | "experience" | "coverLetter" | "education";
+  context: "summary" | "experience" | "coverLetter" | "education" | "projects" | "other";
   onEnhance: (enhancedText: string) => void;
   className?: string;
 }

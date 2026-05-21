@@ -36,6 +36,14 @@ export async function POST(req: NextRequest) {
       case "coverLetter":
         systemPrompt += "Mejora la siguiente carta de presentación. Hazla persuasiva, educada y directa. Mejora el vocabulario y la fluidez. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones ni comillas.";
         break;
+      case "projects":
+      case "project":
+        systemPrompt += "Mejora la siguiente descripción de un proyecto personal o profesional. Resalta el objetivo, tecnologías clave empleadas, tu rol y los resultados logrados. Haz que suene muy profesional y técnico. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones ni comillas.";
+        break;
+      case "other":
+      case "others":
+        systemPrompt += "Mejora y da formato profesional a la siguiente sección adicional (idiomas, intereses, certificaciones, etc.) para que se vea estructurada, pulida y elegante. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones ni comillas.";
+        break;
       default:
         systemPrompt += "Mejora profesionalmente el siguiente texto para un currículum vitae. Devuelve ÚNICAMENTE el texto mejorado, sin introducciones.";
     }

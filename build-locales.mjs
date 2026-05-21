@@ -132,6 +132,24 @@ const messages = {
         title: "Carta de Presentación",
         label: "Contenido de la carta (opcional)",
         placeholder: "Escribe aquí tu carta de presentación..."
+      },
+      projects: {
+        title: "Proyectos Personales",
+        add: "Añadir Proyecto",
+        empty: "No has añadido proyectos personales todavía.",
+        name: "Nombre del Proyecto",
+        namePlaceholder: "Ej. Sistema de Comercio Electrónico",
+        url: "URL del Proyecto (opcional)",
+        urlPlaceholder: "Ej. https://github.com/usuario/proyecto",
+        startDate: "Fecha Inicio",
+        endDate: "Fecha Fin",
+        description: "Descripción",
+        descriptionPlaceholder: "Describe el propósito del proyecto, las tecnologías utilizadas y tus logros..."
+      },
+      other: {
+        title: "Otros (Idiomas, Intereses, etc.)",
+        label: "Información adicional relevante",
+        placeholder: "Idiomas: Español (Nativo), Inglés (C1)\nCertificaciones: AWS Certified Solutions Architect\nIntereses: Contribuir al código abierto, senderismo..."
       }
     },
     CVPreview: {
@@ -141,7 +159,9 @@ const messages = {
         education: "Educación",
         skills: "Habilidades",
         contact: "Contacto",
-        coverLetter: "Carta de Presentación"
+        coverLetter: "Carta de Presentación",
+        projects: "Proyectos Personales",
+        other: "Otros"
       },
       dates: {
         present: "Actualidad"
@@ -168,10 +188,28 @@ const messages = {
       experience: { title: "Experience", add: "Add", empty: "You haven't added any experience yet.", company: "Company", companyPlaceholder: "Company name", role: "Role", rolePlaceholder: "E.g. Software Engineer", startDate: "Start Date", endDate: "End Date", current: "Current", description: "Description", descriptionPlaceholder: "Describe your responsibilities and achievements..." },
       education: { title: "Education", add: "Add", empty: "You haven't added any education yet.", institution: "Institution", institutionPlaceholder: "University or Center", degree: "Degree", degreePlaceholder: "E.g. Bachelor in Computer Science", startDate: "Start Date", endDate: "End Date", current: "Current", description: "Description (optional)", descriptionPlaceholder: "Describe your achievements, projects, or skills acquired..." },
       skills: { title: "Skills", label: "Your skills (comma separated)", placeholder: "React, TypeScript, Node.js, UI Design..." },
-      coverLetter: { title: "Cover Letter", label: "Letter content (optional)", placeholder: "Write your cover letter here..." }
+      coverLetter: { title: "Cover Letter", label: "Letter content (optional)", placeholder: "Write your cover letter here..." },
+      projects: {
+        title: "Personal Projects",
+        add: "Add Project",
+        empty: "You haven't added any personal projects yet.",
+        name: "Project Name",
+        namePlaceholder: "E.g. E-commerce System",
+        url: "Project URL (optional)",
+        urlPlaceholder: "E.g. https://github.com/user/project",
+        startDate: "Start Date",
+        endDate: "End Date",
+        description: "Description",
+        descriptionPlaceholder: "Describe the purpose of the project, the technologies used, and your achievements..."
+      },
+      other: {
+        title: "Others (Languages, Interests, etc.)",
+        label: "Additional relevant details",
+        placeholder: "Languages: English (Native), Spanish (C1)\nCertifications: AWS Certified Solutions Architect\nInterests: Open source contributing, hiking..."
+      }
     },
     CVPreview: {
-      sections: { summary: "Professional Profile", experience: "Professional Experience", education: "Education", skills: "Skills", contact: "Contact", coverLetter: "Cover Letter" },
+      sections: { summary: "Professional Profile", experience: "Professional Experience", education: "Education", skills: "Skills", contact: "Contact", coverLetter: "Cover Letter", projects: "Personal Projects", other: "Others" },
       dates: { present: "Present" }
     }
   },

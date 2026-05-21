@@ -126,6 +126,24 @@
       "title": "Carta de Presentación",
       "label": "Contenido de la carta (opcional)",
       "placeholder": "Escribe aquí tu carta de presentación..."
+    },
+    "projects": {
+      "title": "Proyectos Personales",
+      "add": "Añadir Proyecto",
+      "empty": "No has añadido proyectos personales todavía.",
+      "name": "Nombre del Proyecto",
+      "namePlaceholder": "Ej. Sistema de Comercio Electrónico",
+      "url": "URL del Proyecto (opcional)",
+      "urlPlaceholder": "Ej. https://github.com/usuario/proyecto",
+      "startDate": "Fecha Inicio",
+      "endDate": "Fecha Fin",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe el propósito del proyecto, las tecnologías utilizadas y tus logros..."
+    },
+    "other": {
+      "title": "Otros (Idiomas, Intereses, etc.)",
+      "label": "Información adicional relevante",
+      "placeholder": "Idiomas: Español (Nativo), Inglés (C1)\nCertificaciones: AWS Certified Solutions Architect\nIntereses: Contribuir al código abierto, senderismo..."
     }
   },
   "CVPreview": {
@@ -135,7 +153,9 @@
       "education": "Educación",
       "skills": "Habilidades",
       "contact": "Contacto",
-      "coverLetter": "Carta de Presentación"
+      "coverLetter": "Carta de Presentación",
+      "projects": "Proyectos Personales",
+      "other": "Otros"
     },
     "dates": {
       "present": "Actualidad"
