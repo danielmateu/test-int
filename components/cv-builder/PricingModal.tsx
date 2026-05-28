@@ -43,7 +43,7 @@ export function PricingModal({
   const handleStripeCheckout = async () => {
     setIsLoadingCheckout(true);
     try {
-      const res = await createCheckoutSessionAction("price_premium_monthly", "es");
+      const res = await createCheckoutSessionAction(undefined, "es");
 
       console.log(res)
 

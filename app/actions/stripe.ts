@@ -38,14 +38,14 @@ export async function getUserSubscriptionStatusAction(): Promise<{ isPremium: bo
     const periodEnd = user.subscription_current_period_end;
 
     // Si es active o trialing y no ha expirado
-    const isPremium = 
-      (status === "active" || status === "trialing") && 
+    const isPremium =
+      (status === "active" || status === "trialing") &&
       (!periodEnd || new Date(periodEnd) > new Date());
 
-    return { 
-      isPremium, 
-      status, 
-      currentPeriodEnd: periodEnd || undefined 
+    return {
+      isPremium,
+      status,
+      currentPeriodEnd: periodEnd || undefined
     };
   } catch (err: any) {
     console.error("[getUserSubscriptionStatusAction] Exception caught:", err.message);
@@ -55,9 +55,10 @@ export async function getUserSubscriptionStatusAction(): Promise<{ isPremium: bo
 
 // 2. Crear una sesión de Checkout de Stripe (o simulación)
 export async function createCheckoutSessionAction(
-  priceId: string = "price_premium_monthly",
+  priceId?: string,
   locale: string = "es"
 ): Promise<{ url: string; simulated?: boolean }> {
+  const activePriceId = priceId || process.env.STRIPE_PRICE_ID || "price_premium_monthly";
   const session = await auth();
   if (!session?.user?.id || !session?.user?.email) {
     throw new Error("No autorizado");
@@ -68,9 +69,9 @@ export async function createCheckoutSessionAction(
   // Si Stripe no está configurado, forzamos simulación demo
   if (!stripe) {
     console.log("[Stripe] Secret key not configured. Using simulated checkout session.");
-    return { 
+    return {
       url: `${appUrl}/${locale}/dashboard?session_id=sim_checkout_${Math.random().toString(36).substring(2, 10)}`,
-      simulated: true 
+      simulated: true
     };
   }
 
@@ -106,7 +107,7 @@ export async function createCheckoutSessionAction(
       payment_method_types: ["card"],
       line_items: [
         {
-          price: priceId, // Debe crearse este price ID en tu Stripe Dashboard
+          price: activePriceId, // Debe crearse este price ID en tu Stripe Dashboard o .env.local
           quantity: 1,
         },
       ],
@@ -124,9 +125,9 @@ export async function createCheckoutSessionAction(
     return { url: checkoutSession.url };
   } catch (err: any) {
     console.error("[Stripe checkout error] falling back to simulated session:", err.message);
-    return { 
+    return {
       url: `${appUrl}/${locale}/dashboard?session_id=sim_checkout_${Math.random().toString(36).substring(2, 10)}`,
-      simulated: true 
+      simulated: true
     };
   }
 }
