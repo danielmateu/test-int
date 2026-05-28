@@ -45,6 +45,8 @@ export function PricingModal({
     try {
       const res = await createCheckoutSessionAction("price_premium_monthly", "es");
 
+      console.log(res)
+
       if (res.simulated) {
         // Stripe no está configurado en el servidor, procedemos con Checkout Simulado
         toast.info("Stripe no está configurado en .env.local. Redirigiendo a pasarela demo...");
