@@ -71,7 +71,13 @@
     "stageUpdated": "Stage updated successfully",
     "noTrackedJobs": "You haven't tracked any jobs yet. Browse recommended jobs and click 'Track Job' to get started!",
     "noCvAssociated": "No CV associated",
-    "selectCv": "Select CV to associate"
+    "selectCv": "Select CV to associate",
+    "tailorCVTitle": "One-Click CV Tailoring (Gemini AI)",
+    "tailorCVButton": "Adapt my CV for this Job with Gemini",
+    "tailorCVLoading": "Optimizing and tailoring resume...",
+    "tailorCVSuccess": "Resume adapted successfully! Created a new version named: \"{title}\"",
+    "tailorCVLimitError": "Limit reached: You have reached the limit of 4 free resumes. Delete an existing one to save this adapted version.",
+    "tailorCVError": "Error tailoring resume. Please try again."
   },
   "LandingPage": {
     "heroBadge": "The new era of resumes",

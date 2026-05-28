@@ -42,17 +42,17 @@ export async function saveCV(data: CVData, id?: string) {
   if (id) {
     const { error: updateError } = await supabase
       .from("cv_documents")
-      .update({ 
-        content: data, 
-        updated_at: new Date().toISOString() 
+      .update({
+        content: data,
+        updated_at: new Date().toISOString()
       })
       .eq("id", id)
       .eq("user_id", session.user.id);
-      
+
     if (updateError) throw new Error(updateError.message);
     return { success: true, id };
-  } 
-  
+  }
+
   // Si no hay ID, es una creación nueva. Comprobamos el límite.
   const { count, error: countError } = await supabase
     .from("cv_documents")
@@ -61,20 +61,20 @@ export async function saveCV(data: CVData, id?: string) {
 
   if (countError) throw new Error("Error comprobando el límite de CVs");
 
-  if (count && count >= 4) {
-    throw new Error("Has alcanzado el límite de 4 currículums gratuitos.");
+  if (count && count >= 8) {
+    throw new Error("Has alcanzado el límite de 8 currículums gratuitos.");
   }
 
   // Insertar nuevo
   const { data: insertedData, error: insertError } = await supabase
     .from("cv_documents")
-    .insert({ 
-      user_id: session.user.id, 
-      content: data 
+    .insert({
+      user_id: session.user.id,
+      content: data
     })
     .select("id")
     .single();
-    
+
   if (insertError) throw new Error(insertError.message);
 
   return { success: true, id: insertedData.id };
@@ -150,9 +150,9 @@ export async function saveCoverLetterToCV(cvId: string, coverLetter: string) {
   // 3. Guardar el CV actualizado en Supabase
   const { error: updateError } = await supabase
     .from("cv_documents")
-    .update({ 
-      content: updatedContent, 
-      updated_at: new Date().toISOString() 
+    .update({
+      content: updatedContent,
+      updated_at: new Date().toISOString()
     })
     .eq("id", cvId)
     .eq("user_id", session.user.id);

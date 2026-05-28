@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useTransition } from "react";
 import { getJobRecommendations, JobOffer } from "@/app/actions/jobs";
 import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Search, MapPin, Briefcase, DollarSign, CheckCircle2, AlertTriangle, ExternalLink, Sparkles, Loader2, Building2, Check, X, Copy, Save, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { generateCoverLetterAction } from "@/app/actions/ai";
-import { saveCoverLetterToCV } from "@/app/actions/cv";
+import { generateCoverLetterAction, tailorCVAction } from "@/app/actions/ai";
+import { saveCoverLetterToCV, saveCV } from "@/app/actions/cv";
 import { addJobApplication, getJobApplications } from "@/app/actions/tracker";
 import { toast } from "sonner";
 
@@ -38,7 +39,7 @@ export function RecommendedJobs({
 }: RecommendedJobsProps) {
   const t = useTranslations("Dashboard");
   const locale = useLocale();
-  
+
   const [localJobs, setLocalJobs] = useState<JobOffer[]>([]);
   const [localTrackedJobUrls, setLocalTrackedJobUrls] = useState<string[]>([]);
 
@@ -51,13 +52,81 @@ export function RecommendedJobs({
   const [searchQuery, setSearchQuery] = useState(initialJobTitle);
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedJob, setSelectedJob] = useState<JobOffer | null>(null);
-  
+
   const [isPending, startTransition] = useTransition();
 
   // Estados para la generación de la carta de presentación
   const [isGeneratingLetter, setIsGeneratingLetter] = useState(false);
   const [generatedLetter, setGeneratedLetter] = useState("");
   const [isSavingLetter, setIsSavingLetter] = useState(false);
+
+  // Estados para la adaptación del CV con IA
+  const [isTailoring, setIsTailoring] = useState(false);
+  const [tailorStep, setTailorStep] = useState("");
+  const router = useRouter();
+
+  const handleTailorCV = async () => {
+    if (!selectedJob || !cvId || !cvData) return;
+
+    setIsTailoring(true);
+    setTailorStep("Analizando perfil y vacante...");
+
+    // Iniciar intervalos para actualizar los micro-pasos de carga animada
+    const steps = [
+      "Reescribiendo perfil profesional...",
+      "Alineando descripciones de experiencia...",
+      "Optimizando lista de habilidades...",
+      "Creando nueva versión adaptada en la nube..."
+    ];
+
+    let stepIndex = 0;
+    const interval = setInterval(() => {
+      if (stepIndex < steps.length) {
+        setTailorStep(steps[stepIndex]);
+        stepIndex++;
+      }
+    }, 2000);
+
+    try {
+      // 1. Llamar a la acción de adaptación con IA
+      const adaptedCV = await tailorCVAction(
+        cvData,
+        selectedJob.title,
+        selectedJob.company,
+        selectedJob.description,
+        locale
+      );
+
+      // 2. Modificar el título para reflejar la adaptación
+      const originalTitle = cvData.title || t("createNew");
+      adaptedCV.title = `${originalTitle} - Adaptado para ${selectedJob.company}`;
+
+      // 3. Guardar como un nuevo CV en Supabase (al no pasar id, saveCV crea uno nuevo)
+      const res = await saveCV(adaptedCV);
+
+      clearInterval(interval);
+      setTailorStep("¡Listo!");
+      toast.success(t("tailorCVSuccess", { title: adaptedCV.title }));
+
+      // Refrescar para recargar el panel y que aparezca el nuevo CV en "Mis CVs"
+      router.refresh();
+
+      // Cerrar el modal para que el usuario vea su nuevo currículum
+      setSelectedJob(null);
+    } catch (error: any) {
+      clearInterval(interval);
+      console.error(error);
+
+      if (error?.message?.includes("límite") || error?.message?.includes("limit") || error?.message?.includes("4") || error?.message?.includes("límite de 4")) {
+        toast.error(t("tailorCVLimitError"));
+      } else {
+        toast.error(t("tailorCVError"));
+      }
+    } finally {
+      setIsTailoring(false);
+      setTailorStep("");
+    }
+  };
 
   // Resetear la carta generada cuando se cambia de oferta
   useEffect(() => {
@@ -71,7 +140,7 @@ export function RecommendedJobs({
       try {
         const res = await getJobApplications();
         if (!active) return;
-        
+
         let apps = [];
         if (res.useLocalStorage) {
           const localData = localStorage.getItem("job_tracker_applications");
@@ -79,7 +148,7 @@ export function RecommendedJobs({
         } else {
           apps = res.data;
         }
-        
+
         const urls = apps
           .map((a: any) => (a.apply_url || a.applyUrl || "").toLowerCase().trim())
           .filter(Boolean);
@@ -117,15 +186,15 @@ export function RecommendedJobs({
 
     try {
       const res = await addJobApplication(appData);
-      
+
       if (res.useLocalStorage) {
         const localData = localStorage.getItem("job_tracker_applications");
         const existing = localData ? JSON.parse(localData) : [];
-        
-        const alreadyExists = existing.some((item: any) => 
+
+        const alreadyExists = existing.some((item: any) =>
           (item.apply_url || item.applyUrl || "").toLowerCase().trim() === jobUrlKey
         );
-        
+
         if (alreadyExists) {
           toast.info("Esta oferta ya está en tu tablero de seguimiento");
           setTrackedJobUrls(prev => {
@@ -148,7 +217,7 @@ export function RecommendedJobs({
       } else {
         toast.success(t("trackSuccess"));
       }
-      
+
       setTrackedJobUrls(prev => {
         if (prev.includes(jobUrlKey)) return prev;
         return [...prev, jobUrlKey];
@@ -342,7 +411,7 @@ export function RecommendedJobs({
                   transition={{ duration: 0.3, delay: idx * 0.05 }}
                   className="h-full"
                 >
-                  <Card 
+                  <Card
                     className="h-full flex flex-col hover:shadow-lg transition-all duration-300 border-border/60 hover:border-primary/50 cursor-pointer group bg-white dark:bg-zinc-900 overflow-hidden relative"
                     onClick={() => setSelectedJob(job)}
                   >
@@ -375,13 +444,12 @@ export function RecommendedJobs({
                               cx="24"
                               cy="24"
                               r="20"
-                              className={`transition-all duration-1000 ${
-                                isHighMatch 
-                                  ? "stroke-emerald-500" 
-                                  : isMediumMatch 
-                                    ? "stroke-amber-500" 
-                                    : "stroke-blue-500"
-                              }`}
+                              className={`transition-all duration-1000 ${isHighMatch
+                                ? "stroke-emerald-500"
+                                : isMediumMatch
+                                  ? "stroke-amber-500"
+                                  : "stroke-blue-500"
+                                }`}
                               strokeWidth="3.5"
                               fill="transparent"
                               strokeDasharray="125.6"
@@ -445,10 +513,10 @@ export function RecommendedJobs({
                       <Button variant="ghost" size="sm" className="w-full text-xs font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
                         {t("viewDetails")}
                       </Button>
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
+
+                      <Button
+                        variant="outline"
+                        size="sm"
                         className={`px-3 text-xs font-semibold rounded-lg cursor-pointer shrink-0 ${trackedJobUrls.includes((job.applyUrl || "").toLowerCase().trim()) ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10' : 'border-border/60 hover:border-primary/40 text-muted-foreground hover:text-primary'}`}
                         disabled={trackedJobUrls.includes((job.applyUrl || "").toLowerCase().trim())}
                         onClick={(e) => handleTrackJob(job, e)}
@@ -456,8 +524,8 @@ export function RecommendedJobs({
                         {trackedJobUrls.includes((job.applyUrl || "").toLowerCase().trim()) ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                       </Button>
 
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         className="w-full text-xs font-semibold rounded-lg cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -642,12 +710,49 @@ export function RecommendedJobs({
                   </Button>
                 )}
               </div>
+
+              {/* Adaptador de CV Inteligente con un clic */}
+              <div className="border-t pt-6 space-y-4">
+                <h4 className="font-bold text-foreground flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+                  {t("tailorCVTitle")}
+                </h4>
+                <div className="bg-linear-to-br from-primary/5 to-purple-500/5 dark:from-primary/10 dark:to-purple-500/10 border border-primary/20 p-5 rounded-xl space-y-4 relative overflow-hidden">
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-foreground">
+                      Optimiza tu perfil, experiencia y habilidades para esta vacante
+                    </p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Nuestra IA analizará tu currículum y reescribirá tu Perfil Profesional, Puesto Laboral e historial de experiencia para alinearse perfectamente con lo que busca la empresa en esta oferta. Se creará de forma segura una **nueva versión adaptada** en tu panel sin modificar tu CV actual.
+                    </p>
+                  </div>
+
+                  <Button
+                    variant="default"
+                    onClick={handleTailorCV}
+                    disabled={isTailoring}
+                    className="w-full text-xs font-semibold rounded-lg cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95 flex items-center justify-center gap-2 h-10 shadow-xs"
+                  >
+                    {isTailoring ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-white mr-1.5" />
+                        <span className="animate-pulse">{tailorStep}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-white" />
+                        {t("tailorCVButton")}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
             </div>
 
             {/* Modal Footer */}
             <DialogFooter className="border-t pt-4 flex flex-row items-center justify-end gap-3 shrink-0">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 disabled={trackedJobUrls.includes((selectedJob.applyUrl || "").toLowerCase().trim())}
                 onClick={() => handleTrackJob(selectedJob)}
                 className={`h-10 text-xs rounded-lg cursor-pointer mr-auto flex items-center gap-1.5 ${trackedJobUrls.includes((selectedJob.applyUrl || "").toLowerCase().trim()) ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5' : 'border-primary/20 hover:border-primary/40 text-primary hover:bg-primary/5'}`}
@@ -667,7 +772,7 @@ export function RecommendedJobs({
               <Button variant="outline" onClick={() => setSelectedJob(null)} className="h-10 text-xs rounded-lg cursor-pointer">
                 Cerrar
               </Button>
-              <Button 
+              <Button
                 className="h-10 text-xs rounded-lg cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95"
                 onClick={() => window.open(selectedJob.applyUrl, "_blank")}
               >

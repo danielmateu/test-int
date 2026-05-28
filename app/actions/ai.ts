@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { GoogleGenAI } from "@google/genai";
+import type { CVData } from "@/components/cv-builder/types";
 
 // Inicializamos el cliente de IA reutilizando la API Key de tu proyecto
 const apiKey = process.env.GEMINI_API_KEY || "";
@@ -143,5 +144,157 @@ WRITING RULES:
 
   throw new Error(
     lastError?.message || "No se pudo generar la carta de presentación con IA. Por favor, inténtalo de nuevo."
+  );
+}
+
+export async function tailorCVAction(
+  cvData: CVData,
+  jobTitle: string,
+  company: string,
+  jobDescription: string,
+  locale: string = "es"
+): Promise<CVData> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("No autorizado");
+  }
+
+  if (!apiKey) {
+    throw new Error("La clave API de Gemini (GEMINI_API_KEY) no está configurada en .env.local");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
+  const isEn = locale.toLowerCase() === "en";
+
+  let systemPrompt = `Eres un redactor experto en talento y selección de personal especializado en la optimización y adaptación de currículums (CV) para ofertas de empleo.
+Tu tarea es recibir el JSON de un CV y la descripción de una vacante, y devolver un nuevo objeto JSON con el CV adaptado y optimizado para ese empleo específico.
+REGLAS ESTRICTAS DE RESPUESTA:
+1. Debes responder ÚNICAMENTE con un bloque de texto JSON limpio y válido.
+2. NO incluyas introducciones, explicaciones ni bloques de markdown (sin tres comillas simples ni "json" al principio). La respuesta debe empezar estrictamente con '{' y terminar con '}'.
+3. El JSON devuelto debe seguir exactamente la misma estructura que el recibido.`;
+
+  if (isEn) {
+    systemPrompt = `You are a professional talent acquisition and career writing expert specialized in optimizing and tailoring resumes (CVs) for specific job offers.
+Your task is to take a candidate's CV JSON and a target job description, and return a new JSON object representing the adapted and optimized CV for that specific job.
+STRICT RESPONSE RULES:
+1. You must respond ONLY with a clean and valid JSON string.
+2. DO NOT include any introductions, explanations, or markdown code blocks (no triple backticks or "json" tags). The response must strictly begin with '{' and end with '}'.
+3. The returned JSON must perfectly match the structure of the input JSON.`;
+  }
+
+  let userPrompt = `
+Por favor, adapta el siguiente currículum (CV) en formato JSON para que encaje perfectamente con la oferta de empleo provista.
+
+JSON DEL CV ORIGINAL DEL CANDIDATO:
+${JSON.stringify(cvData, null, 2)}
+
+DETALLES DE LA OFERTA DE EMPLEO OBJETIVO:
+- Puesto/Título: ${jobTitle}
+- Empresa: ${company}
+- Descripción del empleo: ${jobDescription}
+
+REGLAS DE ADAPTACIÓN:
+1. Idioma de redacción: Redacta la adaptación estrictamente en el idioma correspondiente a "${locale}" (si es 'es' en Español, si es 'en' en Inglés, etc.).
+2. Campos a modificar obligatoriamente:
+   - 'personalInfo.summary': Reescribe el perfil profesional (unas 3-5 líneas) para alinearlo fuertemente con la vacante, destacando las habilidades y logros del candidato más pertinentes para esta vacante de forma persuasiva.
+   - 'personalInfo.jobTitle': Si es adecuado y realista, ajústalo para que concuerde con el título de la oferta o se asemeje a ella (sin mentir).
+   - 'experience': Para cada experiencia laboral de la lista, optimiza el campo 'description'. Utiliza palabras clave de la oferta y destaca los logros que tengan mayor relación con lo buscado. ¡ATENCIÓN! Mantén el 'id', 'company', 'role', 'startDate' y 'endDate' exactamente iguales a los originales.
+   - 'skills': Analiza la oferta e inyecta en la lista las habilidades clave solicitadas en las que el candidato tenga competencia en base a su CV. Reordena la lista de habilidades para priorizar las más críticas para esta oferta.
+3. Campos que DEBEN permanecer 100% IDÉNTICOS sin ningún cambio:
+   - 'personalInfo.fullName', 'personalInfo.email', 'personalInfo.phone', 'personalInfo.location', 'personalInfo.imageUrl', 'personalInfo.githubUrl', 'personalInfo.linkedinUrl', 'personalInfo.portfolioUrl', 'personalInfo.xUrl'
+   - Todo el bloque 'education' (estudios)
+   - Todo el bloque 'projects' (proyectos)
+   - El campo 'other'
+   - El bloque 'theme' (diseño y colores)
+   - El campo 'coverLetter'
+4. Asegúrate de devolver un JSON válido y bien estructurado que comience con '{' y termine con '}'.
+`;
+
+  if (isEn) {
+    userPrompt = `
+Please adapt the following candidate's CV in JSON format to match the target job description.
+
+ORIGINAL CV JSON:
+${JSON.stringify(cvData, null, 2)}
+
+TARGET JOB DETAILS:
+- Job Title: ${jobTitle}
+- Company: ${company}
+- Job Description: ${jobDescription}
+
+TAILORING RULES:
+1. Language: Write the adapted fields strictly in the language code "${locale}" (if 'es' in Spanish, if 'en' in English, etc.).
+2. Fields you MUST modify:
+   - 'personalInfo.summary': Rewrite the professional summary (3-5 lines) to align closely with the job requirements, highlighting achievements and skills relevant to this vacancy in a persuasive tone.
+   - 'personalInfo.jobTitle': If realistic, adjust it to match or align closely with the target job title.
+   - 'experience': For each work experience item in the array, optimize the 'description'. Highlight achievements and use keywords relevant to the target job. CRITICAL: Keep 'id', 'company', 'role', 'startDate', and 'endDate' exactly identical to the originals.
+   - 'skills': Analyze the vacancy and append key skills required by the employer that match the candidate's background. Reorder the list to prioritize the most relevant skills.
+3. Fields that MUST remain 100% IDENTICAL and untouched:
+   - 'personalInfo.fullName', 'personalInfo.email', 'personalInfo.phone', 'personalInfo.location', 'personalInfo.imageUrl', 'personalInfo.githubUrl', 'personalInfo.linkedinUrl', 'personalInfo.portfolioUrl', 'personalInfo.xUrl'
+   - 'education' array
+   - 'projects' array
+   - 'other' field
+   - 'theme' object
+   - 'coverLetter' field
+4. Ensure you return ONLY a valid and well-structured JSON starting with '{' and ending with '}'.
+`;
+  }
+
+  const models = [
+    'gemini-3.1-flash-lite',
+    'gemini-3.0-flash',
+    'gemini-3.1-pro',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+  ];
+
+  const requestPayload = {
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    config: { 
+      systemInstruction: systemPrompt, 
+      temperature: 0.2, // Temperatura baja para respuestas más estructuradas y precisas
+      responseMimeType: "application/json"
+    },
+  };
+
+  let lastError: any;
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({ model, ...requestPayload });
+      const rawText = response.text?.trim() || "";
+      if (rawText) {
+        // Limpiamos posibles bloques markdown en la respuesta por seguridad
+        let cleanedText = rawText;
+        if (cleanedText.startsWith("```")) {
+          cleanedText = cleanedText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+        }
+        
+        try {
+          const adaptedCV = JSON.parse(cleanedText) as CVData;
+          // Validamos que tenga la estructura mínima esperada
+          if (adaptedCV && adaptedCV.personalInfo) {
+            return adaptedCV;
+          }
+        } catch (jsonErr) {
+          console.error(`Error parsing JSON returned by ${model}:`, jsonErr);
+        }
+      }
+    } catch (err: any) {
+      lastError = err;
+      const isRetriable =
+        err?.message?.includes('503') ||
+        err?.message?.includes('UNAVAILABLE') ||
+        err?.message?.includes('429') ||
+        err?.message?.includes('RESOURCE_EXHAUSTED') ||
+        err?.status === 503 ||
+        err?.status === 429;
+      if (!isRetriable) break;
+      console.warn(`Gemini Model ${model} ocupado, intentando reintento de adaptación con otro modelo...`);
+    }
+  }
+
+  throw new Error(
+    lastError?.message || "No se pudo adaptar tu currículum con IA. Por favor, inténtalo de nuevo en unos momentos."
   );
 }
