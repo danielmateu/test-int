@@ -94,7 +94,7 @@ export default function LandingPage() {
             </motion.p>
 
             <motion.div variants={fadeIn} className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
-              <Button size="lg" className="relative overflow-hidden rounded-full h-14 px-8 text-lg w-full sm:w-auto shadow-xl shadow-primary/30 transition-all hover:shadow-primary/60 hover:scale-[1.03] active:scale-95 group" asChild>
+              <Button size="lg" className="relative overflow-hidden rounded-full h-14 px-8 text-lg w-full sm:w-auto shadow-xl shadow-primary/30 transition-all hover:shadow-primary/60 active:scale-95 group" asChild>
                 <Link href="/register">
                   <span className="relative z-10 flex items-center">
                     {t("createCVFree")} <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />

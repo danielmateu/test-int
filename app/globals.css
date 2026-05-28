@@ -143,13 +143,13 @@
   word-break: break-word;
 }
 
-.rich-text-content > p,
-.rich-text-content > div {
+.rich-text-content>p,
+.rich-text-content>div {
   margin-bottom: var(--paragraph-spacing, 0.5rem);
 }
 
-.rich-text-content > p:last-child,
-.rich-text-content > div:last-child {
+.rich-text-content>p:last-child,
+.rich-text-content>div:last-child {
   margin-bottom: 0;
 }
 
@@ -172,11 +172,11 @@
   margin-bottom: var(--section-spacing, 1.5rem);
 }
 
-.preview-item-list > * {
+.preview-item-list>* {
   margin-bottom: var(--item-spacing, 1rem);
 }
 
-.preview-item-list > *:last-child {
+.preview-item-list>*:last-child {
   margin-bottom: 0;
 }
 
@@ -200,4 +200,35 @@
 
 .rich-text-content u {
   text-decoration: underline;
+}
+
+html,
+body {
+  overflow-y: scroll;
+  /* Asegura que el contenido sea desplazable */
+  scrollbar-width: none;
+  /* Oculta la barra de desplazamiento en Firefox */
+  -ms-overflow-style: none;
+  /* Asegura que el contenido sea desplazable */
+}
+
+/* Ocultar la barra de desplazamiento en navegadores basados en WebKit */
+html::-webkit-scrollbar {
+  width: 0;
+  /* Ancho de la barra de desplazamiento */
+  height: 0;
+  /* Altura de la barra de desplazamiento */
+  display: none;
+}
+
+/* Ocultar la barra de desplazamiento en Firefox */
+html {
+  scrollbar-width: none;
+  /* Oculta la barra de desplazamiento en Firefox */
+}
+
+/* Ocultar la barra de desplazamiento en IE y Edge */
+html {
+  -ms-overflow-style: none;
+  /* Oculta la barra de desplazamiento en IE y Edge */
 }
