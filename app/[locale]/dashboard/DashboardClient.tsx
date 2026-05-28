@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
 import { RecommendedJobs } from "@/components/cv-builder/RecommendedJobs";
+import { JobTracker } from "@/components/cv-builder/JobTracker";
+import type { JobOffer } from "@/app/actions/jobs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
@@ -57,6 +59,8 @@ export function DashboardClient({
   const [cvs, setCvs] = useState(initialCvs);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [atsAnalysis, setAtsAnalysis] = useState<ATSAnalysis | null>(null);
+  const [recommendedJobs, setRecommendedJobs] = useState<JobOffer[]>([]);
+  const [trackedJobUrls, setTrackedJobUrls] = useState<string[]>([]);
   const router = useRouter();
   const t = useTranslations("Dashboard");
 
@@ -137,10 +141,11 @@ export function DashboardClient({
         </header>
 
         <Tabs defaultValue="cvs" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="cvs">Mis CVs</TabsTrigger>
             <TabsTrigger value="ats">Validador ATS</TabsTrigger>
-            <TabsTrigger value="jobs">{t("jobsTab")}</TabsTrigger>
+            <TabsTrigger value="jobs">Ofertas de Empleo</TabsTrigger>
+            <TabsTrigger value="tracker">{t("trackerTab")}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="cvs" className="mt-6">
@@ -228,8 +233,16 @@ export function DashboardClient({
                 cvData={activeCV.content}
                 initialJobTitle={activeJobTitle}
                 initialSkills={activeSkills}
+                jobs={recommendedJobs}
+                setJobs={setRecommendedJobs}
+                trackedJobUrls={trackedJobUrls}
+                setTrackedJobUrls={setTrackedJobUrls}
               />
             )}
+          </TabsContent>
+
+          <TabsContent value="tracker" className="mt-6">
+            <JobTracker cvs={cvs} />
           </TabsContent>
         </Tabs>
 

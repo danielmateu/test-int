@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Search, MapPin, Briefcase, DollarSign, CheckCircle2, AlertTriangle, ExternalLink, Sparkles, Loader2, Building2, Check, X, Copy, Save } from "lucide-react";
+import { Search, MapPin, Briefcase, DollarSign, CheckCircle2, AlertTriangle, ExternalLink, Sparkles, Loader2, Building2, Check, X, Copy, Save, Plus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateCoverLetterAction } from "@/app/actions/ai";
 import { saveCoverLetterToCV } from "@/app/actions/cv";
+import { addJobApplication, getJobApplications } from "@/app/actions/tracker";
 import { toast } from "sonner";
 
 interface RecommendedJobsProps {
@@ -19,18 +20,34 @@ interface RecommendedJobsProps {
   cvData: any;
   initialJobTitle?: string;
   initialSkills?: string[];
+  jobs?: JobOffer[];
+  setJobs?: React.Dispatch<React.SetStateAction<JobOffer[]>>;
+  trackedJobUrls?: string[];
+  setTrackedJobUrls?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function RecommendedJobs({
   cvId,
   cvData,
   initialJobTitle = "",
-  initialSkills = []
+  initialSkills = [],
+  jobs: propJobs,
+  setJobs: propSetJobs,
+  trackedJobUrls: propTrackedJobUrls,
+  setTrackedJobUrls: propSetTrackedJobUrls
 }: RecommendedJobsProps) {
   const t = useTranslations("Dashboard");
   const locale = useLocale();
   
-  const [jobs, setJobs] = useState<JobOffer[]>([]);
+  const [localJobs, setLocalJobs] = useState<JobOffer[]>([]);
+  const [localTrackedJobUrls, setLocalTrackedJobUrls] = useState<string[]>([]);
+
+  const jobs = propJobs !== undefined ? propJobs : localJobs;
+  const setJobs = propSetJobs !== undefined ? propSetJobs : setLocalJobs;
+
+  const trackedJobUrls = propTrackedJobUrls !== undefined ? propTrackedJobUrls : localTrackedJobUrls;
+  const setTrackedJobUrls = propSetTrackedJobUrls !== undefined ? propSetTrackedJobUrls : setLocalTrackedJobUrls;
+
   const [searchQuery, setSearchQuery] = useState(initialJobTitle);
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedJob, setSelectedJob] = useState<JobOffer | null>(null);
@@ -46,6 +63,100 @@ export function RecommendedJobs({
   useEffect(() => {
     setGeneratedLetter("");
   }, [selectedJob]);
+
+  // Cargar llaves de postulaciones ya seguidas desde Supabase o localStorage
+  useEffect(() => {
+    let active = true;
+    const fetchTracked = async () => {
+      try {
+        const res = await getJobApplications();
+        if (!active) return;
+        
+        let apps = [];
+        if (res.useLocalStorage) {
+          const localData = localStorage.getItem("job_tracker_applications");
+          if (localData) apps = JSON.parse(localData);
+        } else {
+          apps = res.data;
+        }
+        
+        const urls = apps
+          .map((a: any) => (a.apply_url || a.applyUrl || "").toLowerCase().trim())
+          .filter(Boolean);
+        setTrackedJobUrls(urls);
+      } catch (e) {
+        console.error("Error reading tracked jobs:", e);
+      }
+    };
+    fetchTracked();
+    return () => {
+      active = false;
+    };
+  }, []); // Cargar una sola vez al montar el componente
+
+  // Manejar el guardado de la postulación
+  const handleTrackJob = async (job: JobOffer, e?: React.MouseEvent) => {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+
+    const appData = {
+      title: job.title,
+      company: job.company,
+      location: job.location,
+      salary: job.salary,
+      type: job.type,
+      status: "saved" as const,
+      notes: "",
+      apply_url: job.applyUrl,
+      cv_id: cvId || null
+    };
+
+    const jobUrlKey = (job.applyUrl || "").toLowerCase().trim();
+
+    try {
+      const res = await addJobApplication(appData);
+      
+      if (res.useLocalStorage) {
+        const localData = localStorage.getItem("job_tracker_applications");
+        const existing = localData ? JSON.parse(localData) : [];
+        
+        const alreadyExists = existing.some((item: any) => 
+          (item.apply_url || item.applyUrl || "").toLowerCase().trim() === jobUrlKey
+        );
+        
+        if (alreadyExists) {
+          toast.info("Esta oferta ya está en tu tablero de seguimiento");
+          setTrackedJobUrls(prev => {
+            if (prev.includes(jobUrlKey)) return prev;
+            return [...prev, jobUrlKey];
+          });
+          return;
+        }
+
+        const newLocalApp = {
+          ...appData,
+          id: `local-job-${Date.now()}`,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        const updated = [newLocalApp, ...existing];
+        localStorage.setItem("job_tracker_applications", JSON.stringify(updated));
+        toast.success(t("trackSuccess"));
+      } else {
+        toast.success(t("trackSuccess"));
+      }
+      
+      setTrackedJobUrls(prev => {
+        if (prev.includes(jobUrlKey)) return prev;
+        return [...prev, jobUrlKey];
+      });
+    } catch (error) {
+      toast.error("Error al añadir la oferta a tu seguimiento");
+    }
+  };
 
   // Copiar carta al portapapeles
   const handleCopyLetter = () => {
@@ -334,6 +445,17 @@ export function RecommendedJobs({
                       <Button variant="ghost" size="sm" className="w-full text-xs font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
                         {t("viewDetails")}
                       </Button>
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className={`px-3 text-xs font-semibold rounded-lg cursor-pointer shrink-0 ${trackedJobUrls.includes((job.applyUrl || "").toLowerCase().trim()) ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10' : 'border-border/60 hover:border-primary/40 text-muted-foreground hover:text-primary'}`}
+                        disabled={trackedJobUrls.includes((job.applyUrl || "").toLowerCase().trim())}
+                        onClick={(e) => handleTrackJob(job, e)}
+                      >
+                        {trackedJobUrls.includes((job.applyUrl || "").toLowerCase().trim()) ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+                      </Button>
+
                       <Button 
                         size="sm" 
                         className="w-full text-xs font-semibold rounded-lg cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95"
@@ -343,7 +465,7 @@ export function RecommendedJobs({
                         }}
                       >
                         {t("applyNow")}
-                        <ExternalLink className="w-3 h-3 ml-1.5" />
+                        <ExternalLink className="w-3.5 h-3.5 ml-1" />
                       </Button>
                     </CardFooter>
                   </Card>
@@ -524,6 +646,24 @@ export function RecommendedJobs({
 
             {/* Modal Footer */}
             <DialogFooter className="border-t pt-4 flex flex-row items-center justify-end gap-3 shrink-0">
+              <Button 
+                variant="outline" 
+                disabled={trackedJobUrls.includes((selectedJob.applyUrl || "").toLowerCase().trim())}
+                onClick={() => handleTrackJob(selectedJob)}
+                className={`h-10 text-xs rounded-lg cursor-pointer mr-auto flex items-center gap-1.5 ${trackedJobUrls.includes((selectedJob.applyUrl || "").toLowerCase().trim()) ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5' : 'border-primary/20 hover:border-primary/40 text-primary hover:bg-primary/5'}`}
+              >
+                {trackedJobUrls.includes((selectedJob.applyUrl || "").toLowerCase().trim()) ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-500" />
+                    En Seguimiento
+                  </>
+                ) : (
+                  <>
+                    <Briefcase className="w-4 h-4 text-primary" />
+                    {t("trackJob")}
+                  </>
+                )}
+              </Button>
               <Button variant="outline" onClick={() => setSelectedJob(null)} className="h-10 text-xs rounded-lg cursor-pointer">
                 Cerrar
               </Button>
