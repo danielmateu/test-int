@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { createClient } from "@supabase/supabase-js";
 import { CVData } from "@/components/cv-builder/types";
+import { getUserSubscriptionStatusAction } from "@/app/actions/stripe";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseSecret = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -61,8 +62,15 @@ export async function saveCV(data: CVData, id?: string) {
 
   if (countError) throw new Error("Error comprobando el límite de CVs");
 
-  if (count && count >= 8) {
-    throw new Error("Has alcanzado el límite de 8 currículums gratuitos.");
+  const { isPremium } = await getUserSubscriptionStatusAction();
+  const maxCvs = isPremium ? 8 : 2;
+
+  if (count && count >= maxCvs) {
+    if (!isPremium) {
+      throw new Error("PREMIUM_REQUIRED: Has alcanzado el límite de 2 currículums gratuitos. ¡Suscríbete a Premium para crear hasta 8 currículums!");
+    } else {
+      throw new Error("Has alcanzado el límite máximo de 8 currículums.");
+    }
   }
 
   // Insertar nuevo

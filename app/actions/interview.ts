@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { createClient } from "@supabase/supabase-js";
+import { getUserSubscriptionStatusAction } from "@/app/actions/stripe";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseSecret = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -37,6 +38,26 @@ export async function saveInterviewSimulationAction(
   const session = await auth();
   if (!session?.user?.id) {
     throw new Error("No autorizado");
+  }
+
+  // Comprobar límites de suscripción
+  const { isPremium } = await getUserSubscriptionStatusAction();
+  if (!isPremium) {
+    try {
+      const { count } = await supabase
+        .from("interview_simulations")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", session.user.id);
+      
+      if (count && count >= 2) {
+        throw new Error("PREMIUM_REQUIRED: Has alcanzado el límite de 2 simulaciones de entrevista guardadas. ¡Suscríbete a Premium para tener historial ilimitado!");
+      }
+    } catch (e: any) {
+      if (e.message?.includes("PREMIUM_REQUIRED")) {
+        throw e;
+      }
+      // Si la tabla no existe, dejamos que pase y el cliente aplicará el límite en localStorage
+    }
   }
 
   try {
