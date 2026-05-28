@@ -338,7 +338,7 @@ export function RecommendedJobs({
           </div>
           <Button onClick={handleSearch} disabled={isPending} className="h-10 cursor-pointer">
             {isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            {t("edit")} {/* Usamos "edit" de forma genérica como buscar, o reusar traducciones */}
+            {/* {t("edit")} Usamos "edit" de forma genérica como buscar, o reusar traducciones */}
             Buscar
           </Button>
         </div>

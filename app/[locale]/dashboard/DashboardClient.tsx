@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
 import { RecommendedJobs } from "@/components/cv-builder/RecommendedJobs";
 import { JobTracker } from "@/components/cv-builder/JobTracker";
+import { InterviewSimulator } from "@/components/cv-builder/InterviewSimulator";
 import type { JobOffer } from "@/app/actions/jobs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CVPreview } from "@/components/cv-builder/CVPreview";
@@ -142,11 +143,12 @@ export function DashboardClient({
         </header>
 
         <Tabs defaultValue="cvs" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="cvs">Mis CVs</TabsTrigger>
             <TabsTrigger value="ats">Validador ATS</TabsTrigger>
             <TabsTrigger value="jobs">Ofertas de Empleo</TabsTrigger>
             <TabsTrigger value="tracker">{t("trackerTab")}</TabsTrigger>
+            <TabsTrigger value="interview">{t("interviewTab")}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="cvs" className="mt-6">
@@ -256,6 +258,23 @@ export function DashboardClient({
 
           <TabsContent value="tracker" className="mt-6">
             <JobTracker cvs={cvs} />
+          </TabsContent>
+
+          <TabsContent value="interview" className="mt-6">
+            {cvs.length === 0 ? (
+              <Card className="border-dashed py-12 flex flex-col items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50">
+                <Briefcase className="w-12 h-12 text-muted-foreground mb-4 opacity-50 animate-bounce" />
+                <h3 className="font-semibold text-lg">{t("limitReached")}</h3>
+                <p className="text-sm text-muted-foreground mt-1 text-center max-w-sm px-4">
+                  {t("noCvs")}
+                </p>
+                <Button className="mt-4 cursor-pointer" asChild>
+                  <Link href="/builder">{t("createNew")}</Link>
+                </Button>
+              </Card>
+            ) : (
+              <InterviewSimulator cvs={cvs} />
+            )}
           </TabsContent>
         </Tabs>
 

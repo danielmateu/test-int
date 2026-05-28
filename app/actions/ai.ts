@@ -298,3 +298,298 @@ TAILORING RULES:
     lastError?.message || "No se pudo adaptar tu currículum con IA. Por favor, inténtalo de nuevo en unos momentos."
   );
 }
+
+export async function generateInterviewQuestionsAction(
+  cvData: any,
+  jobTitle: string,
+  company: string,
+  jobDescription: string,
+  locale: string = "es"
+): Promise<string[]> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("No autorizado");
+  }
+
+  if (!apiKey) {
+    throw new Error("La clave API de Gemini (GEMINI_API_KEY) no está configurada");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  const isEn = locale.toLowerCase() === "en";
+
+  // Extraer información del CV
+  const skills = cvData?.skills || [];
+  const experiences = cvData?.experience || [];
+  const jobTitleCV = cvData?.personalInfo?.jobTitle || "Profesional";
+
+  const expText = experiences.map((exp: any) => 
+    `- Puesto: ${exp.role} en ${exp.company}. Descripción: ${exp.description}`
+  ).join("\n");
+
+  const skillsText = skills.join(", ");
+
+  let systemPrompt = `Eres un seleccionador y reclutador de personal técnico de élite. Tu rol es simular entrevistas altamente efectivas.
+Debes devolver ÚNICAMENTE un array JSON que contenga exactamente 5 preguntas personalizadas (behavioral, técnicas y situacionales) adaptadas para confrontar el CV del candidato con la vacante.`;
+
+  if (isEn) {
+    systemPrompt = `You are an elite technical recruiter and hiring manager. Your role is to conduct highly effective interviews.
+You must return ONLY a JSON array containing exactly 5 tailored interview questions (behavioral, technical, and situational) customized to evaluate the candidate's CV against the job description.`;
+  }
+
+  let userPrompt = `
+Genera 5 preguntas de entrevista de trabajo altamente específicas y desafiantes en el idioma "${locale}" (si 'es' genera en Español, si 'en' genera en Inglés, etc.).
+Las preguntas deben evaluar si el candidato encaja con el puesto solicitado, basándose en la comparación entre su CV y la vacante de empleo.
+
+DATOS DEL CANDIDATO (CV):
+- Título profesional: ${jobTitleCV}
+- Habilidades: ${skillsText}
+- Experiencia laboral:
+${expText || "No especificada"}
+
+DATOS DE LA VACANTE:
+- Puesto: ${jobTitle}
+- Empresa: ${company}
+- Descripción: ${jobDescription}
+
+REGLAS DE PREGUNTAS:
+1. Genera exactamente 5 preguntas.
+2. 2 preguntas deben ser de comportamiento/actitud (ej. basadas en resolución de conflictos pasados o motivaciones).
+3. 2 preguntas deben ser técnicas/situacionales específicas para la tecnología o puesto buscado.
+4. 1 pregunta debe evaluar el encaje cultural y adaptación a la empresa "${company}".
+5. Devuelve ÚNICAMENTE un array de cadenas JSON válido. Ej: ["Pregunta 1", "Pregunta 2", "Pregunta 3", "Pregunta 4", "Pregunta 5"].
+6. NO incluyas explicaciones, marcadores de posición, ni bloques de markdown. Empieza con [ y termina con ].
+`;
+
+  if (isEn) {
+    userPrompt = `
+Generate 5 highly specific and challenging job interview questions in the language "${locale}" (if 'es' generate in Spanish, if 'en' generate in English, etc.).
+The questions must evaluate whether the candidate is a great fit for the position, comparing their CV experience with the target job details.
+
+CANDIDATE INFORMATION (CV):
+- Job title: ${jobTitleCV}
+- Skills: ${skillsText}
+- Work Experience:
+${expText || "Not specified"}
+
+JOB DETAILS:
+- Job Title: ${jobTitle}
+- Company: ${company}
+- Description: ${jobDescription}
+
+QUESTION RULES:
+1. Generate exactly 5 questions.
+2. 2 questions must be behavioral/behavioral based (resolving conflicts, motivation).
+3. 2 questions must be technical/situational specific to the target tools or role.
+4. 1 question must evaluate cultural fit and alignment with the company "${company}".
+5. Return ONLY a valid JSON string array. Example: ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"].
+6. DO NOT include explanations or markdown wrappers. Start with [ and end with ].
+`;
+  }
+
+  const models = [
+    'gemini-3.1-flash-lite',
+    'gemini-3.0-flash',
+    'gemini-3.1-pro',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+  ];
+
+  const requestPayload = {
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    config: { 
+      systemInstruction: systemPrompt, 
+      temperature: 0.5,
+      responseMimeType: "application/json"
+    },
+  };
+
+  let lastError: any;
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({ model, ...requestPayload });
+      const rawText = response.text?.trim() || "";
+      if (rawText) {
+        let cleanedText = rawText;
+        if (cleanedText.startsWith("```")) {
+          cleanedText = cleanedText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+        }
+        
+        try {
+          const questions = JSON.parse(cleanedText) as string[];
+          if (Array.isArray(questions) && questions.length > 0) {
+            return questions.slice(0, 5);
+          }
+        } catch (jsonErr) {
+          console.error(`Error parsing questions JSON returned by ${model}:`, jsonErr);
+        }
+      }
+    } catch (err: any) {
+      lastError = err;
+      const isRetriable =
+        err?.message?.includes('503') ||
+        err?.message?.includes('UNAVAILABLE') ||
+        err?.message?.includes('429') ||
+        err?.status === 503 ||
+        err?.status === 429;
+      if (!isRetriable) break;
+    }
+  }
+
+  throw new Error(
+    lastError?.message || "No se pudieron generar las preguntas de entrevista con IA. Por favor, reintenta."
+  );
+}
+
+export interface InterviewQuestionAnalysis {
+  question: string;
+  answer: string;
+  feedback: string;
+  idealAnswer: string;
+}
+
+export interface InterviewEvaluation {
+  score: number;
+  overallFeedback: string;
+  analysis: InterviewQuestionAnalysis[];
+}
+
+export async function evaluateInterviewAnswersAction(
+  cvData: any,
+  jobTitle: string,
+  company: string,
+  jobDescription: string,
+  QA: { question: string; answer: string }[],
+  locale: string = "es"
+): Promise<InterviewEvaluation> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("No autorizado");
+  }
+
+  if (!apiKey) {
+    throw new Error("La clave API de Gemini (GEMINI_API_KEY) no está configurada");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  const isEn = locale.toLowerCase() === "en";
+
+  let systemPrompt = `Eres un evaluador de talento experto en selección de personal. Tu tarea es analizar las respuestas de un candidato en una entrevista de trabajo simulada.
+Debes evaluar sus respuestas comparándolas con su currículum y con la vacante, y devolver ÚNICAMENTE un objeto JSON que siga estrictamente la estructura solicitada.`;
+
+  if (isEn) {
+    systemPrompt = `You are an expert talent acquisition manager and interviewer. Your task is to analyze a candidate's answers from a mock job interview.
+You must evaluate their answers compared to their CV and the target job description, returning ONLY a valid JSON object matching the requested structure.`;
+  }
+
+  let userPrompt = `
+Evalúa la entrevista simulada realizada por el candidato para el puesto de "${jobTitle}" en la empresa "${company}".
+El idioma de tu feedback e informes debe ser estrictamente en "${locale}" (si 'es' en Español, si 'en' en Inglés, etc.).
+
+PREGUNTAS REALIZADAS Y RESPUESTAS DEL CANDIDATO:
+${QA.map((qa, i) => `Pregunta ${i + 1}: ${qa.question}\nRespuesta del candidato: ${qa.answer || "(Sin respuesta / Omitida)"}`).join("\n\n")}
+
+VACANTE DETALLES:
+- Puesto: ${jobTitle}
+- Empresa: ${company}
+- Descripción: ${jobDescription}
+
+DEVUELVE UN OBJETO JSON EXACTAMENTE CON ESTA ESTRUCTURA (SIN INTRODUCCIONES NI BLOQUES DE MARKDOWN):
+{
+  "score": (número entero de 0 a 100 evaluando la calidad y madurez general de las respuestas),
+  "overallFeedback": "Feedback general resumiendo los puntos fuertes clave detectados, las áreas de mejora globales y consejos prácticos de lenguaje corporal u oratoria.",
+  "analysis": [
+    {
+      "question": "Pregunta 1...",
+      "answer": "Respuesta dada...",
+      "feedback": "Feedback constructivo específico para esta respuesta. Qué hizo bien, qué habilidades no explotó y cómo podría estructurarla mejor (usando metodología STAR si aplica).",
+      "idealAnswer": "Un ejemplo redactado de forma profesional de cómo se debería haber contestado idealmente a esta pregunta utilizando la experiencia sugerida del CV del candidato."
+    },
+    ... (repetir para las 5 preguntas)
+  ]
+}
+`;
+
+  if (isEn) {
+    userPrompt = `
+Evaluate the mock interview conducted by the candidate for the "${jobTitle}" position at "${company}".
+The language of your feedback and evaluation must be strictly in "${locale}" (if 'es' in Spanish, if 'en' in English, etc.).
+
+QUESTIONS ASKED & CANDIDATE ANSWERS:
+${QA.map((qa, i) => `Question ${i + 1}: ${qa.question}\nCandidate Answer: ${qa.answer || "(No answer provided / Skipped)"}`).join("\n\n")}
+
+JOB DESCRIPTION:
+- Title: ${jobTitle}
+- Company: ${company}
+- Description: ${jobDescription}
+
+RETURN A VALID JSON OBJECT WITH THIS EXACT STRUCTURE (NO MARKDOWN WRAAPERS, NO EXPLANATIONS):
+{
+  "score": (integer score from 0 to 100 based on the quality and depth of the answers),
+  "overallFeedback": "Overall feedback summarizing key strengths, major improvement areas, and practical communication tips.",
+  "analysis": [
+    {
+      "question": "Question 1...",
+      "answer": "Candidate answer...",
+      "feedback": "Specific constructive feedback for this answer. What went well, what skills were neglected, and how to structure it better (e.g. using STAR method).",
+      "idealAnswer": "A professional mock ideal answer showing how the candidate should have answered this question leveraging their CV background."
+    },
+    ... (repeat for all 5 questions)
+  ]
+}
+`;
+  }
+
+  const models = [
+    'gemini-3.1-flash-lite',
+    'gemini-3.0-flash',
+    'gemini-3.1-pro',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+  ];
+
+  const requestPayload = {
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    config: { 
+      systemInstruction: systemPrompt, 
+      temperature: 0.35,
+      responseMimeType: "application/json"
+    },
+  };
+
+  let lastError: any;
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({ model, ...requestPayload });
+      const rawText = response.text?.trim() || "";
+      if (rawText) {
+        let cleanedText = rawText;
+        if (cleanedText.startsWith("```")) {
+          cleanedText = cleanedText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+        }
+        
+        try {
+          const evalRes = JSON.parse(cleanedText) as InterviewEvaluation;
+          if (evalRes && typeof evalRes.score === 'number' && Array.isArray(evalRes.analysis)) {
+            return evalRes;
+          }
+        } catch (jsonErr) {
+          console.error(`Error parsing interview evaluation JSON returned by ${model}:`, jsonErr);
+        }
+      }
+    } catch (err: any) {
+      lastError = err;
+      const isRetriable =
+        err?.message?.includes('503') ||
+        err?.message?.includes('UNAVAILABLE') ||
+        err?.message?.includes('429') ||
+        err?.status === 503 ||
+        err?.status === 429;
+      if (!isRetriable) break;
+    }
+  }
+
+  throw new Error(
+    lastError?.message || "No se pudo evaluar la entrevista con IA. Por favor, reintenta."
+  );
+}
