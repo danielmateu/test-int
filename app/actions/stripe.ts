@@ -124,11 +124,8 @@ export async function createCheckoutSessionAction(
 
     return { url: checkoutSession.url };
   } catch (err: any) {
-    console.error("[Stripe checkout error] falling back to simulated session:", err.message);
-    return {
-      url: `${appUrl}/${locale}/dashboard?session_id=sim_checkout_${Math.random().toString(36).substring(2, 10)}`,
-      simulated: true
-    };
+    console.error("[Stripe checkout error]", err.message);
+    throw new Error(err.message || "Error al crear la sesión de pago con Stripe");
   }
 }
 
