@@ -3,13 +3,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { FileText, Plus, Trash2, Edit2, LogOut } from "lucide-react";
+import { FileText, Plus, Trash2, Edit2, LogOut, Briefcase } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "@/i18n/routing";
 import { deleteCV } from "@/app/actions/cv";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signOut } from "next-auth/react";
+import { RecommendedJobs } from "@/components/cv-builder/RecommendedJobs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
@@ -58,6 +59,10 @@ export function DashboardClient({
   const [atsAnalysis, setAtsAnalysis] = useState<ATSAnalysis | null>(null);
   const router = useRouter();
   const t = useTranslations("Dashboard");
+
+  const activeCV = cvs[0];
+  const activeJobTitle = activeCV?.content?.personalInfo?.jobTitle || "";
+  const activeSkills = activeCV?.content?.skills || [];
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -132,9 +137,10 @@ export function DashboardClient({
         </header>
 
         <Tabs defaultValue="cvs" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="cvs">Mis CVs</TabsTrigger>
             <TabsTrigger value="ats">Validador ATS</TabsTrigger>
+            <TabsTrigger value="jobs">{t("jobsTab")}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="cvs" className="mt-6">
@@ -202,6 +208,28 @@ export function DashboardClient({
                 <ATSResults analysis={atsAnalysis} />
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="jobs" className="mt-6">
+            {cvs.length === 0 ? (
+              <Card className="border-dashed py-12 flex flex-col items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50">
+                <Briefcase className="w-12 h-12 text-muted-foreground mb-4 opacity-50 animate-bounce" />
+                <h3 className="font-semibold text-lg">{t("limitReached")}</h3>
+                <p className="text-sm text-muted-foreground mt-1 text-center max-w-sm px-4">
+                  {t("noCvs")}
+                </p>
+                <Button className="mt-4 cursor-pointer" asChild>
+                  <Link href="/builder">{t("createNew")}</Link>
+                </Button>
+              </Card>
+            ) : (
+              <RecommendedJobs
+                cvId={activeCV.id}
+                cvData={activeCV.content}
+                initialJobTitle={activeJobTitle}
+                initialSkills={activeSkills}
+              />
+            )}
           </TabsContent>
         </Tabs>
 

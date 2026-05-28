@@ -124,3 +124,39 @@ export async function deleteCV(id: string) {
   if (error) throw new Error(error.message);
   return { success: true };
 }
+
+export async function saveCoverLetterToCV(cvId: string, coverLetter: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("No autorizado");
+
+  // 1. Obtener el CV actual para no perder el resto de información
+  const { data: cv, error: fetchError } = await supabase
+    .from("cv_documents")
+    .select("content")
+    .eq("id", cvId)
+    .eq("user_id", session.user.id)
+    .single();
+
+  if (fetchError || !cv) {
+    throw new Error("Currículum no encontrado");
+  }
+
+  // 2. Actualizar el campo coverLetter
+  const updatedContent = {
+    ...(cv.content as any),
+    coverLetter: coverLetter
+  };
+
+  // 3. Guardar el CV actualizado en Supabase
+  const { error: updateError } = await supabase
+    .from("cv_documents")
+    .update({ 
+      content: updatedContent, 
+      updated_at: new Date().toISOString() 
+    })
+    .eq("id", cvId)
+    .eq("user_id", session.user.id);
+
+  if (updateError) throw new Error(updateError.message);
+  return { success: true };
+}
