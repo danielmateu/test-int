@@ -8,6 +8,16 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Sparkles, Loader2, Award, ArrowRight, RefreshCw, AlertTriangle, CheckCircle2, 
   ChevronRight, ChevronDown, Building2, User, MessageSquare, Trash2
@@ -92,6 +102,7 @@ export function InterviewSimulator({
   const [history, setHistory] = useState<InterviewSimulationRecord[]>([]);
   const [useLocalHistory, setUseLocalHistory] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+  const [recordToDeleteId, setRecordToDeleteId] = useState<string | null>(null);
 
   const loadHistory = async () => {
     setIsLoadingHistory(true);
@@ -320,19 +331,19 @@ export function InterviewSimulator({
     setExpandedQuestionIdx(0);
   };
 
-  const handleDeleteHistoryItem = async (recordId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm(t("deleteConfirm"))) return;
+  const confirmDeleteHistoryItem = async () => {
+    if (!recordToDeleteId) return;
 
-    const updatedHistory = history.filter(item => item.id !== recordId);
+    const updatedHistory = history.filter(item => item.id !== recordToDeleteId);
     setHistory(updatedHistory);
 
     if (useLocalHistory) {
       localStorage.setItem("job_interview_simulations", JSON.stringify(updatedHistory));
       toast.success(t("interviewHistoryDeleteSuccess"));
+      setRecordToDeleteId(null);
     } else {
       try {
-        const res = await deleteInterviewSimulationAction(recordId);
+        const res = await deleteInterviewSimulationAction(recordToDeleteId);
         if (res.useLocalStorage) {
           setUseLocalHistory(true);
           localStorage.setItem("job_interview_simulations", JSON.stringify(updatedHistory));
@@ -341,6 +352,8 @@ export function InterviewSimulator({
       } catch (err) {
         toast.error("Error al eliminar del historial");
         loadHistory();
+      } finally {
+        setRecordToDeleteId(null);
       }
     }
   };
@@ -559,8 +572,8 @@ export function InterviewSimulator({
                           <ChevronRight className="w-3.5 h-3.5 ml-1" />
                         </Button>
                         <Button 
-                          onClick={(e) => handleDeleteHistoryItem(record.id, e)} 
-                          variant="ghost" 
+                           onClick={(e) => { e.stopPropagation(); setRecordToDeleteId(record.id); }} 
+                           variant="ghost" 
                           size="icon" 
                           className="h-8 w-8 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded-lg cursor-pointer"
                         >
@@ -881,6 +894,23 @@ export function InterviewSimulator({
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AlertDialog open={!!recordToDeleteId} onOpenChange={(open) => !open && setRecordToDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Confirmar eliminación?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("deleteConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteHistoryItem} className="bg-red-500 hover:bg-red-600 text-white cursor-pointer">
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

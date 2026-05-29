@@ -25,6 +25,16 @@ import { CVUploader } from "@/components/cv-builder/CVUploader";
 import { ATSResults, ATSAnalysis } from "@/components/cv-builder/ATSResults";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface CVList {
   id: string;
@@ -103,17 +113,19 @@ export function DashboardClient({
   const activeJobTitle = activeCV?.content?.personalInfo?.jobTitle || "";
   const activeSkills = activeCV?.content?.skills || [];
 
-  const handleDelete = async (id: string, e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!confirm(t("deleteConfirm"))) return;
+  const [cvToDeleteId, setCvToDeleteId] = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (!cvToDeleteId) return;
 
     try {
-      await deleteCV(id);
-      setCvs(cvs.filter(cv => cv.id !== id));
+      await deleteCV(cvToDeleteId);
+      setCvs(cvs.filter(cv => cv.id !== cvToDeleteId));
       toast.success(t("deleteSuccess"));
     } catch (error) {
       toast.error(t("deleteError"));
+    } finally {
+      setCvToDeleteId(null);
     }
   }
 
@@ -244,7 +256,7 @@ export function DashboardClient({
                             <Edit2 className="w-4 h-4 mr-2" />
                             {t("edit")}
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" onClick={(e) => handleDelete(cv.id, e)}>
+                          <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950" onClick={(e) => { e.stopPropagation(); e.preventDefault(); setCvToDeleteId(cv.id); }}>
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </CardFooter>
@@ -365,6 +377,22 @@ export function DashboardClient({
         currentPeriodEnd={currentPeriodEnd}
         onSubscriptionUpdate={checkSubscription}
       />
+      <AlertDialog open={!!cvToDeleteId} onOpenChange={(open) => !open && setCvToDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Confirmar eliminación?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("deleteConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600 text-white cursor-pointer">
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

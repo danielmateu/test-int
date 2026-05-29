@@ -6,6 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
@@ -67,6 +77,7 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
   const [editingNotes, setEditingNotes] = useState("");
   const [selectedCvId, setSelectedCvId] = useState<string | null>("null");
   const [isSavingDetails, setIsSavingDetails] = useState(false);
+  const [appToDeleteId, setAppToDeleteId] = useState<string | null>(null);
 
   const [isPending, startTransition] = useTransition();
 
@@ -133,19 +144,19 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
   };
 
   // 3. Eliminar postulación
-  const handleDeleteApp = async (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm(t("deleteConfirm"))) return;
+  const confirmDeleteApp = async () => {
+    if (!appToDeleteId) return;
 
-    const updatedApps = applications.filter(app => app.id !== id);
+    const updatedApps = applications.filter(app => app.id !== appToDeleteId);
     setApplications(updatedApps);
 
     if (useLocal) {
       localStorage.setItem("job_tracker_applications", JSON.stringify(updatedApps));
       toast.success(t("trackDelete"));
+      setAppToDeleteId(null);
     } else {
       try {
-        const res = await deleteJobApplication(id);
+        const res = await deleteJobApplication(appToDeleteId);
         if (res.useLocalStorage) {
           setUseLocal(true);
           localStorage.setItem("job_tracker_applications", JSON.stringify(updatedApps));
@@ -154,6 +165,8 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
       } catch (error) {
         toast.error("Error al eliminar la postulación");
         loadTracker();
+      } finally {
+        setAppToDeleteId(null);
       }
     }
   };
@@ -372,7 +385,7 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
                                     variant="ghost"
                                     size="icon"
                                     className="w-6 h-6 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded cursor-pointer shrink-0"
-                                    onClick={(e) => handleDeleteApp(app.id, e)}
+                                    onClick={(e) => { e.stopPropagation(); setAppToDeleteId(app.id); }}
                                   >
                                     <Trash2 className="w-3 h-3" />
                                   </Button>
@@ -476,6 +489,23 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
           </DialogContent>
         )}
       </Dialog>
+
+      <AlertDialog open={!!appToDeleteId} onOpenChange={(open) => !open && setAppToDeleteId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Confirmar eliminación?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("deleteConfirm")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteApp} className="bg-red-500 hover:bg-red-600 text-white cursor-pointer">
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
