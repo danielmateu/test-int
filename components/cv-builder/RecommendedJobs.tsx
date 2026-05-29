@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Search, MapPin, Briefcase, DollarSign, CheckCircle2, AlertTriangle, ExternalLink, Sparkles, Loader2, Building2, Check, X, Copy, Save, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, MapPin, Briefcase, DollarSign, CheckCircle2, AlertTriangle, ExternalLink, Sparkles, Loader2, Building2, Check, X, Copy, Save, Plus, Globe, SlidersHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { generateCoverLetterAction, tailorCVAction } from "@/app/actions/ai";
 import { saveCoverLetterToCV, saveCV } from "@/app/actions/cv";
@@ -56,6 +57,12 @@ export function RecommendedJobs({
   const [searchQuery, setSearchQuery] = useState(initialJobTitle);
   const [filterType, setFilterType] = useState<string>("all");
   const [selectedJob, setSelectedJob] = useState<JobOffer | null>(null);
+
+  // Estados de Filtros Avanzados
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterLocation, setFilterLocation] = useState("");
+  const [filterCountry, setFilterCountry] = useState(locale || "es");
+  const [filterMinSalary, setFilterMinSalary] = useState("any");
 
   const [isPending, startTransition] = useTransition();
 
@@ -287,7 +294,9 @@ export function RecommendedJobs({
   useEffect(() => {
     startTransition(async () => {
       try {
-        const data = await getJobRecommendations(initialJobTitle, initialSkills, locale);
+        const data = await getJobRecommendations(initialJobTitle, initialSkills, locale, {
+          country: locale || "es",
+        });
         setJobs(data);
       } catch (error) {
         console.error("Error loading initial job recommendations:", error);
@@ -299,7 +308,12 @@ export function RecommendedJobs({
   const handleSearch = () => {
     startTransition(async () => {
       try {
-        const data = await getJobRecommendations(searchQuery, initialSkills, locale);
+        const salaryVal = filterMinSalary !== "any" ? parseInt(filterMinSalary, 10) : undefined;
+        const data = await getJobRecommendations(searchQuery, initialSkills, locale, {
+          location: filterLocation || undefined,
+          country: filterCountry || undefined,
+          minSalary: salaryVal,
+        });
         setJobs(data);
       } catch (error) {
         console.error("Error searching jobs:", error);
@@ -348,13 +362,95 @@ export function RecommendedJobs({
               className="pl-9 h-10 w-full rounded-lg"
             />
           </div>
-          <Button onClick={handleSearch} disabled={isPending} className="h-10 cursor-pointer">
-            {isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-            {/* {t("edit")} Usamos "edit" de forma genérica como buscar, o reusar traducciones */}
-            Buscar
-          </Button>
+          <div className="flex gap-2 shrink-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`h-10 px-3 cursor-pointer shrink-0 transition-colors ${showFilters ? 'border-primary bg-primary/5 text-primary' : 'border-border/60 text-muted-foreground'}`}
+              title="Filtros Avanzados"
+            >
+              <SlidersHorizontal className="w-4.5 h-4.5" />
+            </Button>
+            <Button onClick={handleSearch} disabled={isPending} className="h-10 cursor-pointer">
+              {isPending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+              Buscar
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Advanced Filters Panel */}
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: -8 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden bg-white dark:bg-zinc-900 border border-border/40 rounded-xl shadow-xs p-6 space-y-4"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+              {/* Ciudad / Región */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-foreground block flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                  Ubicación (Ciudad o Región)
+                </label>
+                <Input
+                  type="text"
+                  value={filterLocation}
+                  onChange={(e) => setFilterLocation(e.target.value)}
+                  placeholder="Ej. Madrid, Barcelona, London..."
+                  className="h-10 rounded-lg text-xs"
+                />
+              </div>
+
+              {/* País Selector */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-foreground block flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-primary" />
+                  País de Búsqueda
+                </label>
+                <Select value={filterCountry} onValueChange={setFilterCountry}>
+                  <SelectTrigger className="h-10 rounded-lg text-xs">
+                    <SelectValue placeholder="Seleccionar país" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="es">España (ES)</SelectItem>
+                    <SelectItem value="gb">Reino Unido (UK)</SelectItem>
+                    <SelectItem value="us">Estados Unidos (US)</SelectItem>
+                    <SelectItem value="fr">Francia (FR)</SelectItem>
+                    <SelectItem value="de">Alemania (DE)</SelectItem>
+                    <SelectItem value="it">Italia (IT)</SelectItem>
+                    <SelectItem value="pt">Portugal (PT)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Salario Mínimo */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-foreground block flex items-center gap-1.5">
+                  <DollarSign className="w-3.5 h-3.5 text-primary" />
+                  Salario Mínimo
+                </label>
+                <Select value={filterMinSalary} onValueChange={setFilterMinSalary}>
+                  <SelectTrigger className="h-10 rounded-lg text-xs">
+                    <SelectValue placeholder="Cualquier salario" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="any">Cualquier salario</SelectItem>
+                    <SelectItem value="20000">Desde €20,000 / año</SelectItem>
+                    <SelectItem value="30000">Desde €30,000 / año</SelectItem>
+                    <SelectItem value="40000">Desde €40,000 / año</SelectItem>
+                    <SelectItem value="50000">Desde €50,000 / año</SelectItem>
+                    <SelectItem value="60000">Desde €60,000 / año</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Tabs / Filter Badges */}
       <div className="flex flex-wrap gap-2 pb-1">

@@ -112,10 +112,26 @@ function getCountryCode(locale: string = "es"): string {
   return map[locale.toLowerCase()] || "es";
 }
 
+export interface JobFilters {
+  location?: string;
+  country?: string;
+  minSalary?: number;
+}
+
+function parseMinSalary(salaryStr: string): number {
+  const matches = salaryStr.match(/\d+[\d.,]*/);
+  if (matches) {
+    const num = parseInt(matches[0].replace(/[.,\s]/g, ""), 10);
+    return num;
+  }
+  return 0;
+}
+
 export async function getJobRecommendations(
   jobTitle?: string,
   userSkills: string[] = [],
-  locale: string = "es"
+  locale: string = "es",
+  filters?: JobFilters
 ): Promise<JobOffer[]> {
   const session = await auth();
   if (!session?.user) {
@@ -132,7 +148,23 @@ export async function getJobRecommendations(
   if (!appId || !appKey) {
     console.log("Adzuna API: Credenciales no configuradas. Usando datos simulados.");
     
-    const matchedOffers: JobOffer[] = baseOffers.map((base, index) => {
+    let filteredBase = [...baseOffers];
+
+    if (filters?.location) {
+      const locClean = filters.location.toLowerCase().trim();
+      filteredBase = filteredBase.filter(base => 
+        base.location.toLowerCase().includes(locClean)
+      );
+    }
+
+    if (filters?.minSalary) {
+      filteredBase = filteredBase.filter(base => {
+        const minVal = parseMinSalary(base.salary);
+        return minVal >= filters.minSalary!;
+      });
+    }
+
+    const matchedOffers: JobOffer[] = filteredBase.map((base, index) => {
       let scoreMultiplier = 0.5;
 
       const baseTitle = base.title.toLowerCase();
@@ -193,10 +225,18 @@ export async function getJobRecommendations(
 
   // --- INTEGRACIÓN EN TIEMPO REAL CON LA API DE ADZUNA ---
   try {
-    const country = getCountryCode(locale);
+    const country = filters?.country || getCountryCode(locale);
     const searchWord = cleanTitle || "javascript developer";
     
-    const url = `http://api.adzuna.com/v1/api/jobs/${country}/search/1?app_id=${appId}&app_key=${appKey}&results_per_page=15&what=${encodeURIComponent(searchWord)}&content-type=application/json`;
+    let url = `http://api.adzuna.com/v1/api/jobs/${country}/search/1?app_id=${appId}&app_key=${appKey}&results_per_page=15&what=${encodeURIComponent(searchWord)}&content-type=application/json`;
+
+    if (filters?.location) {
+      url += `&where=${encodeURIComponent(filters.location.trim())}`;
+    }
+
+    if (filters?.minSalary) {
+      url += `&salary_min=${filters.minSalary}`;
+    }
 
     const response = await fetch(url);
     if (!response.ok) {
