@@ -14,6 +14,7 @@ import { RecommendedJobs } from "@/components/cv-builder/RecommendedJobs";
 import { JobTracker } from "@/components/cv-builder/JobTracker";
 import { InterviewSimulator } from "@/components/cv-builder/InterviewSimulator";
 import { PricingModal } from "@/components/cv-builder/PricingModal";
+import { Analytics } from "@/components/cv-builder/Analytics";
 import { getUserSubscriptionStatusAction } from "@/app/actions/stripe";
 import type { JobOffer } from "@/app/actions/jobs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -213,12 +214,13 @@ export function DashboardClient({
 
 
           <Tabs defaultValue="cvs" className="w-full">
-            <TabsList className="grid grid-cols-6 w-full h-auto p-1 gap-1 bg-muted rounded-lg md:grid-cols-5 md:h-9 md:p-[3px] md:gap-0">
+            <TabsList className="grid grid-cols-6 w-full h-auto p-1 gap-1 bg-muted rounded-lg md:grid-cols-6 md:h-9 md:p-[3px] md:gap-0">
               <TabsTrigger value="cvs" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">Mis CVs</TabsTrigger>
               <TabsTrigger value="ats" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">Validador ATS</TabsTrigger>
-              <TabsTrigger value="jobs" className="col-span-6 md:col-span-1 h-9 text-xs sm:text-sm">Ofertas de Empleo</TabsTrigger>
+              <TabsTrigger value="jobs" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">Ofertas de Empleo</TabsTrigger>
               <TabsTrigger value="tracker" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">{t("trackerTab")}</TabsTrigger>
               <TabsTrigger value="interview" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">{t("interviewTab")}</TabsTrigger>
+              <TabsTrigger value="analytics" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">Estadísticas</TabsTrigger>
             </TabsList>
 
             <TabsContent value="cvs" className="mt-6">
@@ -285,7 +287,7 @@ export function DashboardClient({
                       </div>
                       <h3 className="font-medium text-lg text-muted-foreground">{t("limitReached")}</h3>
                       <p className="text-sm text-muted-foreground mt-1 text-center px-4">
-                        {isPremium 
+                        {isPremium
                           ? "Has alcanzado el límite máximo de 8 currículums."
                           : t("premiumLimitCVError") || t("limitMsg")}
                       </p>
@@ -362,6 +364,10 @@ export function DashboardClient({
                   onUpgradeClick={() => setIsPricingOpen(true)}
                 />
               )}
+            </TabsContent>
+
+            <TabsContent value="analytics" className="mt-6">
+              <Analytics cvsCount={cvs.length} />
             </TabsContent>
           </Tabs>
 
