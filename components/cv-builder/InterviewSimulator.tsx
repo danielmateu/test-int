@@ -51,9 +51,16 @@ interface JobApplication {
 interface InterviewSimulatorProps {
   cvs: CVList[];
   applications?: JobApplication[];
+  isPremium?: boolean;
+  onUpgradeClick?: () => void;
 }
 
-export function InterviewSimulator({ cvs, applications }: InterviewSimulatorProps) {
+export function InterviewSimulator({
+  cvs,
+  applications,
+  isPremium = false,
+  onUpgradeClick
+}: InterviewSimulatorProps) {
   const t = useTranslations("Dashboard");
   const locale = useLocale();
   const router = useRouter();
@@ -392,6 +399,15 @@ export function InterviewSimulator({ cvs, applications }: InterviewSimulatorProp
               </CardHeader>
 
               <CardContent className="space-y-5">
+                {!isPremium && history.length >= 2 && (
+                  <div className="bg-amber-500/10 border border-amber-500/25 p-3 rounded-lg flex gap-2.5 items-start text-xs text-amber-700 dark:text-amber-400 font-medium">
+                    <AlertTriangle className="w-4.5 h-4.5 text-amber-500 shrink-0 mt-0.5" />
+                    <div className="space-y-0.5">
+                      <p className="font-bold">Límite de Simulaciones Guardadas Alcanzado (2/2)</p>
+                      <p className="text-[11px] leading-relaxed text-muted-foreground">Has guardado el máximo de 2 simulaciones de entrevista de tu plan gratuito. ¡Mejora al Plan Premium para simular sin límites!</p>
+                    </div>
+                  </div>
+                )}
                 {/* Select from applications tracker */}
                 {appsToUse.length > 0 ? (
                   <div className="space-y-2">
@@ -465,23 +481,33 @@ export function InterviewSimulator({ cvs, applications }: InterviewSimulatorProp
               </CardContent>
 
               <CardFooter className="border-t pt-4 bg-zinc-50/50 dark:bg-zinc-900/50">
-                <Button
-                  onClick={handleStartSimulation}
-                  disabled={isLoading || !activeCV}
-                  className="w-full cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95 text-xs font-semibold rounded-lg h-10 shadow-xs"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin text-white mr-2" />
-                      {t("interviewLoadingQuestions")}
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 text-white mr-2" />
-                      {t("interviewStartButton")}
-                    </>
-                  )}
-                </Button>
+                {!isPremium && history.length >= 2 ? (
+                  <Button
+                    onClick={onUpgradeClick}
+                    className="w-full cursor-pointer bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-500/95 hover:to-teal-600/95 text-xs font-bold rounded-lg h-10 shadow-md text-white flex items-center justify-center gap-1.5 animate-pulse"
+                  >
+                    <Sparkles className="w-4 h-4 fill-white text-white" />
+                    Desbloquear Simulaciones Ilimitadas (Upgrade Premium)
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleStartSimulation}
+                    disabled={isLoading || !activeCV}
+                    className="w-full cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95 text-xs font-semibold rounded-lg h-10 shadow-xs"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-white mr-2" />
+                        {t("interviewLoadingQuestions")}
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 text-white mr-2" />
+                        {t("interviewStartButton")}
+                      </>
+                    )}
+                  </Button>
+                )}
               </CardFooter>
             </Card>
 

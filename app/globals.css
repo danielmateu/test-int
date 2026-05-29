@@ -232,3 +232,12 @@ html {
   -ms-overflow-style: none;
   /* Oculta la barra de desplazamiento en IE y Edge */
 }
+
+/* Utilidad para ocultar barras de desplazamiento en contenedores con scroll */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE y Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari y Opera */
+}

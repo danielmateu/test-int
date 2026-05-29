@@ -147,15 +147,15 @@ export function DashboardClient({
 
   return (
     <>
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-6 md:p-12">
-        <div className="max-w-5xl mx-auto space-y-8">
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-6 md:p-12">
+        <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8">
 
-          <header className="flex justify-between items-center border-b pb-6">
+          <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center border-b pb-6">
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">{t("title")}</h1>
-              <p className="text-muted-foreground mt-2">{t("subtitle")} ({cvs.length}/4 {t("used")})</p>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("title")}</h1>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">{t("subtitle")} ({cvs.length}/{isPremium ? 8 : 2} {t("used")})</p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
               {/* Premium Upgrade Badge Button */}
               <Button
                 onClick={() => setIsPricingOpen(true)}
@@ -201,12 +201,12 @@ export function DashboardClient({
 
 
           <Tabs defaultValue="cvs" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="cvs">Mis CVs</TabsTrigger>
-              <TabsTrigger value="ats">Validador ATS</TabsTrigger>
-              <TabsTrigger value="jobs">Ofertas de Empleo</TabsTrigger>
-              <TabsTrigger value="tracker">{t("trackerTab")}</TabsTrigger>
-              <TabsTrigger value="interview">{t("interviewTab")}</TabsTrigger>
+            <TabsList className="grid grid-cols-6 w-full h-auto p-1 gap-1 bg-muted rounded-lg md:grid-cols-5 md:h-9 md:p-[3px] md:gap-0">
+              <TabsTrigger value="cvs" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">Mis CVs</TabsTrigger>
+              <TabsTrigger value="ats" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">Validador ATS</TabsTrigger>
+              <TabsTrigger value="jobs" className="col-span-6 md:col-span-1 h-9 text-xs sm:text-sm">Ofertas de Empleo</TabsTrigger>
+              <TabsTrigger value="tracker" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">{t("trackerTab")}</TabsTrigger>
+              <TabsTrigger value="interview" className="col-span-3 md:col-span-1 h-9 text-xs sm:text-sm">{t("interviewTab")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="cvs" className="mt-6">
@@ -253,25 +253,36 @@ export function DashboardClient({
                   ))}
 
                   {/* Create New Card */}
-                  {cvs.length < 8 ? (
+                  {cvs.length < (isPremium ? 8 : 2) ? (
                     <Link href="/builder">
                       <Card className="border-dashed hover:border-primary transition-colors cursor-pointer h-full min-h-62.5 flex flex-col items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50 hover:bg-zinc-50 dark:hover:bg-zinc-900">
                         <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                           <Plus className="w-6 h-6 text-primary" />
                         </div>
                         <h3 className="font-medium text-lg">{t("createNew")}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">{8 - cvs.length} {t("available")}</p>
+                        <p className="text-sm text-muted-foreground mt-1">{(isPremium ? 8 : 2) - cvs.length} {t("available")}</p>
                       </Card>
                     </Link>
                   ) : (
-                    <Card className="border-dashed h-full min-h-62.5 flex flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-900 opacity-75">
+                    <Card
+                      onClick={() => !isPremium && setIsPricingOpen(true)}
+                      className={`border-dashed h-full min-h-62.5 flex flex-col items-center justify-center bg-zinc-100 dark:bg-zinc-900/90 opacity-75 ${!isPremium ? "cursor-pointer hover:border-primary transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-900/80" : ""}`}
+                    >
                       <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                        <FileText className="w-6 h-6 text-muted-foreground" />
+                        <Zap className="w-6 h-6 text-muted-foreground" />
                       </div>
                       <h3 className="font-medium text-lg text-muted-foreground">{t("limitReached")}</h3>
                       <p className="text-sm text-muted-foreground mt-1 text-center px-4">
-                        {t("limitMsg")}
+                        {isPremium 
+                          ? "Has alcanzado el límite máximo de 8 currículums."
+                          : t("premiumLimitCVError") || t("limitMsg")}
                       </p>
+                      {!isPremium && (
+                        <span className="text-[10px] font-bold text-primary mt-2 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 fill-primary animate-pulse" />
+                          Haz clic para mejorar a Premium
+                        </span>
+                      )}
                     </Card>
                   )}
                 </AnimatePresence>
@@ -310,12 +321,14 @@ export function DashboardClient({
                   setJobs={setRecommendedJobs}
                   trackedJobUrls={trackedJobUrls}
                   setTrackedJobUrls={setTrackedJobUrls}
+                  isPremium={isPremium}
+                  onUpgradeClick={() => setIsPricingOpen(true)}
                 />
               )}
             </TabsContent>
 
             <TabsContent value="tracker" className="mt-6">
-              <JobTracker cvs={cvs} />
+              <JobTracker cvs={cvs} isPremium={isPremium} onUpgradeClick={() => setIsPricingOpen(true)} />
             </TabsContent>
 
             <TabsContent value="interview" className="mt-6">
@@ -331,7 +344,11 @@ export function DashboardClient({
                   </Button>
                 </Card>
               ) : (
-                <InterviewSimulator cvs={cvs} />
+                <InterviewSimulator
+                  cvs={cvs}
+                  isPremium={isPremium}
+                  onUpgradeClick={() => setIsPricingOpen(true)}
+                />
               )}
             </TabsContent>
           </Tabs>

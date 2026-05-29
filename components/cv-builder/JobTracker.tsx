@@ -32,6 +32,8 @@ interface CVList {
 
 interface JobTrackerProps {
   cvs: CVList[];
+  isPremium?: boolean;
+  onUpgradeClick?: () => void;
 }
 
 // Columnas Kanban del Tablero
@@ -53,7 +55,7 @@ const columns: KanbanColumn[] = [
   { id: "rejected", colorClass: "text-rose-500", bgHeaderClass: "bg-rose-500/10 text-rose-600 dark:text-rose-400", bgClass: "bg-rose-500/5", borderClass: "border-rose-500/10" }
 ];
 
-export function JobTracker({ cvs }: JobTrackerProps) {
+export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTrackerProps) {
   const t = useTranslations("Dashboard");
 
   const [applications, setApplications] = useState<JobApplication[]>([]);
@@ -225,6 +227,25 @@ export function JobTracker({ cvs }: JobTrackerProps) {
           </Button>
         </div>
       </div>
+
+      {!isPremium && applications.length >= 5 && (
+        <div className="bg-amber-500/10 border border-amber-500/25 p-3 rounded-lg flex flex-col sm:flex-row gap-3 justify-between items-center text-xs text-amber-700 dark:text-amber-400 font-medium mb-4">
+          <div className="flex gap-2.5 items-start">
+            <Info className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <div className="space-y-0.5">
+              <p className="font-bold">Tablero al Límite de Capacidad (5/5)</p>
+              <p className="text-[11px] leading-relaxed text-muted-foreground">Estás utilizando las 5 ofertas de seguimiento gratuitas. Sube a Premium para añadir ofertas ilimitadas en tu Kanban.</p>
+            </div>
+          </div>
+          <Button
+            onClick={onUpgradeClick}
+            size="sm"
+            className="h-8 text-[11px] font-bold bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95 text-white shrink-0 cursor-pointer rounded-lg px-3.5"
+          >
+            Mejorar a Premium
+          </Button>
+        </div>
+      )}
 
       {/* Kanban Columns */}
       {isLoading && applications.length === 0 ? (

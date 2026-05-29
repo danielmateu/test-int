@@ -25,6 +25,8 @@ interface RecommendedJobsProps {
   setJobs?: React.Dispatch<React.SetStateAction<JobOffer[]>>;
   trackedJobUrls?: string[];
   setTrackedJobUrls?: React.Dispatch<React.SetStateAction<string[]>>;
+  isPremium?: boolean;
+  onUpgradeClick?: () => void;
 }
 
 export function RecommendedJobs({
@@ -35,7 +37,9 @@ export function RecommendedJobs({
   jobs: propJobs,
   setJobs: propSetJobs,
   trackedJobUrls: propTrackedJobUrls,
-  setTrackedJobUrls: propSetTrackedJobUrls
+  setTrackedJobUrls: propSetTrackedJobUrls,
+  isPremium = false,
+  onUpgradeClick
 }: RecommendedJobsProps) {
   const t = useTranslations("Dashboard");
   const locale = useLocale();
@@ -168,6 +172,14 @@ export function RecommendedJobs({
     if (e) {
       e.stopPropagation();
       e.preventDefault();
+    }
+
+    if (!isPremium && trackedJobUrls.length >= 5) {
+      toast.error("Límite alcanzado: El Plan Gratuito te permite hacer seguimiento de hasta 5 ofertas. ¡Suscríbete a Premium para tener seguimiento ilimitado!");
+      if (onUpgradeClick) {
+        onUpgradeClick();
+      }
+      return;
     }
 
     const appData = {
