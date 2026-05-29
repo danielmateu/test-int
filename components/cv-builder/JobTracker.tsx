@@ -2,6 +2,15 @@
 
 import React, { useState, useEffect, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { 
+  DndContext, 
+  useDraggable, 
+  useDroppable,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors
+} from "@dnd-kit/core";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +66,40 @@ interface KanbanColumn {
   borderClass: string;
 }
 
+function DroppableColumn({ id, children, className }: { id: string, children: React.ReactNode, className?: string }) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div
+      ref={setNodeRef}
+      className={`${className} ${isOver ? 'bg-primary/10 dark:bg-primary/20 border-primary/45 rounded-lg' : ''} transition-all duration-200`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function DraggableCard({ id, children }: { id: string, children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+
+  const style = transform
+    ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+      }
+    : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className={`touch-none select-none ${isDragging ? 'opacity-50 cursor-grabbing shadow-2xl z-50 scale-102' : 'cursor-grab hover:shadow-md'}`}
+    >
+      {children}
+    </div>
+  );
+}
+
 const columns: KanbanColumn[] = [
   { id: "saved", colorClass: "text-zinc-500", bgHeaderClass: "bg-zinc-100 dark:bg-zinc-800/40", bgClass: "bg-zinc-50/40 dark:bg-zinc-950/10", borderClass: "border-zinc-200/50 dark:border-zinc-800/30" },
   { id: "applied", colorClass: "text-blue-500", bgHeaderClass: "bg-blue-500/10 text-blue-600 dark:text-blue-400", bgClass: "bg-blue-500/5", borderClass: "border-blue-500/10" },
@@ -80,6 +123,54 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
   const [appToDeleteId, setAppToDeleteId] = useState<string | null>(null);
 
   const [isPending, startTransition] = useTransition();
+
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 5,
+    },
+  });
+
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 250,
+      tolerance: 5,
+    },
+  });
+
+  const sensors = useSensors(mouseSensor, touchSensor);
+
+  const handleDragEnd = async (event: any) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const appId = active.id;
+    const newStatus = over.id;
+
+    const app = applications.find(a => a.id === appId);
+    if (!app || app.status === newStatus) return;
+
+    const updatedApps = applications.map(a => 
+      a.id === appId ? { ...a, status: newStatus as Stage, updated_at: new Date().toISOString() } : a
+    );
+    setApplications(updatedApps);
+
+    if (useLocal) {
+      localStorage.setItem("job_tracker_applications", JSON.stringify(updatedApps));
+      toast.success(t("stageUpdated"));
+    } else {
+      try {
+        const res = await updateJobApplicationStatus(appId, newStatus as Stage);
+        if (res.useLocalStorage) {
+          setUseLocal(true);
+          localStorage.setItem("job_tracker_applications", JSON.stringify(updatedApps));
+        }
+        toast.success(t("stageUpdated"));
+      } catch (error) {
+        toast.error("Error al mover la tarjeta");
+        loadTracker();
+      }
+    }
+  };
 
   // 1. Cargar postulaciones iniciales
   const loadTracker = () => {
@@ -280,128 +371,134 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
           </div>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
-          {columns.map((col) => {
-            const colApps = applications.filter((app) => app.status === col.id);
-            const titleKey = `stage${col.id.charAt(0).toUpperCase() + col.id.slice(1)}`;
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
+            {columns.map((col) => {
+              const colApps = applications.filter((app) => app.status === col.id);
+              const titleKey = `stage${col.id.charAt(0).toUpperCase() + col.id.slice(1)}`;
 
-            return (
-              <div 
-                key={col.id} 
-                className={`rounded-xl border ${col.borderClass} ${col.bgClass} flex flex-col max-h-[80vh] overflow-hidden shadow-xs`}
-              >
-                {/* Column Header */}
-                <div className={`p-3.5 border-b font-bold flex justify-between items-center ${col.bgHeaderClass}`}>
-                  <span className="text-xs uppercase tracking-wider">{t(titleKey)}</span>
-                  <Badge variant="outline" className="bg-background/80 text-[10px] px-2 py-0.5 rounded-full font-bold">
-                    {colApps.length}
-                  </Badge>
-                </div>
+              return (
+                <div 
+                  key={col.id} 
+                  className={`rounded-xl border ${col.borderClass} ${col.bgClass} flex flex-col max-h-[80vh] overflow-hidden shadow-xs`}
+                >
+                  {/* Column Header */}
+                  <div className={`p-3.5 border-b font-bold flex justify-between items-center ${col.bgHeaderClass}`}>
+                    <span className="text-xs uppercase tracking-wider">{t(titleKey)}</span>
+                    <Badge variant="outline" className="bg-background/80 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                      {colApps.length}
+                    </Badge>
+                  </div>
 
-                {/* Cards Container */}
-                <div className="p-3 space-y-3 overflow-y-auto grow no-scrollbar min-h-48 max-h-[65vh]">
-                  <AnimatePresence mode="popLayout">
-                    {colApps.map((app, idx) => {
-                      const associatedCv = cvs.find(c => c.id === app.cv_id);
+                  {/* Cards Container */}
+                  <DroppableColumn id={col.id} className="p-3 space-y-3 overflow-y-auto grow no-scrollbar min-h-48 max-h-[65vh]">
+                    <AnimatePresence mode="popLayout">
+                      {colApps.map((app, idx) => {
+                        const associatedCv = cvs.find(c => c.id === app.cv_id);
 
-                      return (
-                        <motion.div
-                          key={app.id}
-                          layout
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.9 }}
-                          transition={{ duration: 0.2 }}
-                          onClick={() => handleOpenEdit(app)}
-                        >
-                          <Card className="hover:shadow-md transition-shadow cursor-pointer border-border/70 hover:border-primary/40 bg-white dark:bg-zinc-900 p-3.5 relative overflow-hidden group">
-                            {/* Card Body */}
-                            <div className="space-y-3 text-xs">
-                              <div>
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase">{app.company}</span>
-                                <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1 mt-0.5">{app.title}</h4>
-                              </div>
-
-                              {/* Card Metadata info */}
-                              <div className="space-y-1.5 text-[10px] text-muted-foreground">
-                                {app.location && (
-                                  <div className="flex items-center gap-1.5">
-                                    <MapPin className="w-3 h-3 shrink-0" />
-                                    <span className="truncate">{app.location}</span>
+                        return (
+                          <motion.div
+                            key={app.id}
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <DraggableCard id={app.id}>
+                              <Card 
+                                className="hover:shadow-md transition-shadow cursor-pointer border-border/70 hover:border-primary/40 bg-white dark:bg-zinc-900 p-3.5 relative overflow-hidden group"
+                                onClick={() => handleOpenEdit(app)}
+                              >
+                                {/* Card Body */}
+                                <div className="space-y-3 text-xs">
+                                  <div>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase">{app.company}</span>
+                                    <h4 className="font-bold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1 mt-0.5">{app.title}</h4>
                                   </div>
-                                )}
-                                {app.salary && app.salary !== "Salario no especificado" && (
-                                  <div className="flex items-center gap-1.5">
-                                    <DollarSign className="w-3 h-3 shrink-0" />
-                                    <span className="font-medium text-foreground">{app.salary}</span>
+
+                                  {/* Card Metadata info */}
+                                  <div className="space-y-1.5 text-[10px] text-muted-foreground">
+                                    {app.location && (
+                                      <div className="flex items-center gap-1.5">
+                                        <MapPin className="w-3 h-3 shrink-0" />
+                                        <span className="truncate">{app.location}</span>
+                                      </div>
+                                    )}
+                                    {app.salary && app.salary !== "Salario no especificado" && (
+                                      <div className="flex items-center gap-1.5">
+                                        <DollarSign className="w-3 h-3 shrink-0" />
+                                        <span className="font-medium text-foreground">{app.salary}</span>
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                              </div>
 
-                              {/* Associated CV Badge */}
-                              {associatedCv && (
-                                <Badge variant="secondary" className="bg-primary/5 border border-primary/10 text-[9px] text-primary px-1.5 py-0 rounded font-medium truncate max-w-full inline-flex items-center gap-1">
-                                  <FileText className="w-2.5 h-2.5 shrink-0" />
-                                  <span className="truncate">{associatedCv.title}</span>
-                                </Badge>
-                              )}
-
-                              {/* Card Actions Bottom */}
-                              <div className="flex justify-between items-center pt-2.5 border-t border-border/30">
-                                {/* Shift status left/right (Mobile friendly) */}
-                                <div className="flex gap-1">
-                                  <Button 
-                                    variant="outline" 
-                                    size="icon" 
-                                    className="w-6 h-6 rounded cursor-pointer shrink-0 disabled:opacity-30"
-                                    disabled={app.status === "saved"}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleShiftStatus(app, "left");
-                                    }}
-                                  >
-                                    <ChevronLeft className="w-3 h-3" />
-                                  </Button>
-                                  <Button 
-                                    variant="outline" 
-                                    size="icon" 
-                                    className="w-6 h-6 rounded cursor-pointer shrink-0 disabled:opacity-30"
-                                    disabled={app.status === "rejected"}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleShiftStatus(app, "right");
-                                    }}
-                                  >
-                                    <ChevronRight className="w-3 h-3" />
-                                  </Button>
-                                </div>
-
-                                {/* Trash and icons */}
-                                <div className="flex items-center gap-2">
-                                  {app.notes && (
-                                    <StickyNote className="w-3.5 h-3.5 text-amber-500/80 animate-pulse shrink-0" />
+                                  {/* Associated CV Badge */}
+                                  {associatedCv && (
+                                    <Badge variant="secondary" className="bg-primary/5 border border-primary/10 text-[9px] text-primary px-1.5 py-0 rounded font-medium truncate max-w-full inline-flex items-center gap-1">
+                                      <FileText className="w-2.5 h-2.5 shrink-0" />
+                                      <span className="truncate">{associatedCv.title}</span>
+                                    </Badge>
                                   )}
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="w-6 h-6 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded cursor-pointer shrink-0"
-                                    onClick={(e) => { e.stopPropagation(); setAppToDeleteId(app.id); }}
-                                  >
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
+
+                                  {/* Card Actions Bottom */}
+                                  <div className="flex justify-between items-center pt-2.5 border-t border-border/30">
+                                    {/* Shift status left/right (Mobile friendly) */}
+                                    <div className="flex gap-1">
+                                      <Button 
+                                        variant="outline" 
+                                        size="icon" 
+                                        className="w-6 h-6 rounded cursor-pointer shrink-0 disabled:opacity-30"
+                                        disabled={app.status === "saved"}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleShiftStatus(app, "left");
+                                        }}
+                                      >
+                                        <ChevronLeft className="w-3 h-3" />
+                                      </Button>
+                                      <Button 
+                                        variant="outline" 
+                                        size="icon" 
+                                        className="w-6 h-6 rounded cursor-pointer shrink-0 disabled:opacity-30"
+                                        disabled={app.status === "rejected"}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleShiftStatus(app, "right");
+                                        }}
+                                      >
+                                        <ChevronRight className="w-3 h-3" />
+                                      </Button>
+                                    </div>
+
+                                    {/* Trash and icons */}
+                                    <div className="flex items-center gap-2">
+                                      {app.notes && (
+                                        <StickyNote className="w-3.5 h-3.5 text-amber-500/80 animate-pulse shrink-0" />
+                                      )}
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="w-6 h-6 text-red-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950 rounded cursor-pointer shrink-0"
+                                        onClick={(e) => { e.stopPropagation(); setAppToDeleteId(app.id); }}
+                                      >
+                                        <Trash2 className="w-3 h-3" />
+                                      </Button>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                            </div>
-                          </Card>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
+                              </Card>
+                            </DraggableCard>
+                          </motion.div>
+                        );
+                      })}
+                    </AnimatePresence>
+                  </DroppableColumn>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </DndContext>
       )}
 
       {/* Editing / Notes Modal */}
