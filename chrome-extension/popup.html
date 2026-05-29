@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CV AI Builder - Capturar Oferta</title>
+  <style>
+    :root {
+      --background: #09090b;
+      --card: #18181b;
+      --border: #27272a;
+      --text: #fafafa;
+      --text-muted: #a1a1aa;
+      --primary: #ffffff;
+      --primary-foreground: #09090b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      width: 320px;
+      background-color: var(--background);
+      color: var(--text);
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+      color: white;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    h1 {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+    }
+
+    .subtitle {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      padding: 8px 10px;
+      font-size: 11px;
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    button {
+      width: 100%;
+      background: linear-gradient(135deg, #09090b, #18181b);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 16px;
+    }
+
+    button:hover {
+      border-color: #3b82f6;
+      background: rgba(59, 130, 246, 0.08);
+      color: #3b82f6;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(to right, #3b82f6, #8b5cf6);
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(to right, #2563eb, #7c3aed);
+      color: white;
+      box-shadow: 0 4px 12px rgba(124, 92, 246, 0.2);
+    }
+
+    .alert {
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    .alert-success {
+      background-color: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    .alert-error {
+      background-color: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .alert-info {
+      background-color: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">✨</div>
+    <div>
+      <h1>CV AI Builder</h1>
+      <div class="subtitle">Capturador de Empleos</div>
+    </div>
+  </header>
+
+  <main>
+    <div id="alert-box" class="alert"></div>
+
+    <!-- Email Setup Group -->
+    <div class="form-group">
+      <label for="user-email">Tu Email Registrado</label>
+      <input type="email" id="user-email" placeholder="ejemplo@correo.com" required />
+    </div>
+
+    <hr style="border: 0; border-top: 1px solid var(--border); margin: 12px 0;" />
+
+    <!-- Job Info Form -->
+    <div class="form-group">
+      <label for="job-title">Puesto de Empleo</label>
+      <input type="text" id="job-title" placeholder="Cargando título..." required />
+    </div>
+
+    <div class="form-group">
+      <label for="job-company">Empresa</label>
+      <input type="text" id="job-company" placeholder="Cargando empresa..." required />
+    </div>
+
+    <div class="row">
+      <div class="form-group">
+        <label for="job-location">Ubicación</label>
+        <input type="text" id="job-location" placeholder="Ciudad / Región" />
+      </div>
+      <div class="form-group">
+        <label for="job-salary">Salario</label>
+        <input type="text" id="job-salary" placeholder="No especificado" />
+      </div>
+    </div>
+
+    <input type="hidden" id="job-url" />
+
+    <button id="save-btn" class="btn-primary" disabled>
+      <span>Guardar en mi Tablero</span>
+    </button>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
