@@ -257,10 +257,10 @@ export async function verifyCheckoutSessionAction(sessionId: string): Promise<{ 
       let priceId = "";
 
       if (subscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const subscription = (await stripe.subscriptions.retrieve(subscriptionId)) as any;
         status = subscription.status;
         periodEnd = new Date(subscription.current_period_end * 1000).toISOString();
-        priceId = subscription.items.data[0]?.price.id || "";
+        priceId = subscription.items?.data[0]?.price.id || "";
       }
 
       // Actualizar la base de datos inmediatamente
