@@ -210,3 +210,83 @@ export async function simulateUpgradeAction(enable: boolean = true): Promise<{ s
     return { success: true, useLocalStorage: true };
   }
 }
+
+// 5. Verificar sesión de Stripe instantáneamente al volver
+export async function verifyCheckoutSessionAction(sessionId: string): Promise<{ success: boolean; isPremium: boolean }> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("No autorizado");
+  }
+
+  // Si es una sesión simulada
+  if (sessionId.startsWith("sim_checkout_")) {
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    
+    const { error } = await supabase
+      .from("users")
+      .update({
+        subscription_status: "active",
+        subscription_current_period_end: nextMonth.toISOString(),
+        stripe_subscription_id: "sim_sub_" + Math.random().toString(36).substring(2, 12)
+      })
+      .eq("id", session.user.id);
+
+    if (error) {
+      console.error("[verifyCheckoutSessionAction] Error updating DB for simulated session:", error.message);
+      return { success: false, isPremium: false };
+    }
+    
+    return { success: true, isPremium: true };
+  }
+
+  if (!stripe) {
+    console.warn("[verifyCheckoutSessionAction] Stripe not configured, but session is not simulated.");
+    return { success: false, isPremium: false };
+  }
+
+  try {
+    // Obtener la sesión desde Stripe
+    const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId);
+    
+    // Verificar si el pago fue exitoso
+    if (checkoutSession.payment_status === "paid" || checkoutSession.status === "complete") {
+      const subscriptionId = checkoutSession.subscription as string;
+      let status = "active";
+      let periodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      let priceId = "";
+
+      if (subscriptionId) {
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        status = subscription.status;
+        periodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        priceId = subscription.items.data[0]?.price.id || "";
+      }
+
+      // Actualizar la base de datos inmediatamente
+      const { error } = await supabase
+        .from("users")
+        .update({
+          stripe_customer_id: checkoutSession.customer as string,
+          stripe_subscription_id: subscriptionId,
+          subscription_status: status,
+          subscription_price_id: priceId,
+          subscription_current_period_end: periodEnd
+        })
+        .eq("id", session.user.id);
+
+      if (error) {
+        console.error("[verifyCheckoutSessionAction] Error updating DB:", error.message);
+        return { success: false, isPremium: false };
+      }
+
+      return { success: true, isPremium: true };
+    }
+    
+    return { success: false, isPremium: false };
+  } catch (err: any) {
+    console.error("[verifyCheckoutSessionAction] Error verifying Stripe session:", err.message);
+    return { success: false, isPremium: false };
+  }
+}
+

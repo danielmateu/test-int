@@ -15,7 +15,7 @@ import { JobTracker } from "@/components/cv-builder/JobTracker";
 import { InterviewSimulator } from "@/components/cv-builder/InterviewSimulator";
 import { PricingModal } from "@/components/cv-builder/PricingModal";
 import { Analytics } from "@/components/cv-builder/Analytics";
-import { getUserSubscriptionStatusAction } from "@/app/actions/stripe";
+import { getUserSubscriptionStatusAction, verifyCheckoutSessionAction } from "@/app/actions/stripe";
 import type { JobOffer } from "@/app/actions/jobs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { CVPreview } from "@/components/cv-builder/CVPreview";
@@ -84,6 +84,29 @@ export function DashboardClient({
 
   const checkSubscription = async () => {
     try {
+      // Verificar sesión de pago si viene de redirección Stripe
+      if (typeof window !== "undefined") {
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get("session_id");
+        if (sessionId) {
+          toast.info("Verificando tu suscripción premium...");
+          try {
+            const verifyRes = await verifyCheckoutSessionAction(sessionId);
+            if (verifyRes.success) {
+              toast.success("¡Tu cuenta ha sido mejorada a Premium con éxito! ✨");
+              // Limpiar parámetro sin refrescar la página
+              const newUrl = window.location.pathname;
+              window.history.replaceState({}, document.title, newUrl);
+            } else {
+              toast.error("No pudimos verificar la sesión de Stripe en el servidor.");
+            }
+          } catch (verifyErr) {
+            console.error("Verification error:", verifyErr);
+            toast.error("Error al procesar la verificación del pago.");
+          }
+        }
+      }
+
       const res = await getUserSubscriptionStatusAction();
       if (res.useLocalStorage) {
         const localIsPremium = localStorage.getItem("simulated_is_premium") === "true";
