@@ -10,6 +10,40 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseSecret = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 const supabase = createClient(supabaseUrl, supabaseSecret, { db: { schema: 'next_auth' } });
 
+// Helper para parsear fechas de Stripe de forma segura (evita "Invalid time value")
+function parseStripeDate(val: any): string {
+  try {
+    if (!val) {
+      return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    }
+    
+    if (typeof val === "number") {
+      if (val < 10000000000) {
+        return new Date(val * 1000).toISOString();
+      }
+      return new Date(val).toISOString();
+    }
+    
+    if (typeof val === "string") {
+      const num = Number(val);
+      if (!isNaN(num)) {
+        if (num < 10000000000) {
+          return new Date(num * 1000).toISOString();
+        }
+        return new Date(num).toISOString();
+      }
+      const parsed = new Date(val);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString();
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing Stripe date:", e);
+  }
+  
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+}
+
 export async function POST(req: NextRequest) {
   if (!stripe || !webhookSecret) {
     console.error("[Stripe Webhook] Stripe is not configured or missing Webhook Secret.");
@@ -45,7 +79,7 @@ export async function POST(req: NextRequest) {
         // Recuperar detalles de suscripción
         const subscription = (await stripe.subscriptions.retrieve(subscriptionId)) as any;
         const priceId = subscription.items.data[0]?.price.id;
-        const periodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        const periodEnd = parseStripeDate(subscription.current_period_end);
 
         console.log(`[Stripe Webhook] checkout.session.completed for user ${userId}. Price: ${priceId}`);
 
@@ -71,7 +105,7 @@ export async function POST(req: NextRequest) {
         const subscription = event.data.object as any;
         const customerId = subscription.customer as string;
         const priceId = subscription.items.data[0]?.price.id;
-        const periodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        const periodEnd = parseStripeDate(subscription.current_period_end);
 
         console.log(`[Stripe Webhook] customer.subscription.updated. Customer: ${customerId}. Status: ${subscription.status}`);
 

@@ -211,6 +211,40 @@ export async function simulateUpgradeAction(enable: boolean = true): Promise<{ s
   }
 }
 
+// Helper para parsear fechas de Stripe de forma segura (evita "Invalid time value")
+function parseStripeDate(val: any): string {
+  try {
+    if (!val) {
+      return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    }
+    
+    if (typeof val === "number") {
+      if (val < 10000000000) {
+        return new Date(val * 1000).toISOString();
+      }
+      return new Date(val).toISOString();
+    }
+    
+    if (typeof val === "string") {
+      const num = Number(val);
+      if (!isNaN(num)) {
+        if (num < 10000000000) {
+          return new Date(num * 1000).toISOString();
+        }
+        return new Date(num).toISOString();
+      }
+      const parsed = new Date(val);
+      if (!isNaN(parsed.getTime())) {
+        return parsed.toISOString();
+      }
+    }
+  } catch (e) {
+    console.error("Error parsing Stripe date:", e);
+  }
+  
+  return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+}
+
 // 5. Verificar sesión de Stripe instantáneamente al volver
 export async function verifyCheckoutSessionAction(sessionId: string): Promise<{ success: boolean; isPremium: boolean }> {
   const session = await auth();
@@ -259,7 +293,7 @@ export async function verifyCheckoutSessionAction(sessionId: string): Promise<{ 
       if (subscriptionId) {
         const subscription = (await stripe.subscriptions.retrieve(subscriptionId)) as any;
         status = subscription.status;
-        periodEnd = new Date(subscription.current_period_end * 1000).toISOString();
+        periodEnd = parseStripeDate(subscription.current_period_end);
         priceId = subscription.items?.data[0]?.price.id || "";
       }
 
