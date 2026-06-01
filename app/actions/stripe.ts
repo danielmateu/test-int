@@ -3,6 +3,7 @@
 import { auth } from "@/auth";
 import { createClient } from "@supabase/supabase-js";
 import Stripe from "stripe";
+import { headers } from "next/headers";
 
 const stripeApiKey = process.env.STRIPE_SECRET_KEY || "";
 const stripe = stripeApiKey ? new Stripe(stripeApiKey) : null;
@@ -64,7 +65,10 @@ export async function createCheckoutSessionAction(
     throw new Error("No autorizado");
   }
 
-  const appUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost:3000";
+  const proto = headersList.get("x-forwarded-proto") || "http";
+  const appUrl = process.env.NEXTAUTH_URL || `${proto}://${host}`;
 
   // Si Stripe no está configurado, forzamos simulación demo
   if (!stripe) {
@@ -136,7 +140,10 @@ export async function createCustomerPortalAction(): Promise<{ url: string; simul
     throw new Error("No autorizado");
   }
 
-  const appUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+  const headersList = await headers();
+  const host = headersList.get("host") || "localhost:3000";
+  const proto = headersList.get("x-forwarded-proto") || "http";
+  const appUrl = process.env.NEXTAUTH_URL || `${proto}://${host}`;
 
   if (!stripe) {
     return { url: `${appUrl}/`, simulated: true };
