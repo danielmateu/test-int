@@ -122,7 +122,7 @@
     "pricingFreeTitle": "Free Plan",
     "pricingFreeFeatures": "• Up to 2 resumes created\n• 3 AI job searches per day\n• 2 mock interview simulations\n• 3 cover letters per month",
     "pricingPremiumTitle": "Premium Pro Plan",
-    "pricingPremiumPrice": "$9.99 / mo",
+    "pricingPremiumPrice": "$9.50 / mo",
     "pricingPremiumFeatures": "• Unlimited resumes (up to 8)\n• UNLIMITED AI Job Searches\n• UNLIMITED AI Interview Prep\n• UNLIMITED Cover Letters\n• Priority Gemini 3.1 Pro engine access",
     "pricingCheckoutReal": "Subscribe with Stripe",
     "pricingCheckoutSim": "Simulate Premium (One click)",

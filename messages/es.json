@@ -122,7 +122,7 @@
     "pricingFreeTitle": "Plan Gratuito",
     "pricingFreeFeatures": "• Hasta 2 currículums creados\n• 3 búsquedas con IA al día\n• 2 simulaciones de entrevista guardadas\n• 3 cartas de presentación al mes",
     "pricingPremiumTitle": "Plan Premium Pro",
-    "pricingPremiumPrice": "9.99€ / mes",
+    "pricingPremiumPrice": "9.50€ / mes",
     "pricingPremiumFeatures": "• Currículums ilimitados (hasta 8)\n• Búsquedas de empleo ILIMITADAS\n• Simulador de Entrevistas ILIMITADO\n• Cartas de presentación ILIMITADAS\n• Acceso prioritario a Gemini 3.1 Pro",
     "pricingCheckoutReal": "Suscribirse con Stripe",
     "pricingCheckoutSim": "Simular Premium (Un clic)",
