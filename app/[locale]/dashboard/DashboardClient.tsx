@@ -195,20 +195,22 @@ export function DashboardClient({
               {/* Premium Upgrade Badge Button */}
               <Button
                 onClick={() => setIsPricingOpen(true)}
-                variant={isPremium ? "outline" : "default"}
-                className={`h-9 px-4 rounded-xl text-xs font-bold shrink-0 cursor-pointer ${isPremium
-                  ? "border-emerald-500/20 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 hover:border-emerald-500/30"
-                  : "bg-linear-to-r from-primary via-purple-500 to-blue-500 hover:opacity-95 shadow-xs text-white"
+                variant="ghost"
+                className={`h-9.5 px-5.5 rounded-xl text-xs font-black shrink-0 cursor-pointer relative overflow-hidden group tracking-wide border-0 transition-all ${isPremium
+                  ? "btn-premium-active"
+                  : "btn-premium-shimmer text-white"
                   }`}
               >
                 {isPremium ? (
                   <>
-                    <Sparkles className="w-3.5 h-3.5 mr-1.5 fill-emerald-500 animate-pulse text-emerald-500" />
+                    <Sparkles className="w-4 h-4 mr-1.5 fill-emerald-500 text-emerald-500 transition-transform duration-500 group-hover:rotate-180 group-hover:scale-120 animate-pulse" />
                     {t("premiumBadge")}
                   </>
                 ) : (
                   <>
-                    <Zap className="w-3.5 h-3.5 mr-1.5 fill-white text-white" />
+                    {/* Extra shiny overlay reflection */}
+                    <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                    <Zap className="w-4 h-4 mr-1.5 fill-white text-white transition-transform duration-300 group-hover:scale-125 group-hover:rotate-12" />
                     {t("upgradeButton")}
                   </>
                 )}

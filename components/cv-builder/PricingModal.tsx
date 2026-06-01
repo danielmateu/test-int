@@ -261,16 +261,18 @@ export function PricingModal({
                   <Button
                     onClick={handleStripeCheckout}
                     disabled={isLoadingCheckout}
-                    className="w-full text-xs font-semibold cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95 h-10 rounded-xl shadow-xs"
+                    className="w-full text-xs font-black cursor-pointer btn-premium-shimmer h-11 rounded-xl text-white relative overflow-hidden group tracking-wide border-0 shadow-lg"
                   >
                     {isLoadingCheckout ? (
                       <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
+                        <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
                         Conectando pasarela...
                       </>
                     ) : (
                       <>
-                        <CreditCard className="w-3.5 h-3.5 mr-1.5" />
+                        {/* Extra shiny overlay reflection */}
+                        <span className="absolute inset-0 w-full h-full bg-linear-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
+                        <CreditCard className="w-4 h-4 mr-1.5 transition-transform duration-300 group-hover:scale-115 group-hover:-rotate-6" />
                         {t("pricingCheckoutReal")}
                       </>
                     )}
