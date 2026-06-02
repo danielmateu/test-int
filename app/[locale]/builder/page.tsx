@@ -14,8 +14,10 @@ import { useSession, signOut } from "next-auth/react";
 import { saveCV, loadCV } from "@/app/actions/cv";
 import { toast } from "sonner";
 import { useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
+import { ATSKeywordOptimizer } from "@/components/cv-builder/ATSKeywordOptimizer";
+import { ATSJobFitAnalysis } from "@/app/actions/ai";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -61,12 +63,18 @@ export default function BuilderPage() {
 
 function BuilderPageContent() {
   const searchParams = useSearchParams();
+  const params = useParams();
   const cvId = searchParams.get("id");
   const router = useRouter();
+  const locale = (params?.locale as string) || "es";
 
   const [cvData, setCvData] = useState<CVData>(initialData);
   const [isSaving, setIsSaving] = useState(false);
   const { data: session, status } = useSession();
+
+  // Persistent ATS Keyword Optimizer state to prevent loss on tab switches
+  const [atsAnalysis, setAtsAnalysis] = useState<ATSJobFitAnalysis | null>(null);
+  const [atsJobDescription, setAtsJobDescription] = useState("");
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -198,15 +206,30 @@ function BuilderPageContent() {
         {/* Left column: Form & Styles */}
         <div className="flex-1 xl:max-w-200 xl:h-[calc(100vh-8rem)] xl:overflow-y-auto print:hidden no-scrollbar pr-2">
           <Tabs defaultValue="content" className="w-full">
-            <TabsList className="w-full grid grid-cols-2 mb-8">
+            <TabsList className="w-full grid grid-cols-3 mb-8">
               <TabsTrigger value="content">Contenido</TabsTrigger>
               <TabsTrigger value="styles">Diseño</TabsTrigger>
+              <TabsTrigger value="ats" className="gap-1 flex items-center">
+                <span>ATS</span>
+                <Sparkles className="w-3.5 h-3.5 text-primary shrink-0" />
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="content" className="mt-0 outline-none">
               <CVForm data={cvData} setData={setCvData} status={status} />
             </TabsContent>
             <TabsContent value="styles" className="mt-0 outline-none">
               <CVStyleEditor data={cvData} setData={setCvData} />
+            </TabsContent>
+            <TabsContent value="ats" className="mt-0 outline-none">
+              <ATSKeywordOptimizer 
+                cvData={cvData} 
+                setData={setCvData} 
+                locale={locale} 
+                jobDescription={atsJobDescription}
+                setJobDescription={setAtsJobDescription}
+                analysis={atsAnalysis}
+                setAnalysis={setAtsAnalysis}
+              />
             </TabsContent>
           </Tabs>
         </div>

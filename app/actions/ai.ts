@@ -593,3 +593,195 @@ RETURN A VALID JSON OBJECT WITH THIS EXACT STRUCTURE (NO MARKDOWN WRAAPERS, NO E
     lastError?.message || "No se pudo evaluar la entrevista con IA. Por favor, reintenta."
   );
 }
+
+export interface ATSJobFitAnalysis {
+  score: number;
+  matchingKeywords: string[];
+  missingKeywords: string[];
+  suggestions: {
+    section: "summary" | "experience" | "skills" | "projects" | "other";
+    tip: string;
+    phrasing?: string;
+  }[];
+}
+
+export async function analyzeATSJobFitAction(
+  cvData: CVData,
+  jobDescription: string,
+  locale: string = "es"
+): Promise<ATSJobFitAnalysis> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("No autorizado");
+  }
+
+  if (!apiKey) {
+    throw new Error("La clave API de Gemini (GEMINI_API_KEY) no está configurada");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+  const isEn = locale.toLowerCase() === "en";
+
+  // Extraer información relevante del CV
+  const summary = cvData.personalInfo?.summary || "";
+  const skills = cvData.skills || [];
+  const experiences = cvData.experience || [];
+  const projects = cvData.projects || [];
+  const other = cvData.other || "";
+
+  const expText = experiences.map((exp: any) => 
+    `- Puesto: ${exp.role} en ${exp.company}. Descripción: ${exp.description}`
+  ).join("\n");
+
+  const projText = (projects || []).map((proj: any) => 
+    `- Proyecto: ${proj.name}. Descripción: ${proj.description}`
+  ).join("\n");
+
+  const skillsText = skills.join(", ");
+
+  let systemPrompt = `Eres un sistema experto ATS (Applicant Tracking System) y analista de selección de personal. Tu rol es auditar currículums en comparación con ofertas de empleo.
+Debes devolver ÚNICAMENTE un objeto JSON estructurado que evalúe y compare el CV del candidato contra la descripción del empleo provista.`;
+
+  if (isEn) {
+    systemPrompt = `You are an expert ATS (Applicant Tracking System) auditor and recruitment analyst. Your role is to audit resumes in comparison with job offers.
+You must return ONLY a structured JSON object that evaluates and compares the candidate's CV against the provided job description.`;
+  }
+
+  let userPrompt = `
+Analiza el currículum del candidato y compáralo con la descripción del empleo provista.
+El idioma de tu análisis y de todas tus sugerencias debe ser estrictamente en "${locale}" (si 'es' en Español, si 'en' en Inglés, etc.).
+
+INFORMACIÓN DEL CANDIDATO (CV):
+- Perfil Profesional (Summary): ${summary}
+- Habilidades: ${skillsText}
+- Experiencia laboral:
+${expText || "Ninguna registrada"}
+- Proyectos personales:
+${projText || "Ninguno registrado"}
+- Otros datos: ${other}
+
+INFORMACIÓN DE LA OFERTA DE EMPLEO (JOB DESCRIPTION):
+${jobDescription}
+
+REGLAS DE ANÁLISIS:
+1. Extrae hasta 12 a 15 palabras clave/conceptos críticos del puesto (tecnologías, herramientas, metodologías, certificaciones o habilidades blandas clave).
+2. Compara si esas palabras clave o sus sinónimos directos están presentes de alguna forma en el CV del candidato.
+3. Clasifícalas en:
+   - "matchingKeywords": Palabras clave críticas que SÍ están en el CV.
+   - "missingKeywords": Palabras clave críticas que están en la oferta de empleo pero NO se mencionan o no se destacan en el CV.
+4. Calcula un "score" numérico entero de 0 a 100 de coincidencia basado en la proporción y relevancia de palabras clave encontradas y el encaje general.
+5. Genera de 3 a 5 "suggestions" (sugerencias) específicas para ayudar al candidato a incorporar las palabras clave ausentes ("missingKeywords") en diferentes secciones del CV de forma natural. Cada sugerencia debe indicar la sección ("summary", "experience", "skills", "projects", "other"), dar un consejo práctico ("tip") y proporcionar una frase de ejemplo redactada profesionalmente ("phrasing") para ser integrada.
+
+DEVUELVE UN OBJETO JSON EXACTAMENTE CON ESTA ESTRUCTURA (SIN INTRODUCCIONES NI BLOQUES DE MARKDOWN):
+{
+  "score": (número entero de 0 a 100),
+  "matchingKeywords": ["Keyword1", "Keyword2", ...],
+  "missingKeywords": ["MissingKeyword1", "MissingKeyword2", ...],
+  "suggestions": [
+    {
+      "section": "skills", // O "summary", "experience", "projects", "other"
+      "tip": "Añade '...' a tus habilidades si tienes conocimientos prácticos del tema.",
+      "phrasing": "..." // Opcional, sugerencia de frase o término exacto a inyectar
+    },
+    ...
+  ]
+}
+`;
+
+  if (isEn) {
+    userPrompt = `
+Analyze the candidate's resume and compare it against the provided job description.
+The language of your analysis and suggestions must be strictly in "${locale}" (if 'es' in Spanish, if 'en' in English, etc.).
+
+CANDIDATE INFORMATION (CV):
+- Professional Summary: ${summary}
+- Skills: ${skillsText}
+- Work Experience:
+${expText || "None specified"}
+- Projects:
+${projText || "None specified"}
+- Other info: ${other}
+
+JOB DESCRIPTION DETAILS:
+${jobDescription}
+
+ANALYSIS RULES:
+1. Extract 12 to 15 critical keywords/skills from the job description (technologies, tools, frameworks, certifications, or key soft skills).
+2. Check if those keywords or their direct synonyms are present in the candidate's CV text.
+3. Classify them into:
+   - "matchingKeywords": Critical keywords that ARE present in the CV.
+   - "missingKeywords": Critical keywords required by the employer that are NOT found or highlighted in the CV.
+4. Calculate a matching "score" (integer 0-100) based on the presence and critical importance of the found keywords.
+5. Create 3 to 5 targeted "suggestions" to help the user incorporate the "missingKeywords" in a natural way. For each suggestion, provide the target section ("summary", "experience", "skills", "projects", "other"), an actionable advice ("tip"), and a professionally written example phrase ("phrasing") that the candidate can copy/paste or adapt.
+
+RETURN A VALID JSON OBJECT WITH THIS EXACT STRUCTURE (NO MARKDOWN WRAPPERS, NO EXPLANATIONS):
+{
+  "score": (integer 0-100),
+  "matchingKeywords": ["Keyword1", "Keyword2", ...],
+  "missingKeywords": ["MissingKeyword1", "MissingKeyword2", ...],
+  "suggestions": [
+    {
+      "section": "skills",
+      "tip": "Add '...' to your skills list if you possess practical experience.",
+      "phrasing": "..."
+    },
+    ...
+  ]
+}
+`;
+  }
+
+  const models = [
+    'gemini-3.1-flash-lite',
+    'gemini-3.0-flash',
+    'gemini-3.1-pro',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+  ];
+
+  const requestPayload = {
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    config: { 
+      systemInstruction: systemPrompt, 
+      temperature: 0.25,
+      responseMimeType: "application/json"
+    },
+  };
+
+  let lastError: any;
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({ model, ...requestPayload });
+      const rawText = response.text?.trim() || "";
+      if (rawText) {
+        let cleanedText = rawText;
+        if (cleanedText.startsWith("```")) {
+          cleanedText = cleanedText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+        }
+        
+        try {
+          const analysisRes = JSON.parse(cleanedText) as ATSJobFitAnalysis;
+          if (analysisRes && typeof analysisRes.score === 'number' && Array.isArray(analysisRes.matchingKeywords) && Array.isArray(analysisRes.missingKeywords)) {
+            return analysisRes;
+          }
+        } catch (jsonErr) {
+          console.error(`Error parsing ATS fit analysis JSON returned by ${model}:`, jsonErr);
+        }
+      }
+    } catch (err: any) {
+      lastError = err;
+      const isRetriable =
+        err?.message?.includes('503') ||
+        err?.message?.includes('UNAVAILABLE') ||
+        err?.message?.includes('429') ||
+        err?.status === 503 ||
+        err?.status === 429;
+      if (!isRetriable) break;
+    }
+  }
+
+  throw new Error(
+    lastError?.message || "No se pudo realizar el análisis de coincidencia ATS con IA. Por favor, reintenta."
+  );
+}
+

@@ -259,5 +259,28 @@
     "dates": {
       "present": "Actualidad"
     }
+  },
+  "ATSKeywordOptimizer": {
+    "title": "Optimización ATS en Tiempo Real",
+    "subtitle": "Pega la descripción de la oferta para analizar la coincidencia con tu CV y recibir sugerencias instantáneas.",
+    "placeholder": "Pega la descripción de la vacante, requisitos o responsabilidades del puesto aquí...",
+    "btnAnalyze": "Analizar Coincidencia con IA",
+    "btnAnalyzing": "Analizando con IA...",
+    "scoreLabel": "Puntuación de Coincidencia ATS",
+    "scanRealtimeAlert": "¡Edita tu CV a la izquierda! La coincidencia y la puntuación se recalcularán automáticamente en tiempo real sin llamadas de IA extras.",
+    "matchingKeywords": "Palabras clave presentes ({count})",
+    "missingKeywords": "Palabras clave ausentes ({count})",
+    "suggestionsTitle": "Sugerencias de Adaptación IA",
+    "suggestionsDesc": "Integra estas sugerencias y frases redactadas profesionalmente en tu CV para maximizar el encaje.",
+    "sectionSummary": "Perfil",
+    "sectionExperience": "Experiencia",
+    "sectionSkills": "Habilidades",
+    "sectionProjects": "Proyectos",
+    "sectionOther": "Otros",
+    "copyTooltip": "Copiar sugerencia",
+    "copySuccess": "Sugerencia copiada al portapapeles",
+    "addToSkills": "Añadir a Habilidades",
+    "addedToSkillsSuccess": "Habilidad añadida correctamente",
+    "noAnalysisYet": "Copia e introduce la descripción del empleo arriba para iniciar el análisis inteligente de coincidencia ATS."
   }
 }

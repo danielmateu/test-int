@@ -259,5 +259,28 @@
     "dates": {
       "present": "Present"
     }
+  },
+  "ATSKeywordOptimizer": {
+    "title": "Real-Time ATS Optimization",
+    "subtitle": "Paste the target job description to analyze the alignment with your CV and get instant suggestions.",
+    "placeholder": "Paste the job vacancy description, requirements, or responsibilities here...",
+    "btnAnalyze": "Analyze Match with AI",
+    "btnAnalyzing": "Analyzing with AI...",
+    "scoreLabel": "ATS Match Score",
+    "scanRealtimeAlert": "Edit your CV on the left! The matching keywords and score will automatically recalculate in real-time without extra AI calls.",
+    "matchingKeywords": "Present Keywords ({count})",
+    "missingKeywords": "Missing Keywords ({count})",
+    "suggestionsTitle": "AI Tailoring Suggestions",
+    "suggestionsDesc": "Integrate these suggestions and professionally written phrases in your CV to maximize fit.",
+    "sectionSummary": "Summary",
+    "sectionExperience": "Experience",
+    "sectionSkills": "Skills",
+    "sectionProjects": "Projects",
+    "sectionOther": "Other",
+    "copyTooltip": "Copy suggestion",
+    "copySuccess": "Suggestion copied to clipboard",
+    "addToSkills": "Add to Skills",
+    "addedToSkillsSuccess": "Skill successfully added",
+    "noAnalysisYet": "Copy and enter a job description above to start the smart ATS keyword match analysis."
   }
 }
