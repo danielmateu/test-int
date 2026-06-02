@@ -1,30 +1,34 @@
 'use client'
 
-import { ProductAdapter } from '@/lib/mock-data-interface';
-import { legacyResponse } from '@/lib/mockData';
 import { useMemo, useState } from 'react';
 import { Input } from './ui/input';
 import { Card, CardContent } from './ui/card';
 
 interface legacyResponseProps {
-    legacyResponse: typeof legacyResponse;
+    legacyResponse?: any[];
 }
 
-export default function ProductList({ legacyResponse }: legacyResponseProps) {
+export default function ProductList({ legacyResponse = [] }: legacyResponseProps) {
 
-    const products = legacyResponse.map(ProductAdapter.adapt)
+    const products = useMemo(() => {
+        return legacyResponse.map((product: any) => ({
+            id: product?.id || Math.random().toString(),
+            name: product?.name || '',
+            price: product?.price || 0,
+            date: product?.date || null
+        }));
+    }, [legacyResponse]);
 
     const [searchTerm, setSearchTerm] = useState<string>("");
 
     const filteredProducts = useMemo(() => {
-        return products.filter(product => product.name.toLocaleLowerCase().includes(searchTerm.toLocaleLowerCase()))
+        return products.filter((product: any) => 
+            product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
     }, [products, searchTerm]);
-
-    // console.log({ filteredProducts });
 
     return (
         <div className="space-y-12">
-            {/* <h1>Hello Page</h1> */}
             <Input
                 type="text"
                 placeholder='Filtra por nombre'
@@ -35,7 +39,7 @@ export default function ProductList({ legacyResponse }: legacyResponseProps) {
 
             <ul>
                 {
-                    filteredProducts.map(product => (
+                    filteredProducts.map((product: any) => (
                         <li key={product.id}>
                             <Card>
                                 <CardContent>
@@ -46,8 +50,6 @@ export default function ProductList({ legacyResponse }: legacyResponseProps) {
                     ))
                 }
             </ul>
-
-
         </div>
     );
-}
+}
