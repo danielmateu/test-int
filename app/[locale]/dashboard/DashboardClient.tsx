@@ -36,6 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { ModeToggle } from "@/components/mode-toggle";
 
 interface CVList {
   id: string;
@@ -191,7 +192,7 @@ export function DashboardClient({
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">{t("title")}</h1>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1 sm:mt-2">{t("subtitle")} ({cvs.length}/{isPremium ? 8 : 2} {t("used")})</p>
             </div>
-            <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
               {/* Premium Upgrade Badge Button */}
               <Button
                 onClick={() => setIsPricingOpen(true)}
@@ -215,24 +216,27 @@ export function DashboardClient({
                   </>
                 )}
               </Button>
+              <div className="flex items-center gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-9 w-9 rounded-full cursor-pointer">
+                      <Avatar>
+                        <AvatarImage src={userImage || ""} />
+                        <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>{t("logout")}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              <LanguageSwitcher />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-9 w-9 rounded-full ml-2 cursor-pointer">
-                    <Avatar>
-                      <AvatarImage src={userImage || ""} />
-                      <AvatarFallback>{userName.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>{t("logout")}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                <LanguageSwitcher />
+                <ModeToggle />
+              </div>
             </div>
           </header>
 
