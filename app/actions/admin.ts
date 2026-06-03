@@ -32,6 +32,7 @@ export interface AdminStats {
   premiumUsers: number;
   freeUsers: number;
   totalCVs: number;
+  totalTranslations: number;
   totalSimulations: number;
   totalApplications: number;
   estimatedMRR: number;
@@ -41,6 +42,7 @@ export interface AdminStats {
     date: string;
     registrations: number;
     cvs: number;
+    translations: number;
     simulations: number;
   }[];
 }
@@ -71,9 +73,22 @@ export async function getAdminStats(): Promise<AdminStats> {
     }
   });
 
-  const { count: totalCVs, error: cvsErr } = await supabasePublic
+  const { data: cvsList, error: cvsErr } = await supabasePublic
     .from("cv_documents")
-    .select("*", { count: "exact", head: true });
+    .select("created_at, content");
+
+  if (cvsErr) throw new Error("Error cargando CVs: " + cvsErr.message);
+
+  const totalCVs = cvsList?.length || 0;
+  
+  // Contar traducciones basadas en el sufijo del idioma (ej. " (EN)", " (ES)")
+  let totalTranslations = 0;
+  const translationRegex = /\s*\(([A-Z]{2})\)$/i;
+  cvsList?.forEach((cv) => {
+    if (translationRegex.test(cv.content?.title || "")) {
+      totalTranslations++;
+    }
+  });
 
   const { count: totalSimulations, error: simErr } = await supabasePublic
     .from("interview_simulations")
@@ -178,14 +193,19 @@ export async function getAdminStats(): Promise<AdminStats> {
     });
   }
 
-  // Agrupar CVs por día
+  // Agrupar CVs y traducciones por día
   const cvsByDate: Record<string, number> = {};
-  cvTrend?.forEach((c) => {
+  const translationsByDate: Record<string, number> = {};
+  cvsList?.forEach((c) => {
     const dateStr = new Date(c.created_at).toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "2-digit",
     });
     cvsByDate[dateStr] = (cvsByDate[dateStr] || 0) + 1;
+    
+    if (translationRegex.test(c.content?.title || "")) {
+      translationsByDate[dateStr] = (translationsByDate[dateStr] || 0) + 1;
+    }
   });
 
   // Agrupar simulaciones por día
@@ -212,6 +232,7 @@ export async function getAdminStats(): Promise<AdminStats> {
       date: dateStr,
       registrations: registrationsByDate[dateStr] || 0,
       cvs: cvsByDate[dateStr] || 0,
+      translations: translationsByDate[dateStr] || 0,
       simulations: simsByDate[dateStr] || 0,
     });
   }
@@ -220,7 +241,8 @@ export async function getAdminStats(): Promise<AdminStats> {
     totalUsers,
     premiumUsers,
     freeUsers,
-    totalCVs: totalCVs || 0,
+    totalCVs,
+    totalTranslations,
     totalSimulations: totalSimulations || 0,
     totalApplications: totalApplications || 0,
     estimatedMRR,
@@ -238,6 +260,7 @@ export interface AdminUser {
   subscription_status: string | null;
   subscription_current_period_end: string | null;
   cvCount: number;
+  translationCount: number;
   interviewCount: number;
   jobCount: number;
 }
@@ -258,14 +281,20 @@ export async function getAdminUsers(
   if (error) throw new Error("Error cargando usuarios: " + error.message);
 
   // 2. Cargar metadatos del esquema público en paralelo para inyectar conteos
-  const { data: cvs } = await supabasePublic.from("cv_documents").select("user_id");
+  const { data: cvs } = await supabasePublic.from("cv_documents").select("user_id, content");
   const { data: sims } = await supabasePublic.from("interview_simulations").select("user_id");
   const { data: jobs } = await supabasePublic.from("job_applications").select("user_id");
 
   // Mapeadores de contadores
   const cvCounts: Record<string, number> = {};
+  const translationCounts: Record<string, number> = {};
+  const translationRegex = /\s*\(([A-Z]{2})\)$/i;
+
   cvs?.forEach((c) => {
     cvCounts[c.user_id] = (cvCounts[c.user_id] || 0) + 1;
+    if (translationRegex.test(c.content?.title || "")) {
+      translationCounts[c.user_id] = (translationCounts[c.user_id] || 0) + 1;
+    }
   });
 
   const simCounts: Record<string, number> = {};
@@ -287,6 +316,7 @@ export async function getAdminUsers(
     subscription_status: u.subscription_status || "free",
     subscription_current_period_end: u.subscription_current_period_end,
     cvCount: cvCounts[u.id] || 0,
+    translationCount: translationCounts[u.id] || 0,
     interviewCount: simCounts[u.id] || 0,
     jobCount: jobCounts[u.id] || 0,
   }));
@@ -364,7 +394,7 @@ export async function deleteUser(userId: string): Promise<{ success: boolean }> 
 }
 
 export interface UserDetails {
-  cvs: { id: string; title: string; updated_at: string; skillsCount: number }[];
+  cvs: { id: string; title: string; updated_at: string; skillsCount: number; isTranslation: boolean; lang?: string }[];
   interviews: { id: string; job_title: string; company: string; score: number; created_at: string }[];
   jobs: { id: string; title: string; company: string; status: string; updated_at: string }[];
 }
@@ -393,12 +423,18 @@ export async function getUserDetails(userId: string): Promise<UserDetails> {
     .eq("user_id", userId)
     .order("updated_at", { ascending: false });
 
-  const formattedCVs = (cvs || []).map((c: any) => ({
-    id: c.id,
-    title: c.content?.title || "CV Sin Título",
-    updated_at: c.updated_at,
-    skillsCount: c.content?.skills?.length || 0,
-  }));
+  const translationRegex = /\s*\(([A-Z]{2})\)$/i;
+  const formattedCVs = (cvs || []).map((c: any) => {
+    const match = (c.content?.title || "").match(translationRegex);
+    return {
+      id: c.id,
+      title: c.content?.title || "CV Sin Título",
+      updated_at: c.updated_at,
+      skillsCount: c.content?.skills?.length || 0,
+      isTranslation: !!match,
+      lang: match ? match[1].toUpperCase() : undefined
+    };
+  });
 
   const formattedInterviews = (sims || []).map((s: any) => ({
     id: s.id,

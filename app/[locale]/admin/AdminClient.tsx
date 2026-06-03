@@ -23,7 +23,8 @@ import {
   FileSpreadsheet,
   AlertCircle,
   LogOut,
-  ArrowLeftIcon
+  ArrowLeftIcon,
+  Languages
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -300,7 +301,7 @@ export function AdminClient({
           {/* VISTA GENERAL */}
           <TabsContent value="overview" className="space-y-6">
             {/* TARJETAS DE MÉTRICAS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
               <Card className="relative overflow-hidden group hover:shadow-md transition-shadow">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-blue-500" />
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -359,6 +360,20 @@ export function AdminClient({
                   </p>
                 </CardContent>
               </Card>
+
+              <Card className="relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-indigo-500" />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-muted-foreground">Traducciones IA</CardTitle>
+                  <Languages className="h-5 w-5 text-indigo-500 bg-indigo-500/10 p-1 rounded-md" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.totalTranslations}</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    CVs traducidos a otros idiomas
+                  </p>
+                </CardContent>
+              </Card>
             </div>
 
             {/* GRÁFICOS */}
@@ -387,6 +402,10 @@ export function AdminClient({
                             <stop offset="5%" stopColor="#a855f7" stopOpacity={0.2} />
                             <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                           </linearGradient>
+                          <linearGradient id="colorTrans" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.2} />
+                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                          </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.15} />
                         <XAxis dataKey="date" fontSize={11} tickLine={false} />
@@ -395,6 +414,7 @@ export function AdminClient({
                         <Legend iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
                         <Area type="monotone" dataKey="registrations" name="Nuevos Usuarios" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorReg)" />
                         <Area type="monotone" dataKey="cvs" name="CVs Creados" stroke="#f97316" strokeWidth={2} fillOpacity={1} fill="url(#colorCV)" />
+                        <Area type="monotone" dataKey="translations" name="Traducciones IA" stroke="#6366f1" strokeWidth={2} fillOpacity={1} fill="url(#colorTrans)" />
                         <Area type="monotone" dataKey="simulations" name="Simulaciones IA" stroke="#a855f7" strokeWidth={2} fillOpacity={1} fill="url(#colorSim)" />
                       </AreaChart>
                     </ResponsiveContainer>
@@ -552,7 +572,14 @@ export function AdminClient({
                                 </span>
                               )}
                             </td>
-                            <td className="p-4 text-center font-medium">{user.cvCount}</td>
+                            <td className="p-4 text-center">
+                              <div className="font-medium text-zinc-900 dark:text-zinc-100">{user.cvCount}</div>
+                              {user.translationCount > 0 && (
+                                <div className="text-[10px] text-indigo-500 dark:text-indigo-400 font-semibold mt-0.5">
+                                  ({user.translationCount} trad.)
+                                </div>
+                              )}
+                            </td>
                             <td className="p-4 text-center font-medium">{user.interviewCount}</td>
                             <td className="p-4 text-center font-medium">{user.jobCount}</td>
                             <td className="p-4 pr-6 text-right">
@@ -609,11 +636,16 @@ export function AdminClient({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   <div className="p-5 border rounded-lg bg-zinc-50/50 dark:bg-zinc-900/20 space-y-2">
                     <p className="text-xs font-semibold text-muted-foreground uppercase">ATS Optimizations</p>
                     <p className="text-2xl font-bold">{stats.totalCVs}</p>
                     <p className="text-xs text-muted-foreground">Promedio: ~3,500 tokens por análisis</p>
+                  </div>
+                  <div className="p-5 border rounded-lg bg-zinc-50/50 dark:bg-zinc-900/20 space-y-2">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase">Traducciones de CV</p>
+                    <p className="text-2xl font-bold">{stats.totalTranslations}</p>
+                    <p className="text-xs text-muted-foreground">Promedio: ~8,000 tokens por traducción</p>
                   </div>
                   <div className="p-5 border rounded-lg bg-zinc-50/50 dark:bg-zinc-900/20 space-y-2">
                     <p className="text-xs font-semibold text-muted-foreground uppercase">Simulaciones de Entrevistas</p>
@@ -623,7 +655,7 @@ export function AdminClient({
                   <div className="p-5 border rounded-lg bg-zinc-50/50 dark:bg-zinc-900/20 space-y-2">
                     <p className="text-xs font-semibold text-muted-foreground uppercase">Coste API Estimado</p>
                     <p className="text-2xl font-bold text-emerald-500">
-                      {((stats.totalCVs * 3500 + stats.totalSimulations * 12000) * 0.000000075).toFixed(4)} $
+                      {((stats.totalCVs * 3500 + stats.totalSimulations * 12000 + stats.totalTranslations * 8000) * 0.000000075).toFixed(4)} $
                     </p>
                     <p className="text-xs text-muted-foreground">Basado en tarifas de Gemini 2.5 Flash / 3.0 Flash</p>
                   </div>
@@ -634,7 +666,7 @@ export function AdminClient({
                   <div>
                     <p className="font-semibold">Nota sobre facturación:</p>
                     <p className="text-xs mt-0.5">
-                      Este cálculo es un estimador local del tráfico API real. Los costes reflejan el uso de las llamadas de IA para redactar currículums, estructurar y evaluar simulaciones de entrevistas, y auditar currículums contra ofertas mediante el motor ATS.
+                      Este cálculo es un estimador local del tráfico API real. Los costes reflejan el uso de las llamadas de IA para redactar currículums, traducir currículums a otros idiomas, estructurar y evaluar simulaciones de entrevistas, y auditar currículums contra ofertas mediante el motor ATS.
                     </p>
                   </div>
                 </div>
@@ -676,10 +708,17 @@ export function AdminClient({
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
                     {userDetails.cvs.map((cv) => (
-                      <div key={cv.id} className="p-3 border rounded-lg flex items-center justify-between text-xs hover:border-zinc-300 dark:hover:border-zinc-700">
-                        <div>
-                          <p className="font-semibold">{cv.title}</p>
-                          <p className="text-muted-foreground text-[10px] mt-0.5">
+                      <div key={cv.id} className="p-3 border rounded-lg flex items-center justify-between text-xs hover:border-zinc-300 dark:hover:border-zinc-700 animate-fade-in">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="font-semibold">{cv.title}</span>
+                            {cv.isTranslation && (
+                              <span className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold px-1.5 py-0.2 rounded border border-indigo-500/20">
+                                IA {cv.lang}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-muted-foreground text-[10px]">
                             Modificado: {new Date(cv.updated_at).toLocaleDateString()}
                           </p>
                         </div>

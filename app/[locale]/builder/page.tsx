@@ -7,7 +7,7 @@ import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Printer, ArrowLeft, Save, LogOut, User, Sparkles } from "lucide-react";
+import { Printer, ArrowLeft, Save, LogOut, User, Sparkles, Languages, Loader2 } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useSession, signOut } from "next-auth/react";
@@ -17,7 +17,7 @@ import { useEffect, Suspense } from "react";
 import { useSearchParams, useParams } from "next/navigation";
 import { useRouter } from "@/i18n/routing";
 import { ATSKeywordOptimizer } from "@/components/cv-builder/ATSKeywordOptimizer";
-import { ATSJobFitAnalysis } from "@/app/actions/ai";
+import { ATSJobFitAnalysis, translateCVAction } from "@/app/actions/ai";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -75,6 +75,35 @@ function BuilderPageContent() {
   // Persistent ATS Keyword Optimizer state to prevent loss on tab switches
   const [atsAnalysis, setAtsAnalysis] = useState<ATSJobFitAnalysis | null>(null);
   const [atsJobDescription, setAtsJobDescription] = useState("");
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  const handleTranslate = async (targetLocale: string) => {
+    try {
+      setIsTranslating(true);
+      toast.loading("Traduciendo tu currículum con IA...", { id: "cv-translation" });
+      
+      const translatedData = await translateCVAction(cvData, targetLocale);
+      
+      // Limpiar sufijos anteriores de idioma (ej. "CV (EN) (FR)" -> "CV (FR)")
+      const cleanTitle = (cvData.title || "CV").replace(/\s*\([A-Z]{2}\)$/gi, "");
+      const newTitle = `${cleanTitle} (${targetLocale.toUpperCase()})`;
+      
+      setCvData({
+        ...translatedData,
+        title: newTitle
+      });
+      
+      toast.success(`¡Currículum traducido correctamente al ${targetLocale.toUpperCase()}! Revisa y pulsa 'Guardar' para registrar los cambios.`, {
+        id: "cv-translation",
+        duration: 5000
+      });
+    } catch (err: any) {
+      toast.error(err.message || "Error al traducir el CV", { id: "cv-translation" });
+      console.error(err);
+    } finally {
+      setIsTranslating(false);
+    }
+  };
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -164,6 +193,29 @@ function BuilderPageContent() {
                   <Save className="w-4 h-4" />
                   {isSaving ? "Guardando..." : "Guardar CV"}
                 </Button>
+                
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" disabled={isTranslating} className="gap-2 shrink-0 cursor-pointer">
+                      {isTranslating ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Languages className="w-4 h-4 text-indigo-500" />
+                      )}
+                      <span>{isTranslating ? "Traduciendo..." : "Traducir CV"}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleTranslate("es")} className="cursor-pointer">Español</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleTranslate("en")} className="cursor-pointer">English</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleTranslate("fr")} className="cursor-pointer">Français</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleTranslate("de")} className="cursor-pointer">Deutsch</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleTranslate("it")} className="cursor-pointer">Italiano</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleTranslate("pt")} className="cursor-pointer">Português</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleTranslate("ca")} className="cursor-pointer">Català</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
                 <Button onClick={handlePrint} className="gap-2">
                   <Printer className="w-4 h-4" />
                   Exportar a PDF

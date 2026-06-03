@@ -130,6 +130,12 @@ WRITING RULES:
       }
     } catch (err: any) {
       lastError = err;
+      const isModelError =
+        err?.status === 404 ||
+        err?.message?.includes('404') ||
+        err?.message?.includes('not found') ||
+        err?.message?.includes('not supported') ||
+        err?.message?.includes('NOT_FOUND');
       const isRetriable =
         err?.message?.includes('503') ||
         err?.message?.includes('UNAVAILABLE') ||
@@ -137,7 +143,7 @@ WRITING RULES:
         err?.message?.includes('RESOURCE_EXHAUSTED') ||
         err?.status === 503 ||
         err?.status === 429;
-      if (!isRetriable) break; // Si no es por cuota/servidor saturado, salimos del bucle
+      if (!isRetriable && !isModelError) break; // Si no es por cuota/servidor saturado o error de modelo, salimos del bucle
       console.warn(`Gemini Model ${model} saturado o no disponible, intentando con el siguiente...`);
     }
   }
@@ -282,6 +288,12 @@ TAILORING RULES:
       }
     } catch (err: any) {
       lastError = err;
+      const isModelError =
+        err?.status === 404 ||
+        err?.message?.includes('404') ||
+        err?.message?.includes('not found') ||
+        err?.message?.includes('not supported') ||
+        err?.message?.includes('NOT_FOUND');
       const isRetriable =
         err?.message?.includes('503') ||
         err?.message?.includes('UNAVAILABLE') ||
@@ -289,8 +301,8 @@ TAILORING RULES:
         err?.message?.includes('RESOURCE_EXHAUSTED') ||
         err?.status === 503 ||
         err?.status === 429;
-      if (!isRetriable) break;
-      console.warn(`Gemini Model ${model} ocupado, intentando reintento de adaptación con otro modelo...`);
+      if (!isRetriable && !isModelError) break;
+      console.warn(`Gemini Model ${model} no disponible o saturado, intentando reintento con otro modelo...`);
     }
   }
 
@@ -426,13 +438,20 @@ QUESTION RULES:
       }
     } catch (err: any) {
       lastError = err;
+      const isModelError =
+        err?.status === 404 ||
+        err?.message?.includes('404') ||
+        err?.message?.includes('not found') ||
+        err?.message?.includes('not supported') ||
+        err?.message?.includes('NOT_FOUND');
       const isRetriable =
         err?.message?.includes('503') ||
         err?.message?.includes('UNAVAILABLE') ||
         err?.message?.includes('429') ||
         err?.status === 503 ||
         err?.status === 429;
-      if (!isRetriable) break;
+      if (!isRetriable && !isModelError) break;
+      console.warn(`Gemini Model ${model} no disponible o saturado, intentando generar preguntas con otro modelo...`);
     }
   }
 
@@ -579,13 +598,20 @@ RETURN A VALID JSON OBJECT WITH THIS EXACT STRUCTURE (NO MARKDOWN WRAAPERS, NO E
       }
     } catch (err: any) {
       lastError = err;
+      const isModelError =
+        err?.status === 404 ||
+        err?.message?.includes('404') ||
+        err?.message?.includes('not found') ||
+        err?.message?.includes('not supported') ||
+        err?.message?.includes('NOT_FOUND');
       const isRetriable =
         err?.message?.includes('503') ||
         err?.message?.includes('UNAVAILABLE') ||
         err?.message?.includes('429') ||
         err?.status === 503 ||
         err?.status === 429;
-      if (!isRetriable) break;
+      if (!isRetriable && !isModelError) break;
+      console.warn(`Gemini Model ${model} no disponible o saturado, intentando evaluar con otro modelo...`);
     }
   }
 
@@ -770,18 +796,132 @@ RETURN A VALID JSON OBJECT WITH THIS EXACT STRUCTURE (NO MARKDOWN WRAPPERS, NO E
       }
     } catch (err: any) {
       lastError = err;
+      const isModelError =
+        err?.status === 404 ||
+        err?.message?.includes('404') ||
+        err?.message?.includes('not found') ||
+        err?.message?.includes('not supported') ||
+        err?.message?.includes('NOT_FOUND');
       const isRetriable =
         err?.message?.includes('503') ||
         err?.message?.includes('UNAVAILABLE') ||
         err?.message?.includes('429') ||
         err?.status === 503 ||
         err?.status === 429;
-      if (!isRetriable) break;
+      if (!isRetriable && !isModelError) break;
+      console.warn(`Gemini Model ${model} no disponible o saturado, intentando análisis ATS con otro modelo...`);
     }
   }
 
   throw new Error(
     lastError?.message || "No se pudo realizar el análisis de coincidencia ATS con IA. Por favor, reintenta."
+  );
+}
+
+/**
+ * Traduce contextualmente un currículum completo en formato JSON a otro idioma usando IA (Gemini)
+ */
+export async function translateCVAction(
+  cvData: CVData,
+  targetLocale: string
+): Promise<CVData> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("No autorizado");
+  }
+
+  if (!apiKey) {
+    throw new Error("La clave API de Gemini (GEMINI_API_KEY) no está configurada");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
+  const languageMap: Record<string, string> = {
+    es: "Español",
+    en: "Inglés (English)",
+    fr: "Francés (French)",
+    de: "Alemán (German)",
+    it: "Italiano (Italian)",
+    pt: "Portugués (Portuguese)",
+    ca: "Catalán (Catalan)"
+  };
+
+  const targetLanguageName = languageMap[targetLocale] || targetLocale;
+
+  const systemPrompt = `Eres un traductor profesional y especialista en reclutamiento.
+Tu tarea es traducir un currículum (CV) completo provisto en formato JSON al idioma: "${targetLanguageName}".
+
+REGLAS DE TRADUCCIÓN ESTRICTAS:
+1. Traduce TODOS los valores de texto descriptivos, resúmenes profesionales, logros en las experiencias, títulos de proyectos, nombres de carreras/grados académicos y secciones de otros datos al idioma de destino.
+2. Mantén la estructura de llaves/claves JSON exactamente idéntica. No traduzcas ninguna clave del JSON (ej. no traduzcas 'personalInfo', 'experience', 'startDate', 'fullName', 'skills', etc.), solo traduce los valores.
+3. No traduzcas nombres propios de personas (como el valor de 'fullName'), direcciones de correo, enlaces de redes sociales (LinkedIn, GitHub, etc.), URLs de imágenes, colores hexadecimales ni tipografías.
+4. Traduce términos de fechas de forma natural, por ejemplo "Presente" o "Actualidad" debe traducirse como "Present" o "Presente" según corresponda al idioma.
+5. Devuelve ÚNICAMENTE el objeto JSON traducido y estructurado de forma limpia. NO envuelvas la respuesta en bloques de código markdown de tipo \`\`\`json. La respuesta debe comenzar estrictamente con '{' y terminar con '}'.`;
+
+  const userPrompt = `
+Por favor, traduce el siguiente currículum en formato JSON al idioma "${targetLanguageName}":
+
+${JSON.stringify(cvData, null, 2)}
+`;
+
+  const models = [
+    'gemini-3.1-flash-lite',
+    'gemini-3.0-flash',
+    'gemini-3.1-pro',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+  ];
+
+  const requestPayload = {
+    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
+    config: { 
+      systemInstruction: systemPrompt, 
+      temperature: 0.1, // Temperatura baja para traducciones fieles y estables
+      responseMimeType: "application/json"
+    },
+  };
+
+  let lastError: any;
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({ model, ...requestPayload });
+      const rawText = response.text?.trim() || "";
+      if (rawText) {
+        let cleanedText = rawText;
+        if (cleanedText.startsWith("```")) {
+          cleanedText = cleanedText.replace(/^```json\s*/i, "").replace(/```$/, "").trim();
+        }
+        
+        try {
+          const translatedCV = JSON.parse(cleanedText) as CVData;
+          if (translatedCV && translatedCV.personalInfo) {
+            return translatedCV;
+          }
+        } catch (jsonErr) {
+          console.error(`Error parsing translation JSON returned by ${model}:`, jsonErr);
+        }
+      }
+    } catch (err: any) {
+      lastError = err;
+      const isModelError =
+        err?.status === 404 ||
+        err?.message?.includes('404') ||
+        err?.message?.includes('not found') ||
+        err?.message?.includes('not supported') ||
+        err?.message?.includes('NOT_FOUND');
+      const isRetriable =
+        err?.message?.includes('503') ||
+        err?.message?.includes('UNAVAILABLE') ||
+        err?.message?.includes('429') ||
+        err?.status === 503 ||
+        err?.status === 429;
+      if (!isRetriable && !isModelError) break;
+      console.warn(`Gemini Model ${model} no disponible o saturado, intentando traducción con otro modelo...`);
+    }
+  }
+
+  throw new Error(
+    lastError?.message || "No se pudo traducir el currículum con IA. Por favor, reintenta en unos momentos."
   );
 }
 
