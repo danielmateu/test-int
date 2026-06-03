@@ -77,7 +77,6 @@ import {
   UserDetails
 } from "@/app/actions/admin";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { auth } from "@/auth";
 import { signOut } from "next-auth/react";
 import { useTranslations } from "next-intl";
 
