@@ -21,7 +21,9 @@ import {
   RefreshCw,
   FolderOpen,
   FileSpreadsheet,
-  AlertCircle
+  AlertCircle,
+  LogOut,
+  ArrowLeftIcon
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -30,6 +32,7 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useRouter } from "@/i18n/routing";
 import {
   Dialog,
   DialogContent,
@@ -73,6 +76,10 @@ import {
   AdminUser,
   UserDetails
 } from "@/app/actions/admin";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { auth } from "@/auth";
+import { signOut } from "next-auth/react";
+import { useTranslations } from "next-intl";
 
 interface AdminClientProps {
   initialStats: AdminStats;
@@ -87,6 +94,10 @@ export function AdminClient({
   adminName,
   adminImage
 }: AdminClientProps) {
+
+  const router = useRouter();
+  const t = useTranslations("Dashboard");
+
   const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState<AdminStats>(initialStats);
   const [users, setUsers] = useState<AdminUser[]>(initialUsers);
@@ -209,7 +220,7 @@ export function AdminClient({
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 p-4 sm:p-6 md:p-12">
       <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8">
-        
+
         {/* HEADER */}
         <header className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center border-b pb-6">
           <div className="flex items-center gap-3">
@@ -243,11 +254,37 @@ export function AdminClient({
               Sincronizar
             </Button>
 
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Avatar className="h-9 w-9 border">
                 <AvatarImage src={adminImage || ""} />
                 <AvatarFallback>{adminName.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
+              <LanguageSwitcher />
+              <ModeToggle />
+            </div> */}
+
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full cursor-pointer">
+                    <Avatar>
+                      <AvatarImage src={adminImage || ""} />
+                      <AvatarFallback>{adminName.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => router.push('/dashboard')} className="cursor-pointer">
+                    <ArrowLeftIcon className="mr-2 h-4 w-4 text-emerald-500" />
+                    <span>Panel Usuario</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+                    <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                    <span>{t("logout")}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <LanguageSwitcher />
               <ModeToggle />
             </div>
@@ -289,8 +326,8 @@ export function AdminClient({
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.premiumUsers}</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    {stats.totalUsers > 0 
-                      ? `${((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1)}%` 
+                    {stats.totalUsers > 0
+                      ? `${((stats.premiumUsers / stats.totalUsers) * 100).toFixed(1)}%`
                       : "0%"} tasa de conversión de pago
                   </p>
                 </CardContent>
@@ -328,7 +365,7 @@ export function AdminClient({
             {/* GRÁFICOS */}
             {mounted && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
+
                 {/* Registros e interacción diaria */}
                 <Card className="lg:col-span-2">
                   <CardHeader>
@@ -340,16 +377,16 @@ export function AdminClient({
                       <AreaChart data={stats.dailyTrends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                         <defs>
                           <linearGradient id="colorReg" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
-                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2} />
+                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="colorCV" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#f97316" stopOpacity={0.2}/>
-                            <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#f97316" stopOpacity={0.2} />
+                            <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
                           </linearGradient>
                           <linearGradient id="colorSim" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#a855f7" stopOpacity={0.2}/>
-                            <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
+                            <stop offset="5%" stopColor="#a855f7" stopOpacity={0.2} />
+                            <stop offset="95%" stopColor="#a855f7" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.15} />
@@ -394,8 +431,8 @@ export function AdminClient({
                     <div className="absolute top-[44%] left-[50%] -translate-x-[50%] -translate-y-[50%] text-center">
                       <span className="text-xs text-muted-foreground">Premium</span>
                       <p className="text-xl font-extrabold text-emerald-500">
-                        {stats.totalUsers > 0 
-                          ? `${((stats.premiumUsers / stats.totalUsers) * 100).toFixed(0)}%` 
+                        {stats.totalUsers > 0
+                          ? `${((stats.premiumUsers / stats.totalUsers) * 100).toFixed(0)}%`
                           : "0%"}
                       </p>
                     </div>
@@ -438,7 +475,7 @@ export function AdminClient({
                   <CardDescription>Gestiona las cuentas de los usuarios y configura accesos prioritarios.</CardDescription>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                  
+
                   {/* Búsqueda */}
                   <div className="relative w-full sm:w-64">
                     <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -628,7 +665,7 @@ export function AdminClient({
             </div>
           ) : userDetails ? (
             <div className="space-y-6 mt-4">
-              
+
               {/* Sección Currículums */}
               <div className="space-y-3">
                 <h3 className="text-sm font-bold flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
@@ -667,12 +704,12 @@ export function AdminClient({
                 ) : (
                   <div className="space-y-2 pl-6">
                     {userDetails.interviews.map((sim) => {
-                      const scoreColor = sim.score >= 80 
-                        ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20" 
-                        : sim.score >= 50 
-                          ? "text-amber-500 bg-amber-500/10 border-amber-500/20" 
+                      const scoreColor = sim.score >= 80
+                        ? "text-emerald-500 bg-emerald-500/10 border-emerald-500/20"
+                        : sim.score >= 50
+                          ? "text-amber-500 bg-amber-500/10 border-amber-500/20"
                           : "text-red-500 bg-red-500/10 border-red-500/20";
-                      
+
                       return (
                         <div key={sim.id} className="p-3 border rounded-lg flex justify-between items-center text-xs hover:border-zinc-300 dark:hover:border-zinc-700">
                           <div>
