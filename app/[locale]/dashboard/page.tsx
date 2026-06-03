@@ -3,6 +3,7 @@ import { getCVs } from "@/app/actions/cv";
 import { redirect } from "@/i18n/routing";
 import { auth } from "@/auth";
 import { DashboardClient } from "./DashboardClient";
+import { isAdmin as checkIsAdmin } from "@/lib/admin";
 
 export default async function DashboardPage({
   params,
@@ -16,12 +17,14 @@ export default async function DashboardPage({
   }
 
   const cvs = await getCVs();
+  const isUserAdmin = checkIsAdmin(session?.user?.email);
 
   return (
     <DashboardClient
       initialCvs={cvs}
       userName={session?.user?.name || "Usuario"}
       userImage={session?.user?.image}
+      isAdmin={isUserAdmin}
     />
   );
 }

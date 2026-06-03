@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { FileText, Plus, Trash2, Edit2, LogOut, Briefcase, Zap, Sparkles } from "lucide-react";
+import { FileText, Plus, Trash2, Edit2, LogOut, Briefcase, Zap, Sparkles, ShieldCheck } from "lucide-react";
 import { Link } from "@/i18n/routing";
 import { useRouter } from "@/i18n/routing";
 import { deleteCV } from "@/app/actions/cv";
@@ -66,11 +66,13 @@ function CVThumbnail({ content }: { content: CVData }) {
 export function DashboardClient({
   initialCvs,
   userName,
-  userImage
+  userImage,
+  isAdmin
 }: {
   initialCvs: CVList[],
   userName: string,
-  userImage?: string | null
+  userImage?: string | null,
+  isAdmin?: boolean
 }) {
   const [cvs, setCvs] = useState(initialCvs);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -227,8 +229,14 @@ export function DashboardClient({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    {isAdmin && (
+                      <DropdownMenuItem onClick={() => router.push('/admin')} className="cursor-pointer">
+                        <ShieldCheck className="mr-2 h-4 w-4 text-emerald-500" />
+                        <span>Panel Admin</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/' })}>
-                      <LogOut className="mr-2 h-4 w-4" />
+                      <LogOut className="mr-2 h-4 w-4 text-red-600" />
                       <span>{t("logout")}</span>
                     </DropdownMenuItem>
                   </DropdownMenuContent>
