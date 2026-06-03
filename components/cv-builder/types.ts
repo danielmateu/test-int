@@ -48,7 +48,7 @@ export interface SpacingSettings {
 export interface CVTheme {
   color: string;
   font: string;
-  layout: "classic" | "two-column" | "minimalist" | "modern" | "corporate";
+  layout: "classic" | "two-column" | "minimalist" | "modern" | "corporate" | "creative" | "executive";
   typography?: TypographySettings;
   spacing?: SpacingSettings;
 }
@@ -74,7 +74,7 @@ export interface CVData {
   theme: CVTheme;
 }
 
-export function getHeaderDefaultSizes(layout: "classic" | "two-column" | "minimalist" | "modern" | "corporate") {
+export function getHeaderDefaultSizes(layout: "classic" | "two-column" | "minimalist" | "modern" | "corporate" | "creative" | "executive") {
   switch (layout) {
     case "classic":
       return { nameSize: 36, titleSize: 20 };
@@ -86,6 +86,10 @@ export function getHeaderDefaultSizes(layout: "classic" | "two-column" | "minima
       return { nameSize: 48, titleSize: 24 };
     case "corporate":
       return { nameSize: 48, titleSize: 20 };
+    case "creative":
+      return { nameSize: 42, titleSize: 20 };
+    case "executive":
+      return { nameSize: 32, titleSize: 14 };
     default:
       return { nameSize: 36, titleSize: 20 };
   }

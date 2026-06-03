@@ -34,6 +34,8 @@ const LAYOUTS = [
   { name: "Minimalista", value: "minimalist", description: "Limpio, centrado y sin distracciones visuales" },
   { name: "Moderno", value: "modern", description: "Vibrante y contemporáneo, con toques de color y tarjetas" },
   { name: "Corporativo", value: "corporate", description: "Estructurado, profesional y muy claro para entornos formales" },
+  { name: "Creativo (Banner)", value: "creative", description: "Cabecera llamativa con bloque de color completo y diseño moderno" },
+  { name: "Ejecutivo Elegante", value: "executive", description: "Diseño centrado con tipografía clásica y bordes finos tradicionales" },
 ];
 
 export function CVStyleEditor({ data, setData }: CVStyleEditorProps) {

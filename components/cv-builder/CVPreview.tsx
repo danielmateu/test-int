@@ -1136,6 +1136,79 @@ export function CVPreview({ data }: CVPreviewProps) {
             </div>
           </div>
         )}
+
+        {layout === "creative" && (
+          <div className="preview-page-padding print:px-[20mm] print:py-0">
+            <header className="bg-(--theme-color) text-white p-8 rounded-xl shadow-md flex justify-between items-center gap-6 mb-8 relative overflow-hidden break-inside-avoid print:rounded-none print:shadow-none">
+              <div className="absolute right-0 top-0 w-48 h-48 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+              <div className="flex-1">
+                <h1 
+                  className="text-4xl font-extrabold tracking-tight mb-2 uppercase drop-shadow-sm animate-pulse"
+                  style={{ fontSize: `${headerNameSize}px` }}
+                >
+                  {personalInfo.fullName || defaultName}
+                </h1>
+                <p 
+                  className="text-lg font-medium text-white/80 mb-4 tracking-wide"
+                  style={{ fontSize: `${headerTitleSize}px` }}
+                >
+                  {personalInfo.jobTitle || defaultTitle}
+                </p>
+                {/* White-styled contact details */}
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-white/95 font-medium">
+                  {personalInfo.email && <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 shrink-0 text-white/70" />{personalInfo.email}</span>}
+                  {personalInfo.phone && <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 shrink-0 text-white/70" />{personalInfo.phone}</span>}
+                  {personalInfo.location && <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 shrink-0 text-white/70" />{personalInfo.location}</span>}
+                  {personalInfo.linkedinUrl && <a href={personalInfo.linkedinUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-white hover:text-white/80 transition-colors"><Linkedin className="w-3.5 h-3.5 shrink-0 text-white/70" />LinkedIn</a>}
+                  {personalInfo.githubUrl && <a href={personalInfo.githubUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-white hover:text-white/80 transition-colors"><Github className="w-3.5 h-3.5 shrink-0 text-white/70" />GitHub</a>}
+                </div>
+              </div>
+              {personalInfo.imageUrl && (
+                <div className="w-24 h-24 shrink-0 overflow-hidden rounded-2xl border-4 border-white/20 shadow-lg">
+                  <img src={personalInfo.imageUrl} alt="Profile" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </header>
+            {SummarySection({})}
+            {ExperienceSection({})}
+            {EducationSection({})}
+            {ProjectsSection({})}
+            {SkillsSection({})}
+            {OtherSection({})}
+          </div>
+        )}
+
+        {layout === "executive" && (
+          <div className="preview-page-padding print:px-[22mm] print:py-0 font-serif">
+            <header className="border-y-2 border-double border-slate-300 py-6 mb-8 preview-section text-center break-inside-avoid">
+              <h1 
+                className="text-4xl font-bold text-slate-900 mb-1.5 tracking-wide font-serif"
+                style={{ fontSize: `${headerNameSize}px` }}
+              >
+                {personalInfo.fullName || defaultName}
+              </h1>
+              <p 
+                className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 font-sans"
+                style={{ fontSize: `${headerTitleSize}px` }}
+              >
+                {personalInfo.jobTitle || defaultTitle}
+              </p>
+              <div className="flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs text-slate-600 font-sans">
+                {personalInfo.email && <span className="flex items-center gap-1.5"><Mail className="w-3.5 h-3.5 shrink-0 text-(--theme-color)" />{personalInfo.email}</span>}
+                {personalInfo.phone && <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5 shrink-0 text-(--theme-color)" />{personalInfo.phone}</span>}
+                {personalInfo.location && <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 shrink-0 text-(--theme-color)" />{personalInfo.location}</span>}
+                {personalInfo.linkedinUrl && <a href={personalInfo.linkedinUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-slate-900 transition-colors"><Linkedin className="w-3.5 h-3.5 shrink-0 text-(--theme-color)" />LinkedIn</a>}
+                {personalInfo.githubUrl && <a href={personalInfo.githubUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 hover:text-slate-900 transition-colors"><Github className="w-3.5 h-3.5 shrink-0 text-(--theme-color)" />GitHub</a>}
+              </div>
+            </header>
+            {SummarySection({ centered: true })}
+            {ExperienceSection({ centered: true })}
+            {EducationSection({ centered: true })}
+            {ProjectsSection({ centered: true })}
+            {SkillsSection({ centered: true })}
+            {OtherSection({ centered: true })}
+          </div>
+        )}
         </div>
 
         {/* Elemento oculto para medir exactamente 297mm en el DPI de la pantalla actual */}
