@@ -20,7 +20,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { 
   Sparkles, Loader2, Award, ArrowRight, RefreshCw, AlertTriangle, CheckCircle2, 
-  ChevronRight, ChevronDown, Building2, User, MessageSquare, Trash2
+  ChevronRight, ChevronDown, Building2, User, MessageSquare, Trash2,
+  Mic, MicOff, Volume2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -65,6 +66,88 @@ interface InterviewSimulatorProps {
   onUpgradeClick?: () => void;
 }
 
+const voiceTranslations: Record<string, {
+  micTooltip: string;
+  micListening: string;
+  micError: string;
+  micUnsupported: string;
+  speakQuestion: string;
+  stopSpeaking: string;
+  voiceTextToggle: string;
+  recordingActive: string;
+}> = {
+  es: {
+    micTooltip: "Responder por voz (Voice-to-Text)",
+    micListening: "Escuchando... habla ahora. Clica para detener.",
+    micError: "Error de acceso al micrófono. Comprueba los permisos en tu navegador.",
+    micUnsupported: "El reconocimiento de voz no está soportado en este navegador.",
+    speakQuestion: "Escuchar pregunta (Text-to-Speech)",
+    stopSpeaking: "Detener voz",
+    voiceTextToggle: "Escritura manual",
+    recordingActive: "Grabando respuesta..."
+  },
+  en: {
+    micTooltip: "Answer by voice (Voice-to-Text)",
+    micListening: "Listening... speak now. Click to stop.",
+    micError: "Microphone access error. Check your browser permissions.",
+    micUnsupported: "Speech recognition is not supported in this browser.",
+    speakQuestion: "Listen to question (Text-to-Speech)",
+    stopSpeaking: "Stop audio",
+    voiceTextToggle: "Type manually",
+    recordingActive: "Recording answer..."
+  },
+  ca: {
+    micTooltip: "Respondre per veu (Voice-to-Text)",
+    micListening: "Escoltant... parla ara. Clica per aturar.",
+    micError: "Error d'accés al micròfon. Comprova els permisos al navegador.",
+    micUnsupported: "El reconeixement de veu no és compatible amb aquest navegador.",
+    speakQuestion: "Escoltar pregunta (Text-to-Speech)",
+    stopSpeaking: "Aturar veu",
+    voiceTextToggle: "Escriptura manual",
+    recordingActive: "Enregistrant resposta..."
+  },
+  fr: {
+    micTooltip: "Répondre par voix (Voice-to-Text)",
+    micListening: "Écoute en cours... parlez maintenant. Cliquez pour arrêter.",
+    micError: "Erreur d'accès au microphone. Vérifiez les permissions du navigateur.",
+    micUnsupported: "La reconnaissance vocale n'est pas supportée par ce navigateur.",
+    speakQuestion: "Écouter la question (Text-to-Speech)",
+    stopSpeaking: "Arrêter l'audio",
+    voiceTextToggle: "Écrire manuellement",
+    recordingActive: "Enregistrement de la réponse..."
+  },
+  de: {
+    micTooltip: "Per Sprache antworten (Voice-to-Text)",
+    micListening: "Zuhören... jetzt sprechen. Klicken zum Stoppen.",
+    micError: "Fehler beim Mikrofonzugriff. Überprüfen Sie die Browserberechtigungen.",
+    micUnsupported: "Spracherkennung wird in diesem Browser nicht unterstützt.",
+    speakQuestion: "Frage anhören (Text-to-Speech)",
+    stopSpeaking: "Audio stoppen",
+    voiceTextToggle: "Manuell eingeben",
+    recordingActive: "Antwort wird aufgenommen..."
+  },
+  it: {
+    micTooltip: "Rispondi a voce (Voice-to-Text)",
+    micListening: "Ascolto... parla ora. Clicca per fermare.",
+    micError: "Errore di accesso al microfono. Controlla i permessi del browser.",
+    micUnsupported: "Il riconoscimento vocale non è supportato in questo browser.",
+    speakQuestion: "Ascolta la domanda (Text-to-Speech)",
+    stopSpeaking: "Ferma audio",
+    voiceTextToggle: "Scrittura manuale",
+    recordingActive: "Registrazione resposta..."
+  },
+  pt: {
+    micTooltip: "Responder por voz (Voice-to-Text)",
+    micListening: "Ouvindo... fale agora. Clique para parar.",
+    micError: "Erro de acesso ao microfone. Verifique as permissões do navegador.",
+    micUnsupported: "O reconhecimento de voz não é suportado neste navegador.",
+    speakQuestion: "Ouvir pergunta (Text-to-Speech)",
+    stopSpeaking: "Parar áudio",
+    voiceTextToggle: "Digitação manual",
+    recordingActive: "Gravando resposta..."
+  }
+};
+
 export function InterviewSimulator({
   cvs,
   applications,
@@ -74,6 +157,7 @@ export function InterviewSimulator({
   const t = useTranslations("Dashboard");
   const locale = useLocale();
   const router = useRouter();
+  const voiceTrans = voiceTranslations[locale] || voiceTranslations["es"];
 
   const [step, setStep] = useState<"setup" | "questions" | "results">("setup");
   const [isLoading, setIsLoading] = useState(false);
@@ -103,6 +187,153 @@ export function InterviewSimulator({
   const [useLocalHistory, setUseLocalHistory] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(true);
   const [recordToDeleteId, setRecordToDeleteId] = useState<string | null>(null);
+
+  // Voice Simulator States and Ref
+  const [isRecording, setIsRecording] = useState(false);
+  const [isPlayingQuestion, setIsPlayingQuestion] = useState(false);
+  const recognitionRef = React.useRef<any>(null);
+
+  const startRecording = () => {
+    if (typeof window === "undefined") return;
+
+    // Stop Text-to-Speech if active
+    stopSpeaking();
+
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error(voiceTranslations[locale]?.micUnsupported || voiceTranslations["en"].micUnsupported);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      const langMap: Record<string, string> = {
+        es: "es-ES",
+        en: "en-US",
+        fr: "fr-FR",
+        de: "de-DE",
+        it: "it-IT",
+        pt: "pt-BR",
+        ca: "ca-ES"
+      };
+      recognition.lang = langMap[locale] || "es-ES";
+
+      const initialAnswer = answers[currentQuestionIdx] || "";
+
+      recognition.onstart = () => {
+        setIsRecording(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        let interimTranscript = "";
+        let finalTranscript = "";
+
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+
+        const currentTranscript = (initialAnswer ? initialAnswer + " " : "") + finalTranscript + interimTranscript;
+        setAnswers(prev => {
+          const next = [...prev];
+          next[currentQuestionIdx] = currentTranscript;
+          return next;
+        });
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error:", event.error);
+        setIsRecording(false);
+        if (event.error === "not-allowed") {
+          toast.error(voiceTranslations[locale]?.micError || voiceTranslations["en"].micError);
+        } else if (event.error !== "aborted") {
+          toast.error(`Error: ${event.error}`);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err: any) {
+      console.error("Speech recognition initialization error:", err);
+      toast.error("No se pudo iniciar el reconocimiento de voz.");
+    }
+  };
+
+  const stopRecording = () => {
+    if (recognitionRef.current) {
+      try {
+        recognitionRef.current.stop();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    setIsRecording(false);
+  };
+
+  const speakQuestion = (text: string) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+
+    // Stop voice recording if active
+    stopRecording();
+
+    if (isPlayingQuestion) {
+      window.speechSynthesis.cancel();
+      setIsPlayingQuestion(false);
+      return;
+    }
+
+    // Stop any ongoing synthesis
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    const langMap: Record<string, string> = {
+      es: "es-ES",
+      en: "en-US",
+      fr: "fr-FR",
+      de: "de-DE",
+      it: "it-IT",
+      pt: "pt-BR",
+      ca: "ca-ES"
+    };
+    utterance.lang = langMap[locale] || "es-ES";
+
+    utterance.onend = () => {
+      setIsPlayingQuestion(false);
+    };
+    utterance.onerror = () => {
+      setIsPlayingQuestion(false);
+    };
+
+    setIsPlayingQuestion(true);
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeaking = () => {
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setIsPlayingQuestion(false);
+  };
+
+  // Detener voz y grabación al cambiar de pregunta o salir de la sección de preguntas
+  useEffect(() => {
+    stopRecording();
+    stopSpeaking();
+    return () => {
+      stopRecording();
+      stopSpeaking();
+    };
+  }, [currentQuestionIdx, step]);
 
   const loadHistory = async () => {
     setIsLoadingHistory(true);
@@ -237,6 +468,8 @@ export function InterviewSimulator({
   const handleSubmitInterview = async () => {
     if (!activeCV) return;
 
+    stopRecording();
+    stopSpeaking();
     setIsEvaluating(true);
     try {
       const QA = questions.map((q, idx) => ({
@@ -626,33 +859,100 @@ export function InterviewSimulator({
                     transition={{ duration: 0.2 }}
                     className="space-y-4"
                   >
-                    <div className="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-xl border flex gap-3.5 items-start">
-                      <div className="w-10 h-10 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm">
-                        Q
+                    <div className="bg-zinc-50 dark:bg-zinc-950 p-6 rounded-xl border flex flex-col sm:flex-row gap-4 items-start justify-between">
+                      <div className="flex gap-3.5 items-start grow">
+                        <div className="w-10 h-10 shrink-0 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold text-sm">
+                          Q
+                        </div>
+                        <div className="space-y-1 grow">
+                          <span className="text-[10px] uppercase font-bold text-primary tracking-wide block">Pregunta de Reclutador IA</span>
+                          <p className="text-xs font-bold text-foreground leading-relaxed">
+                            {questions[currentQuestionIdx]}
+                          </p>
+                        </div>
                       </div>
-                      <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-bold text-primary tracking-wide block">Pregunta de Reclutador IA</span>
-                        <p className="text-xs font-bold text-foreground leading-relaxed">
-                          {questions[currentQuestionIdx]}
-                        </p>
-                      </div>
+                      
+                      {/* Text-to-Speech button */}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => speakQuestion(questions[currentQuestionIdx])}
+                        className="h-8 text-[11px] rounded-lg cursor-pointer flex items-center gap-1.5 px-3 self-end sm:self-start hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                      >
+                        {isPlayingQuestion ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 text-rose-500 animate-spin" />
+                            {voiceTrans.stopSpeaking}
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3.5 h-3.5 text-primary" />
+                            {voiceTrans.speakQuestion}
+                          </>
+                        )}
+                      </Button>
                     </div>
 
                     <div className="space-y-2 pt-2">
-                      <label className="text-xs font-bold text-foreground block flex items-center gap-1.5">
-                        <User className="w-3.5 h-3.5 text-primary" />
-                        {t("interviewYourAnswerLabel")}
-                      </label>
-                      <Textarea
-                        value={answers[currentQuestionIdx]}
-                        onChange={(e) => {
-                          const newAns = [...answers];
-                          newAns[currentQuestionIdx] = e.target.value;
-                          setAnswers(newAns);
-                        }}
-                        placeholder={t("interviewPlaceholderAnswer")}
-                        className="w-full h-44 rounded-xl text-xs bg-zinc-50/20 dark:bg-zinc-950/20 resize-none p-3.5 focus:ring-1 focus:ring-primary outline-none"
-                      />
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-bold text-foreground block flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-primary" />
+                          {t("interviewYourAnswerLabel")}
+                        </label>
+                        
+                        {isRecording && (
+                          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-rose-500/10 border border-rose-500/20 rounded-full text-[10px] text-rose-600 dark:text-rose-400 font-bold animate-pulse">
+                            {voiceTrans.recordingActive}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="relative">
+                        <Textarea
+                          value={answers[currentQuestionIdx]}
+                          onChange={(e) => {
+                            const newAns = [...answers];
+                            newAns[currentQuestionIdx] = e.target.value;
+                            setAnswers(newAns);
+                          }}
+                          placeholder={t("interviewPlaceholderAnswer")}
+                          className="w-full h-44 rounded-xl text-xs bg-zinc-50/20 dark:bg-zinc-950/20 resize-none p-3.5 pr-14 focus:ring-1 focus:ring-primary outline-none"
+                        />
+                        
+                        {/* Mic recording button inside Textarea */}
+                        <div className="absolute bottom-3.5 right-3.5">
+                          <button
+                            type="button"
+                            onClick={isRecording ? stopRecording : startRecording}
+                            className={`w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-md transition-all duration-300 ${
+                              isRecording 
+                                ? "bg-rose-500 hover:bg-rose-600 text-white animate-pulse ring-4 ring-rose-500/20" 
+                                : "bg-primary hover:bg-primary/90 text-white hover:scale-105"
+                            }`}
+                            title={isRecording ? voiceTrans.micListening : voiceTrans.micTooltip}
+                          >
+                            {isRecording ? (
+                              <MicOff className="w-4 h-4" />
+                            ) : (
+                              <Mic className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Waveform graphic visualization */}
+                      {isRecording && (
+                        <div className="flex items-center gap-2 px-3.5 py-2.5 bg-rose-500/5 dark:bg-rose-500/10 border border-rose-500/10 rounded-xl text-[11px] text-rose-600 dark:text-rose-400 font-medium">
+                          <div className="flex gap-0.5 items-center h-3">
+                            <span className="w-0.75 h-3 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
+                            <span className="w-0.75 h-2 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
+                            <span className="w-0.75 h-3.5 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+                            <span className="w-0.75 h-1.5 bg-rose-500 rounded-full animate-bounce" style={{ animationDelay: "450ms" }} />
+                          </div>
+                          <span>{voiceTrans.micListening}</span>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 </AnimatePresence>
