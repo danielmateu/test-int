@@ -108,15 +108,24 @@ function BuilderPageContent() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      loadCV(cvId || undefined).then((data) => {
-        if (data) {
-          const content = data.content;
-          if (!content.projects) content.projects = [];
-          if (!content.other) content.other = "";
-          setCvData(content);
-          toast.success("CV cargado correctamente desde la nube");
-        }
-      }).catch(console.error);
+      if (cvId) {
+        loadCV(cvId).then((data) => {
+          if (data) {
+            const content = data.content;
+            if (!content.projects) content.projects = [];
+            if (!content.other) content.other = "";
+            setCvData(content);
+            toast.success("CV cargado correctamente desde la nube");
+          }
+        }).catch(console.error);
+      } else {
+        // Reset to blank CV when creating a new one
+        setCvData(JSON.parse(JSON.stringify(initialData)));
+      }
+    } else if (status === "unauthenticated") {
+      if (!cvId) {
+        setCvData(JSON.parse(JSON.stringify(initialData)));
+      }
     }
   }, [status, cvId]);
 
