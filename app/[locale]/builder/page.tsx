@@ -69,9 +69,14 @@ function BuilderPageContent() {
   const router = useRouter();
   const locale = (params?.locale as string) || "es";
 
+  const [mounted, setMounted] = useState(false);
   const [cvData, setCvData] = useState<CVData>(initialData);
   const [isSaving, setIsSaving] = useState(false);
   const { data: session, status } = useSession();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Persistent ATS Keyword Optimizer state to prevent loss on tab switches
   const [atsAnalysis, setAtsAnalysis] = useState<ATSJobFitAnalysis | null>(null);
@@ -160,7 +165,7 @@ function BuilderPageContent() {
       `}} />
 
       {/* Demo mode banner */}
-      {status === "unauthenticated" && (
+      {mounted && status === "unauthenticated" && (
         <div className="bg-linear-to-r from-primary/90 via-purple-600/90 to-blue-600/90 text-white text-sm py-2.5 px-4 flex items-center justify-center gap-3 print:hidden flex-wrap">
           <Sparkles className="w-4 h-4 shrink-0" />
           <span className="text-center">Estás usando el <strong>modo demo</strong> — tu CV no se guardará. Regístrate gratis para guardar y exportar tu trabajo.</span>
@@ -180,7 +185,7 @@ function BuilderPageContent() {
         <nav className="container flex h-16 items-center justify-between px-4 md:px-8 max-w-full">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" asChild className="shrink-0">
-              <Link href={status === "authenticated" ? "/dashboard" : "/"}>
+              <Link href={mounted && status === "authenticated" ? "/dashboard" : "/"}>
                 <ArrowLeft className="w-5 h-5" />
               </Link>
             </Button>
@@ -197,7 +202,7 @@ function BuilderPageContent() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            {status === "authenticated" ? (
+            {mounted && status === "authenticated" ? (
               <>
                 <Button onClick={handleSave} disabled={isSaving} variant="outline" className="gap-2">
                   <Save className="w-4 h-4" />
@@ -251,7 +256,7 @@ function BuilderPageContent() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </>
-            ) : status === "unauthenticated" ? (
+            ) : mounted && status === "unauthenticated" ? (
               <Button asChild variant="outline" className="mr-2">
                 <Link href="/login">Iniciar Sesión para guardar</Link>
               </Button>
@@ -277,7 +282,7 @@ function BuilderPageContent() {
               </TabsTrigger>
             </TabsList>
             <TabsContent value="content" className="mt-0 outline-none">
-              <CVForm data={cvData} setData={setCvData} status={status} />
+              <CVForm data={cvData} setData={setCvData} status={mounted ? status : "loading"} />
             </TabsContent>
             <TabsContent value="styles" className="mt-0 outline-none">
               <CVStyleEditor data={cvData} setData={setCvData} />
