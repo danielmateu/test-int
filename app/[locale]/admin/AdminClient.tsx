@@ -33,6 +33,7 @@ import { toast } from "sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ModeToggle } from "@/components/mode-toggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "@/i18n/routing";
 import {
   Dialog,
@@ -690,9 +691,63 @@ export function AdminClient({
           </DialogHeader>
 
           {loadingDetails ? (
-            <div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
-              <RefreshCw className="w-8 h-8 animate-spin" />
-              Cargando expediente del usuario...
+            <div className="space-y-6 mt-4">
+              {/* Sección Currículums Skeleton */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-4 h-4 text-blue-500" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
+                  {Array.from({ length: 2 }).map((_, idx) => (
+                    <div key={idx} className="p-3 border rounded-lg flex items-center justify-between text-xs">
+                      <div className="space-y-2 grow mr-4">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                      <Skeleton className="h-5 w-16 shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sección Entrevistas Skeleton */}
+              <div className="space-y-3 border-t pt-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-violet-500" />
+                  <Skeleton className="h-4 w-52" />
+                </div>
+                <div className="space-y-2 pl-6">
+                  {Array.from({ length: 2 }).map((_, idx) => (
+                    <div key={idx} className="p-3 border rounded-lg flex justify-between items-center text-xs">
+                      <div className="space-y-2 grow mr-4">
+                        <Skeleton className="h-4 w-2/3" />
+                        <Skeleton className="h-3 w-1/3" />
+                      </div>
+                      <Skeleton className="h-6 w-16 rounded-full shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sección Postulaciones Skeleton */}
+              <div className="space-y-3 border-t pt-4">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-orange-500" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pl-6">
+                  {Array.from({ length: 2 }).map((_, idx) => (
+                    <div key={idx} className="p-3 border rounded-lg flex justify-between items-center text-xs">
+                      <div className="space-y-2 grow mr-4">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                      <Skeleton className="h-5 w-16 shrink-0" />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : userDetails ? (
             <div className="space-y-6 mt-4">

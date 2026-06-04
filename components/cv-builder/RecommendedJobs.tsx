@@ -16,6 +16,7 @@ import { generateCoverLetterAction, tailorCVAction } from "@/app/actions/ai";
 import { saveCoverLetterToCV, saveCV } from "@/app/actions/cv";
 import { addJobApplication, getJobApplications } from "@/app/actions/tracker";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface RecommendedJobsProps {
   cvId: string;
@@ -490,9 +491,32 @@ export function RecommendedJobs({
 
       {/* Job Grid / Empty State */}
       {isPending && jobs.length === 0 ? (
-        <div className="h-64 flex flex-col items-center justify-center space-y-4">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-muted-foreground text-sm">Buscando ofertas compatibles...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <Card key={idx} className="h-full flex flex-col border-border/60 bg-white dark:bg-zinc-900 overflow-hidden relative p-6 space-y-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4.5 w-20 rounded-full" />
+                <Skeleton className="h-6 w-3/4 rounded" />
+              </div>
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-12 w-12 rounded-full shrink-0" />
+                <div className="space-y-1.5 grow">
+                  <Skeleton className="h-3.5 w-1/2 rounded" />
+                  <Skeleton className="h-3.5 w-1/3 rounded" />
+                </div>
+              </div>
+              <div className="space-y-2 py-2">
+                <Skeleton className="h-3 w-full rounded" />
+                <Skeleton className="h-3 w-full rounded" />
+                <Skeleton className="h-3 w-5/6 rounded" />
+              </div>
+              <div className="flex gap-2 pt-3 border-t">
+                <Skeleton className="h-9 grow rounded-lg" />
+                <Skeleton className="h-9 w-9 rounded-lg shrink-0" />
+                <Skeleton className="h-9 grow rounded-lg" />
+              </div>
+            </Card>
+          ))}
         </div>
       ) : filteredJobs.length === 0 ? (
         <Card className="border-dashed py-12 flex flex-col items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50">

@@ -41,6 +41,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Link } from "@/i18n/routing";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CVList {
   id: string;
@@ -353,9 +354,45 @@ export function JobTracker({ cvs, isPremium = false, onUpgradeClick }: JobTracke
 
       {/* Kanban Columns */}
       {isLoading && applications.length === 0 ? (
-        <div className="h-64 flex flex-col items-center justify-center space-y-4">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-muted-foreground text-sm">Cargando tablero Kanban...</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start">
+          {columns.map((col) => {
+            const titleKey = `stage${col.id.charAt(0).toUpperCase() + col.id.slice(1)}`;
+            return (
+              <div 
+                key={col.id} 
+                className={`rounded-xl border ${col.borderClass} ${col.bgClass} flex flex-col min-h-48 overflow-hidden shadow-xs`}
+              >
+                {/* Column Header Skeleton */}
+                <div className={`p-3.5 border-b font-bold flex justify-between items-center ${col.bgHeaderClass}`}>
+                  <span className="text-xs uppercase tracking-wider">{t(titleKey)}</span>
+                  <Skeleton className="h-4 w-6 rounded-full" />
+                </div>
+
+                {/* Cards Container Skeleton */}
+                <div className="p-3 space-y-3">
+                  {Array.from({ length: col.id === "saved" || col.id === "applied" ? 2 : 1 }).map((_, idx) => (
+                    <Card key={idx} className="bg-white dark:bg-zinc-900 p-3.5 border-border/70 space-y-3">
+                      <div className="space-y-1.5">
+                        <Skeleton className="h-3 w-16" />
+                        <Skeleton className="h-4.5 w-5/6" />
+                      </div>
+                      <div className="space-y-1">
+                        <Skeleton className="h-3 w-2/3" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                      <div className="flex justify-between items-center pt-2.5 border-t border-border/30">
+                        <div className="flex gap-1">
+                          <Skeleton className="h-6 w-6 rounded" />
+                          <Skeleton className="h-6 w-6 rounded" />
+                        </div>
+                        <Skeleton className="h-6 w-6 rounded" />
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       ) : applications.length === 0 ? (
         <Card className="border-dashed py-16 flex flex-col items-center justify-center bg-zinc-50/50 dark:bg-zinc-900/50">

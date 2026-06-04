@@ -27,9 +27,80 @@ import {
 import { 
   TrendingUp, Award, Briefcase, Sparkles, RefreshCw, FileText, CheckCircle2, AlertTriangle, Loader2 
 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AnalyticsProps {
   cvsCount: number;
+}
+
+function AnalyticsSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* KPI Dashboard Grid Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {Array.from({ length: 4 }).map((_, idx) => (
+          <Card key={idx} className="bg-white dark:bg-zinc-900 border border-border/50 shadow-xs p-6 space-y-4">
+            <div className="flex justify-between items-center">
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="h-8 w-8 rounded-full" />
+            </div>
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-12" />
+              <Skeleton className="h-3.5 w-5/6" />
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Charts Grid Skeleton */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Card 1: Embudo */}
+        <Card className="bg-white dark:bg-zinc-900 border border-border/40 p-6 space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-3 w-3/4" />
+          </div>
+          <div className="space-y-4 py-4 h-64 flex flex-col justify-between">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="flex items-center gap-4">
+                <Skeleton className="h-3.5 w-20 shrink-0" />
+                <Skeleton className="h-4 rounded-r" style={{ width: `${80 - i * 15}%` }} />
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Card 2: Donut */}
+        <Card className="bg-white dark:bg-zinc-900 border border-border/40 p-6 space-y-6">
+          <div className="space-y-2">
+            <Skeleton className="h-5 w-48" />
+            <Skeleton className="h-3 w-3/4" />
+          </div>
+          <div className="flex flex-col sm:flex-row items-center justify-around gap-6 h-64">
+            <div className="relative w-36 h-36 flex items-center justify-center shrink-0">
+              <div className="absolute inset-0 rounded-full border-12 border-accent animate-pulse" />
+              <Skeleton className="h-16 w-16 rounded-full" />
+            </div>
+            <div className="space-y-4 grow max-w-sm w-full">
+              <div className="space-y-2">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Skeleton className="h-3 w-3 rounded-full shrink-0" />
+                    <Skeleton className="h-3 w-2/3" />
+                  </div>
+                ))}
+              </div>
+              <div className="border-t pt-3 space-y-2">
+                <Skeleton className="h-3 w-24" />
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-5/6" />
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
 }
 
 export function Analytics({ cvsCount }: AnalyticsProps) {
@@ -80,13 +151,7 @@ export function Analytics({ cvsCount }: AnalyticsProps) {
     loadData();
   }, []);
 
-  if (!mounted) {
-    return (
-      <div className="h-96 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
-      </div>
-    );
-  }
+  const showSkeleton = !mounted || (isLoading && applications.length === 0 && interviews.length === 0);
 
   // --- CÁLCULO DE MÉTRICAS CLAVE ---
   const totalApps = applications.length;
@@ -146,11 +211,8 @@ export function Analytics({ cvsCount }: AnalyticsProps) {
         </Button>
       </div>
 
-      {isLoading && applications.length === 0 && interviews.length === 0 ? (
-        <div className="h-64 flex flex-col items-center justify-center space-y-4">
-          <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          <p className="text-muted-foreground text-sm">Cargando métricas de progreso...</p>
-        </div>
+      {showSkeleton ? (
+        <AnalyticsSkeleton />
       ) : (
         <>
           {/* KPI Dashboard Grid */}
