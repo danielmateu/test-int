@@ -925,3 +925,138 @@ ${JSON.stringify(cvData, null, 2)}
   );
 }
 
+/**
+ * Asistente de redacción inteligente (Copiloto IA) para generar o refinar secciones del currículum
+ */
+export async function generateCopilotContentAction(
+  prompt: string,
+  actionType: "generate" | "improve" | "shorten" | "star" | "grammar",
+  sectionContext: string,
+  locale: string = "es"
+): Promise<string> {
+  const session = await auth();
+  if (!session?.user) {
+    throw new Error("No autorizado");
+  }
+
+  if (!apiKey) {
+    throw new Error("La clave API de Gemini (GEMINI_API_KEY) no está configurada");
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
+
+  const isEn = locale.toLowerCase() === "en";
+
+  let systemPrompt = "Eres un redactor experto en talento, reclutamiento y optimización de currículums (CV). ";
+  if (isEn) {
+    systemPrompt = "You are a professional resume writer, talent acquisition specialist, and CV optimizer. ";
+  }
+
+  let instructions = "";
+  if (actionType === "generate") {
+    instructions = isEn
+      ? `Generate high-quality CV content from scratch based on the user's prompt: "${prompt}". `
+      : `Genera contenido de alta calidad para un currículum desde cero basado en la instrucción del usuario: "${prompt}". `;
+  } else if (actionType === "improve") {
+    instructions = isEn
+      ? `Improve the following text, making it sound more professional, impactful, and written with strong action verbs: "${prompt}". `
+      : `Mejora el siguiente texto, haciendo que suene más profesional, impactante y redactado con verbos de acción fuertes: "${prompt}". `;
+  } else if (actionType === "shorten") {
+    instructions = isEn
+      ? `Make the following text shorter, concise, and direct, preserving key information and achievements: "${prompt}". `
+      : `Haz el siguiente texto más corto, conciso y directo, preservando la información y logros clave: "${prompt}". `;
+  } else if (actionType === "star") {
+    instructions = isEn
+      ? `Structure and rewrite the following text using the STAR method (Situation, Task, Action, Result) focusing on measurable metrics and achievements: "${prompt}". `
+      : `Estructura y redacta el siguiente texto usando el método STAR (Situación, Tarea, Acción, Resultado) enfocándote en métricas y logros medibles: "${prompt}". `;
+  } else if (actionType === "grammar") {
+    instructions = isEn
+      ? `Correct any spelling, grammar, and syntax errors in the following text, polishing it to professional quality: "${prompt}". `
+      : `Corrige cualquier error ortográfico, gramatical y sintáctico en el siguiente texto, puliéndolo hasta lograr calidad profesional: "${prompt}". `;
+  }
+
+  // Pautas de contexto de sección
+  let contextGuideline = "";
+  if (sectionContext === "summary") {
+    contextGuideline = isEn
+      ? "This is for the Professional Summary section. Write a cohesive, short paragraph (3-4 lines maximum) highlighting key value, years of experience, and main domains."
+      : "Esto es para la sección de Perfil Profesional. Escribe un párrafo cohesivo y corto (máximo 3-4 líneas) que destaque el valor clave, años de experiencia y áreas principales de especialización.";
+  } else if (sectionContext === "experience") {
+    contextGuideline = isEn
+      ? "This is for the Work Experience description. Use clear bullet points starting with strong action verbs (e.g., Led, Developed, Optimized) highlighting responsibilities and measurable outcomes."
+      : "Esto es para la descripción de Experiencia Laboral. Utiliza viñetas claras que comiencen con verbos de acción fuertes (ej. Lideré, Desarrollé, Optimicé) destacando responsabilidades y resultados medibles.";
+  } else if (sectionContext === "education") {
+    contextGuideline = isEn
+      ? "This is for the Education description. Highlight major subjects, skills acquired, relevant academic projects, or honors."
+      : "Esto es para la descripción de Formación Académica. Destaca materias principales, habilidades adquiridas, proyectos académicos relevantes o menciones de honor.";
+  } else if (sectionContext === "projects") {
+    contextGuideline = isEn
+      ? "This is for a Project description. Detail the project goal, key technologies used, your specific role, and the results or impact achieved."
+      : "Esto es para la descripción de un Proyecto. Detalla el objetivo del proyecto, tecnologías clave empleadas, tu rol específico y los resultados o impacto logrados.";
+  } else if (sectionContext === "skills") {
+    contextGuideline = isEn
+      ? "This is for the Skills section. List relevant, modern keywords or tool names separated by commas."
+      : "Esto es para la sección de Habilidades. Lista palabras clave o herramientas relevantes y modernas separadas por comas.";
+  } else if (sectionContext === "coverLetter") {
+    contextGuideline = isEn
+      ? "This is for a Cover Letter. Write a professional, polite, and persuasive letter draft."
+      : "Esto es para una Carta de Presentación. Redacta un borrador de carta profesional, formal y persuasivo.";
+  }
+
+  const finalPrompt = `
+${instructions}
+${contextGuideline}
+
+REGLAS ESTRICTAS DE SALIDA:
+1. Devuelve ÚNICAMENTE el texto redactado/mejorado final. No incluyas explicaciones previas ni posteriores, no pongas introducciones del tipo "Aquí tienes tu texto:", ni comillas decorativas envolviendo el resultado.
+2. Escribe estrictamente en el idioma correspondiente al locale "${locale}".
+`;
+
+  const models = [
+    'gemini-3.1-flash-lite',
+    'gemini-3.0-flash',
+    'gemini-3.1-pro',
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+  ];
+
+  const requestPayload = {
+    contents: [{ role: 'user', parts: [{ text: finalPrompt }] }],
+    config: { 
+      systemInstruction: systemPrompt, 
+      temperature: 0.7 
+    },
+  };
+
+  let lastError: any;
+  for (const model of models) {
+    try {
+      const response = await ai.models.generateContent({ model, ...requestPayload });
+      const rawText = response.text?.trim() || "";
+      if (rawText) {
+        return rawText;
+      }
+    } catch (err: any) {
+      lastError = err;
+      const isModelError =
+        err?.status === 404 ||
+        err?.message?.includes('404') ||
+        err?.message?.includes('not found') ||
+        err?.message?.includes('not supported') ||
+        err?.message?.includes('NOT_FOUND');
+      const isRetriable =
+        err?.message?.includes('503') ||
+        err?.message?.includes('UNAVAILABLE') ||
+        err?.message?.includes('429') ||
+        err?.status === 503 ||
+        err?.status === 429;
+      if (!isRetriable && !isModelError) break;
+      console.warn(`Gemini Model ${model} no disponible, intentando con otro...`);
+    }
+  }
+
+  throw new Error(
+    lastError?.message || "No se pudo generar el texto con el copiloto IA. Inténtalo de nuevo."
+  );
+}
+

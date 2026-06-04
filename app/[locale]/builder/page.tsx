@@ -5,6 +5,7 @@ import { CVForm } from "@/components/cv-builder/CVForm";
 import { CVStyleEditor } from "@/components/cv-builder/CVStyleEditor";
 import { CVPreview } from "@/components/cv-builder/CVPreview";
 import { CVData } from "@/components/cv-builder/types";
+import { AICopilot } from "@/components/cv-builder/AICopilot";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Printer, ArrowLeft, Save, LogOut, User, Sparkles, Languages, Loader2 } from "lucide-react";
@@ -294,6 +295,9 @@ function BuilderPageContent() {
         </div>
 
       </main>
+
+      {/* Asistente Flotante Copiloto IA */}
+      <AICopilot data={cvData} setData={setCvData} />
     </div>
   );
 }
