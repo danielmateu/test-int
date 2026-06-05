@@ -641,10 +641,10 @@ export function RecommendedJobs({
                       )}
                     </CardContent>
 
-                    <CardFooter className="pt-3 border-t border-border/40 bg-zinc-50/50 dark:bg-zinc-900/50 flex justify-between gap-2">
-                      <Button variant="ghost" size="sm" className="w-full text-xs font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
+                    <CardFooter className="grid  grid-cols-2 gap-3">
+                      {/* <Button variant="ghost" size="sm" className="w-full text-xs font-semibold rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
                         {t("viewDetails")}
-                      </Button>
+                      </Button> */}
 
                       <Button
                         variant="outline"
@@ -658,14 +658,14 @@ export function RecommendedJobs({
 
                       <Button
                         size="sm"
-                        className="w-full text-xs font-semibold rounded-lg cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95"
+                        className="w-full text-xs font-semibold rounded-lg cursor-pointer bg-linear-to-r from-primary to-purple-600 hover:from-primary/95 hover:to-purple-600/95 truncate"
                         onClick={(e) => {
                           e.stopPropagation();
                           window.open(job.applyUrl, "_blank");
                         }}
                       >
                         {t("applyNow")}
-                        <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                        {/* <ExternalLink className="w-3.5 h-3.5 ml-1" /> */}
                       </Button>
                     </CardFooter>
                   </Card>
